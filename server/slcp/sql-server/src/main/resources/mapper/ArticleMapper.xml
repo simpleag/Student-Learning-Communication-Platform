@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zwp.slcp.sqlserver.mapper.ArticleMapper" >
+  <resultMap id="BaseResultMap" type="com.zwp.slcp.apicommon.entity.Article" >
+    <id column="article_id" property="articleId" jdbcType="BIGINT" />
+    <result column="article_author_Id" property="articleAuthorId" jdbcType="BIGINT" />
+    <result column="article_title" property="articleTitle" jdbcType="VARCHAR" />
+    <result column="article_content" property="articleContent" jdbcType="VARCHAR" />
+    <result column="article_comment_number" property="articleCommentNumber" jdbcType="INTEGER" />
+    <result column="article_tag_id" property="articleTagId" jdbcType="INTEGER" />
+    <result column="article_state" property="articleState" jdbcType="INTEGER" />
+    <result column="article_pic_url" property="articlePicUrl" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="BIGINT" />
+    <result column="update_time" property="updateTime" jdbcType="BIGINT" />
+  </resultMap>
+  <resultMap id="FullResultMap" type="com.zwp.slcp.apicommon.entity.HomeArticle" >
+    <id column="article_id" property="articleId" jdbcType="BIGINT" />
+    <result column="article_author_Id" property="articleAuthorId" jdbcType="BIGINT" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="author_pic_url" property="authorPicUrl" jdbcType="VARCHAR" />
+    <result column="article_title" property="articleTitle" jdbcType="VARCHAR" />
+    <result column="article_comment_number" property="articleCommentNumber" jdbcType="INTEGER" />
+    <result column="article_tag_id" property="articleTagId" jdbcType="INTEGER" />
+    <result column="article_state" property="articleState" jdbcType="INTEGER" />
+    <result column="article_pic_url" property="articlePicUrl" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="BIGINT" />
+    <result column="update_time" property="updateTime" jdbcType="BIGINT" />
+    <result column="approve_number" property="approveNumber" jdbcType="INTEGER" />
+    <result column="favorite_number" property="favoriteNumber" jdbcType="INTEGER" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="user_pic_url" property="userPicUrl" jdbcType="VARCHAR" />
+    <result column="tag_name" property="tagName" jdbcType="VARCHAR" />
+    <result column="user_approve_type" property="userApproveType" jdbcType="INTEGER" />
+    <result column="user_favorite_type" property="userFavoriteType" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="DetailResultMap" type="com.zwp.slcp.apicommon.entity.DetailArticle" >
+    <id column="article_id" property="articleId" jdbcType="BIGINT" />
+    <result column="article_author_Id" property="articleAuthorId" jdbcType="BIGINT" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="user_honor" property="userHonor" jdbcType="VARCHAR" />
+    <result column="author_pic_url" property="authorPicUrl" jdbcType="VARCHAR" />
+    <result column="article_title" property="articleTitle" jdbcType="VARCHAR" />
+    <result column="article_content" property="articleContent" jdbcType="VARCHAR" />
+    <result column="article_comment_number" property="articleCommentNumber" jdbcType="INTEGER" />
+    <result column="article_tag_id" property="articleTagId" jdbcType="INTEGER" />
+    <result column="article_state" property="articleState" jdbcType="INTEGER" />
+    <result column="article_pic_url" property="articlePicUrl" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="BIGINT" />
+    <result column="update_time" property="updateTime" jdbcType="BIGINT" />
+    <result column="approve_number" property="approveNumber" jdbcType="INTEGER" />
+    <result column="favorite_number" property="favoriteNumber" jdbcType="INTEGER" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="user_honor" property="userHonor" jdbcType="VARCHAR" />
+    <result column="user_pic_url" property="userPicUrl" jdbcType="VARCHAR" />
+    <result column="tag_name" property="tagName" jdbcType="VARCHAR" />
+    <result column="user_approve_type" property="userApproveType" jdbcType="INTEGER" />
+    <result column="user_favorite_type" property="userFavoriteType" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    article_id, article_author_Id, article_title, article_content, article_comment_number, 
+    article_tag_id, article_state, article_pic_url, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from article
+    where article_id = #{articleId,jdbcType=BIGINT}
+  </select>
+  <select id="selectArticleHomeOrderByTime" resultMap="FullResultMap" parameterType="java.lang.Long">
+    select distinct a.article_id as article_id, article_author_Id, article_title, article_comment_number,
+    article_tag_id, article_state, article_pic_url,user_name,user_pic_url,tag_name, (
+		select count(1)
+        from map_user_article as m
+        WHERE m.article_id = a.article_id AND m.user_approve_type = 1
+
+    ) as approve_number, (select count(1)
+        from map_user_article as m
+        WHERE m.article_id = a.article_id AND m.user_favorite_type = 1
+
+        ) as favorite_number, (
+			select m2.user_approve_type
+            from map_user_article as m2
+            WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.article_id = a.article_id
+        ) as user_approve_type,
+        (
+			select m3.user_favorite_type
+            from map_user_article as m3
+            WHERE m3.user_id = #{userId,jdbcType=BIGINT} AND m3.article_id = a.article_id
+        ) as user_favorite_type, a.create_time as create_time , a.update_time as update_time
+
+FROM article as a,map_user_article as m,user as u, tag as t
+WHERE   u.user_id = a.article_author_Id AND a.article_tag_id = t.tag_id
+order by a.update_time DESC
+
+  </select>
+
+  <select id="selectArticleHomeOrderByHot" resultMap="FullResultMap" parameterType="java.lang.Long">
+    select distinct a.article_id as article_id, article_author_Id, article_title, article_comment_number,
+    article_tag_id, article_state, article_pic_url,user_name,user_pic_url,tag_name, (
+    select count(1)
+    from map_user_article as m
+    WHERE m.article_id = a.article_id AND m.user_approve_type = 1
+
+    ) as approve_number, (select count(1)
+    from map_user_article as m
+    WHERE m.article_id = a.article_id AND m.user_favorite_type = 1
+
+    ) as favorite_number, (
+    select m2.user_approve_type
+    from map_user_article as m2
+    WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.article_id = a.article_id
+    ) as user_approve_type,
+    (
+    select m3.user_favorite_type
+    from map_user_article as m3
+    WHERE m3.user_id = #{userId,jdbcType=BIGINT} AND m3.article_id = a.article_id
+    ) as user_favorite_type
+
+    FROM article as a,map_user_article as m,user as u, tag as t
+    WHERE  u.user_id = a.article_author_Id AND a.article_tag_id = t.tag_id
+    order by a.article_comment_number DESC
+
+  </select>
+  <select id="selectTagsArticleOrderByTime" resultMap="FullResultMap" >
+    select distinct a.article_id as article_id, article_author_Id, article_title, article_comment_number,
+    article_tag_id, article_state, article_pic_url,user_name,user_pic_url,tag_name, (
+		select count(1)
+        from map_user_article as m
+        WHERE m.article_id = a.article_id AND m.user_approve_type = 1
+
+    ) as approve_number, (select count(1)
+        from map_user_article as m
+        WHERE m.article_id = a.article_id AND m.user_favorite_type = 1
+
+        ) as favorite_number, (
+			select m2.user_approve_type
+            from map_user_article as m2
+            WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.article_id = a.article_id
+        ) as user_approve_type,
+        (
+			select m3.user_favorite_type
+            from map_user_article as m3
+            WHERE m3.user_id = #{userId,jdbcType=BIGINT} AND m3.article_id = a.article_id
+        ) as user_favorite_type , a.create_time as create_time , a.update_time as update_time
+
+FROM article as a,map_user_article as m,user as u, tag as t
+WHERE t.tag_id = #{tagId,jdbcType=INTEGER}
+AND a.article_tag_id = t.tag_id
+AND u.user_id = a.article_author_Id
+
+order by a.update_time DESC
+  </select>
+  <select id="selectTagsArticleOrderByHot" resultMap="FullResultMap" >
+    select distinct a.article_id as article_id as article_id, article_author_Id, article_title, article_comment_number,
+    article_tag_id, article_state, article_pic_url,user_name,user_pic_url,tag_name, (
+    select count(1)
+    from map_user_article as m
+    WHERE m.article_id = a.article_id AND m.user_approve_type = 1
+
+    ) as approve_number, (select count(1)
+    from map_user_article as m
+    WHERE m.article_id = a.article_id AND m.user_favorite_type = 1
+
+    ) as favorite_number, (
+    select m2.user_approve_type
+    from map_user_article as m2
+    WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.article_id = a.article_id
+    ) as user_approve_type,
+    (
+    select m3.user_favorite_type
+    from map_user_article as m3
+    WHERE m3.user_id = #{userId,jdbcType=BIGINT} AND m3.article_id = a.article_id
+    ) as user_favorite_type , a.create_time as create_time , a.update_time as update_time
+
+    FROM article as a,map_user_article as m,user as u, tag as t
+    WHERE t.tag_id = #{tagId,jdbcType=INTEGER}
+    AND a.article_tag_id = t.tag_id
+    AND u.user_id = a.article_author_Id
+
+    order by a.article_comment_number DESC
+  </select>
+  <select id="selectsArticleByAuthor" resultMap="FullResultMap" >
+    select distinct a.article_id as article_id, article_author_Id, article_title, article_comment_number,
+    article_tag_id, article_state, article_pic_url,user_name,user_pic_url,tag_name, (
+    select count(1)
+    from map_user_article as m
+    WHERE m.article_id = a.article_id AND m.user_approve_type = 1
+
+    ) as approve_number, (select count(1)
+    from map_user_article as m
+    WHERE m.article_id = a.article_id AND m.user_favorite_type = 1
+
+    ) as favorite_number, (
+    select m2.user_approve_type
+    from map_user_article as m2
+    WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.article_id = a.article_id
+    ) as user_approve_type,
+    (
+    select m3.user_favorite_type
+    from map_user_article as m3
+    WHERE m3.user_id = #{userId,jdbcType=BIGINT} AND m3.article_id = a.article_id
+    ) as user_favorite_type, a.create_time as create_time , a.update_time as update_time
+
+    FROM article as a,user as u, tag as t
+    WHERE  a.article_author_Id = #{authorId,jdbcType=BIGINT}
+    AND t.tag_id = a.article_tag_id
+    AND u.user_id = a.article_author_Id
+    order by a.update_time DESC
+  </select>
+  <select id="selectsArticleByFavorite" resultMap="FullResultMap" >
+    select distinct a.article_id as article_id, article_author_Id, article_title, article_comment_number,
+    article_tag_id, article_state, article_pic_url,user_name,user_pic_url,tag_name, (
+    select count(1)
+    from map_user_article as m
+    WHERE m.article_id = a.article_id AND m.user_approve_type = 1
+
+    ) as approve_number, (select count(1)
+    from map_user_article as m
+    WHERE m.article_id = a.article_id AND m.user_favorite_type = 1
+
+    ) as favorite_number, (
+    select m2.user_approve_type
+    from map_user_article as m2
+    WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.article_id = a.article_id
+    ) as user_approve_type,
+    (
+    select m3.user_favorite_type
+    from map_user_article as m3
+    WHERE m3.user_id = #{userId,jdbcType=BIGINT} AND m3.article_id = a.article_id
+    ) as user_favorite_type, a.create_time as create_time , a.update_time as update_time
+
+    FROM article as a,user as u, tag as t, map_user_article as m0
+    WHERE  m0.user_id = #{userId,jdbcType=BIGINT}
+    AND m0.user_favorite_type = 1
+    AND a.article_id = m0.article_id
+    AND t.tag_id = a.article_tag_id
+    AND u.user_id = a.article_author_Id
+    order by a.update_time DESC
+  </select>
+  <select id="selectDetailArticle" resultMap="DetailResultMap">
+   select distinct a.article_id as article_id, article_author_Id, article_title, article_content, article_comment_number,
+    article_tag_id, article_state, article_pic_url,user_name,user_pic_url,tag_name, (
+		select count(1)
+        from map_user_article as m
+        WHERE m.article_id = a.article_id AND m.user_approve_type = 1
+
+    ) as approve_number, (select count(1)
+        from map_user_article as m
+        WHERE m.article_id = a.article_id AND m.user_favorite_type = 1
+
+        ) as favorite_number, (
+			select m2.user_approve_type
+            from map_user_article as m2
+            WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.article_id = a.article_id
+        ) as user_approve_type,
+        (
+			select m3.user_favorite_type
+            from map_user_article as m3
+            WHERE m3.user_id = #{userId,jdbcType=BIGINT} AND m3.article_id = a.article_id
+        ) as user_favorite_type, user_honor, a.create_time as create_time , a.update_time as update_time
+
+FROM article as a,map_user_article as m,user as u, tag as t
+WHERE a.article_id = #{articleId,jdbcType=BIGINT}
+AND a.article_tag_id = t.tag_id
+AND u.user_id = a.article_author_Id
+
+order by a.article_comment_number DESC
+  </select>
+  <select id="selectDetailArticleByComment" resultMap="DetailResultMap">
+    select distinct a.article_id as article_id, article_author_Id, article_title, article_content, article_comment_number,
+    article_tag_id, article_state, article_pic_url,user_name,user_pic_url,tag_name, (
+    select count(1)
+    from map_user_article as m
+    WHERE m.article_id = a.article_id AND m.user_approve_type = 1
+
+    ) as approve_number, (select count(1)
+    from map_user_article as m
+    WHERE m.article_id = a.article_id AND m.user_favorite_type = 1
+
+    ) as favorite_number, (
+    select m2.user_approve_type
+    from map_user_article as m2
+    WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.article_id = a.article_id
+    ) as user_approve_type,
+    (
+    select m3.user_favorite_type
+    from map_user_article as m3
+    WHERE m3.user_id = #{userId,jdbcType=BIGINT} AND m3.article_id = a.article_id
+    ) as user_favorite_type, user_honor, a.create_time as create_time , a.update_time as update_time
+
+    FROM article as a,map_user_article as m,user as u, tag as t
+    WHERE ac.article_comment_id = #{articleCommentId,jdbcType=BIGINT}
+    AND a.article_id = ac.article_id
+    AND a.article_tag_id = t.tag_id
+    AND u.user_id = a.article_author_Id
+
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from article
+    where article_id = #{articleId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zwp.slcp.apicommon.entity.Article" >
+    insert into article (article_id, article_author_Id, article_title, 
+      article_content, article_comment_number, article_tag_id, 
+      article_state, article_pic_url, create_time, 
+      update_time)
+    values (#{articleId,jdbcType=BIGINT}, #{articleAuthorId,jdbcType=BIGINT}, #{articleTitle,jdbcType=VARCHAR}, 
+      #{articleContent,jdbcType=VARCHAR}, #{articleCommentNumber,jdbcType=INTEGER}, #{articleTagId,jdbcType=INTEGER}, 
+      #{articleState,jdbcType=INTEGER}, #{articlePicUrl,jdbcType=VARCHAR}, #{createTime,jdbcType=BIGINT}, 
+      #{updateTime,jdbcType=BIGINT})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zwp.slcp.apicommon.entity.Article" >
+    insert into article
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="articleId != null" >
+        article_id,
+      </if>
+      <if test="articleAuthorId != null" >
+        article_author_Id,
+      </if>
+      <if test="articleTitle != null" >
+        article_title,
+      </if>
+      <if test="articleContent != null" >
+        article_content,
+      </if>
+      <if test="articleCommentNumber != null" >
+        article_comment_number,
+      </if>
+      <if test="articleTagId != null" >
+        article_tag_id,
+      </if>
+      <if test="articleState != null" >
+        article_state,
+      </if>
+      <if test="articlePicUrl != null" >
+        article_pic_url,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="articleId != null" >
+        #{articleId,jdbcType=BIGINT},
+      </if>
+      <if test="articleAuthorId != null" >
+        #{articleAuthorId,jdbcType=BIGINT},
+      </if>
+      <if test="articleTitle != null" >
+        #{articleTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="articleContent != null" >
+        #{articleContent,jdbcType=VARCHAR},
+      </if>
+      <if test="articleCommentNumber != null" >
+        #{articleCommentNumber,jdbcType=INTEGER},
+      </if>
+      <if test="articleTagId != null" >
+        #{articleTagId,jdbcType=INTEGER},
+      </if>
+      <if test="articleState != null" >
+        #{articleState,jdbcType=INTEGER},
+      </if>
+      <if test="articlePicUrl != null" >
+        #{articlePicUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zwp.slcp.apicommon.entity.Article" >
+    update article
+    <set >
+      <if test="articleAuthorId != null" >
+        article_author_Id = #{articleAuthorId,jdbcType=BIGINT},
+      </if>
+      <if test="articleTitle != null" >
+        article_title = #{articleTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="articleContent != null" >
+        article_content = #{articleContent,jdbcType=VARCHAR},
+      </if>
+      <if test="articleCommentNumber != null" >
+        article_comment_number = #{articleCommentNumber,jdbcType=INTEGER},
+      </if>
+      <if test="articleTagId != null" >
+        article_tag_id = #{articleTagId,jdbcType=INTEGER},
+      </if>
+      <if test="articleState != null" >
+        article_state = #{articleState,jdbcType=INTEGER},
+      </if>
+      <if test="articlePicUrl != null" >
+        article_pic_url = #{articlePicUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=BIGINT},
+      </if>
+    </set>
+    where article_id = #{articleId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zwp.slcp.apicommon.entity.Article" >
+    update article
+    set article_author_Id = #{articleAuthorId,jdbcType=BIGINT},
+      article_title = #{articleTitle,jdbcType=VARCHAR},
+      article_content = #{articleContent,jdbcType=VARCHAR},
+      article_comment_number = #{articleCommentNumber,jdbcType=INTEGER},
+      article_tag_id = #{articleTagId,jdbcType=INTEGER},
+      article_state = #{articleState,jdbcType=INTEGER},
+      article_pic_url = #{articlePicUrl,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=BIGINT},
+      update_time = #{updateTime,jdbcType=BIGINT}
+    where article_id = #{articleId,jdbcType=BIGINT}
+  </update>
+
+  <update id="updateCommentNumber" >
+    update article
+set article_comment_number = article_comment_number + 1, update_time = #{updateTime,jdbcType=BIGINT}
+WHERE article_id = #{articleId,jdbcType=BIGINT}
+  </update>
+
+</mapper>

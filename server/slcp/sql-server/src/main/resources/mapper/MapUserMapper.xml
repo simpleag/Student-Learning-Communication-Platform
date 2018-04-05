@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zwp.slcp.sqlserver.mapper.MapUserMapper">
+  <resultMap id="BaseResultMap" type="com.zwp.slcp.apicommon.entity.MapUser">
+    <id column="user2_id" jdbcType="BIGINT" property="user2Id" />
+    <id column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="user_attention_type" jdbcType="INTEGER" property="userAttentionType" />
+    <result column="create_time" jdbcType="BIGINT" property="createTime" />
+    <result column="update_time" jdbcType="BIGINT" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    user2_id, user_id, user_attention_type, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="com.zwp.slcp.apicommon.entity.MapUserKey" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from map_user
+    where user2_id = #{user2Id,jdbcType=BIGINT}
+      and user_id = #{userId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="com.zwp.slcp.apicommon.entity.MapUserKey">
+    delete from map_user
+    where user2_id = #{user2Id,jdbcType=BIGINT}
+      and user_id = #{userId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zwp.slcp.apicommon.entity.MapUser">
+    insert into map_user (user2_id, user_id, user_attention_type, 
+      create_time, update_time)
+    values (#{user2Id,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{userAttentionType,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zwp.slcp.apicommon.entity.MapUser">
+    insert into map_user
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="user2Id != null">
+        user2_id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="userAttentionType != null">
+        user_attention_type,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="user2Id != null">
+        #{user2Id,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="userAttentionType != null">
+        #{userAttentionType,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zwp.slcp.apicommon.entity.MapUser">
+    update map_user
+    <set>
+      <if test="userAttentionType != null">
+        user_attention_type = #{userAttentionType,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=BIGINT},
+      </if>
+    </set>
+    where user2_id = #{user2Id,jdbcType=BIGINT}
+      and user_id = #{userId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zwp.slcp.apicommon.entity.MapUser">
+    update map_user
+    set user_attention_type = #{userAttentionType,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=BIGINT},
+      update_time = #{updateTime,jdbcType=BIGINT}
+    where user2_id = #{user2Id,jdbcType=BIGINT}
+      and user_id = #{userId,jdbcType=BIGINT}
+  </update>
+</mapper>

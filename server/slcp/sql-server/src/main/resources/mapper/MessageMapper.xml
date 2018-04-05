@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zwp.slcp.sqlserver.mapper.MessageMapper" >
+  <resultMap id="BaseResultMap" type="com.zwp.slcp.apicommon.entity.Message" >
+    <id column="message_id" property="messageId" jdbcType="BIGINT" />
+    <result column="message_author_Id" property="messageAuthorId" jdbcType="BIGINT" />
+    <result column="message_content" property="messageContent" jdbcType="VARCHAR" />
+    <result column="message_receive_userId" property="messageReceiveUserid" jdbcType="BIGINT" />
+    <result column="message_state" property="messageState" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="BIGINT" />
+    <result column="update_time" property="updateTime" jdbcType="BIGINT" />
+  </resultMap>
+  <resultMap id="FullResultMap" type="com.zwp.slcp.apicommon.entity.FullMessage" >
+    <id column="message_id" property="messageId" jdbcType="BIGINT" />
+    <result column="message_author_Id" property="messageAuthorId" jdbcType="BIGINT" />
+    <result column="message_author_name" property="messageAuthorName" jdbcType="VARCHAR" />
+    <result column="message_content" property="messageContent" jdbcType="VARCHAR" />
+    <result column="message_receive_userId" property="messageReceiveUserid" jdbcType="BIGINT" />
+    <result column="message_receive_name" property="messageReceiveName" jdbcType="VARCHAR" />
+    <result column="message_state" property="messageState" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="BIGINT" />
+    <result column="update_time" property="updateTime" jdbcType="BIGINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    message_id, message_author_Id, message_content, message_receive_userId, message_state, 
+    create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from message
+    where message_id = #{messageId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from message
+    where message_id = #{messageId,jdbcType=BIGINT}
+  </delete>
+  <select id="selectByReceiveUserId" resultMap="FullResultMap" parameterType="java.lang.Long">
+    SELECT message_id, message_author_Id, u1.user_name as message_author_name, message_content, message_receive_userId, u2.user_name as message_receive_name, message_state,
+    m.create_time as create_time, m.update_time as update_time
+
+FROM slcp.message as m, user as u1,user as u2
+WHERE m.message_receive_userId = #{messageAuthorId,jdbcType=BIGINT}
+AND u1.user_id = m.message_receive_userId
+AND u2.user_id = m.message_author_Id
+ORDER BY m.create_time desc
+  </select>
+  <select id="selectByUsersId" resultMap="FullResultMap" parameterType="java.lang.Long">
+    SELECT message_id, message_author_Id, u1.user_name as message_author_name, message_content, message_receive_userId, u2.user_name as message_receive_name, message_state,
+    m.create_time as create_time, m.update_time as update_time
+
+    FROM slcp.message as m, user as u1,user as u2
+    WHERE ((m.message_receive_userId = #{messageReceiveId,jdbcType=BIGINT} AND m.message_author_Id = #{messageAuthorId,jdbcType=BIGINT}) OR (m.message_receive_userId = #{messageReceiveId,jdbcType=BIGINT} AND m.message_author_Id = #{messageAuthorId,jdbcType=BIGINT}))
+    AND u1.user_id = m.message_receive_userId
+    AND u2.user_id = m.message_author_Id
+    ORDER BY m.create_time desc
+  </select>
+  <insert id="insert" parameterType="com.zwp.slcp.apicommon.entity.Message" >
+    insert into message (message_id, message_author_Id, message_content, 
+      message_receive_userId, message_state, create_time, 
+      update_time)
+    values (#{messageId,jdbcType=BIGINT}, #{messageAuthorId,jdbcType=BIGINT}, #{messageContent,jdbcType=VARCHAR}, 
+      #{messageReceiveUserid,jdbcType=BIGINT}, #{messageState,jdbcType=INTEGER}, #{createTime,jdbcType=BIGINT}, 
+      #{updateTime,jdbcType=BIGINT})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zwp.slcp.apicommon.entity.Message" >
+    insert into message
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="messageId != null" >
+        message_id,
+      </if>
+      <if test="messageAuthorId != null" >
+        message_author_Id,
+      </if>
+      <if test="messageContent != null" >
+        message_content,
+      </if>
+      <if test="messageReceiveUserid != null" >
+        message_receive_userId,
+      </if>
+      <if test="messageState != null" >
+        message_state,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="messageId != null" >
+        #{messageId,jdbcType=BIGINT},
+      </if>
+      <if test="messageAuthorId != null" >
+        #{messageAuthorId,jdbcType=BIGINT},
+      </if>
+      <if test="messageContent != null" >
+        #{messageContent,jdbcType=VARCHAR},
+      </if>
+      <if test="messageReceiveUserid != null" >
+        #{messageReceiveUserid,jdbcType=BIGINT},
+      </if>
+      <if test="messageState != null" >
+        #{messageState,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zwp.slcp.apicommon.entity.Message" >
+    update message
+    <set >
+      <if test="messageAuthorId != null" >
+        message_author_Id = #{messageAuthorId,jdbcType=BIGINT},
+      </if>
+      <if test="messageContent != null" >
+        message_content = #{messageContent,jdbcType=VARCHAR},
+      </if>
+      <if test="messageReceiveUserid != null" >
+        message_receive_userId = #{messageReceiveUserid,jdbcType=BIGINT},
+      </if>
+      <if test="messageState != null" >
+        message_state = #{messageState,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=BIGINT},
+      </if>
+    </set>
+    where message_id = #{messageId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByReceiveUserId" parameterType="com.zwp.slcp.apicommon.entity.Message" >
+    update message
+    <set >
+      <if test="messageAuthorId != null" >
+        message_author_Id = #{messageAuthorId,jdbcType=BIGINT},
+      </if>
+      <if test="messageContent != null" >
+        message_content = #{messageContent,jdbcType=VARCHAR},
+      </if>
+      <if test="messageReceiveUserid != null" >
+        message_receive_userId = #{messageReceiveUserid,jdbcType=BIGINT},
+      </if>
+      <if test="messageState != null" >
+        message_state = #{messageState,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=BIGINT},
+      </if>
+    </set>
+    where messageReceiveUserid = #{messageReceiveUserid,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zwp.slcp.apicommon.entity.Message" >
+    update message
+    set message_author_Id = #{messageAuthorId,jdbcType=BIGINT},
+      message_content = #{messageContent,jdbcType=VARCHAR},
+      message_receive_userId = #{messageReceiveUserid,jdbcType=BIGINT},
+      message_state = #{messageState,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=BIGINT},
+      update_time = #{updateTime,jdbcType=BIGINT}
+    where message_id = #{messageId,jdbcType=BIGINT}
+  </update>
+</mapper>

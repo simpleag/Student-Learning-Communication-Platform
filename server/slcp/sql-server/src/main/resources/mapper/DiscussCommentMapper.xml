@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zwp.slcp.sqlserver.mapper.DiscussCommentMapper" >
+  <resultMap id="BaseResultMap" type="com.zwp.slcp.apicommon.entity.DiscussComment" >
+    <id column="discuss_comment_id" property="discussCommentId" jdbcType="BIGINT" />
+    <result column="discuss_comment_author_Id" property="discussCommentAuthorId" jdbcType="BIGINT" />
+    <result column="discuss_comment_content" property="discussCommentContent" jdbcType="VARCHAR" />
+    <result column="discuss_list_number" property="discussListNumber" jdbcType="INTEGER" />
+    <result column="discuss_replay_userId" property="discussReplayUserid" jdbcType="BIGINT" />
+    <result column="discuss_comment_state" property="discussCommentState" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="BIGINT" />
+    <result column="update_time" property="updateTime" jdbcType="BIGINT" />
+    <result column="discuss_id" property="discussId" jdbcType="BIGINT" />
+  </resultMap>
+  <resultMap id="DetailResultMap" type="com.zwp.slcp.apicommon.entity.DetailDiscussComment" >
+    <id column="discuss_comment_id" property="discussCommentId" jdbcType="BIGINT" />
+    <result column="discuss_comment_author_Id" property="discussCommentAuthorId" jdbcType="BIGINT" />
+    <result column="discuss_comment_content" property="discussCommentContent" jdbcType="VARCHAR" />
+    <result column="discuss_list_number" property="discussListNumber" jdbcType="INTEGER" />
+    <result column="discuss_replay_userId" property="discussReplayUserid" jdbcType="BIGINT" />
+    <result column="discuss_comment_state" property="discussCommentState" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="BIGINT" />
+    <result column="update_time" property="updateTime" jdbcType="BIGINT" />
+    <result column="discuss_id" property="discussId" jdbcType="BIGINT" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="user_pic_url" property="userPicUrl" jdbcType="VARCHAR" />
+    <result column="approve_number" property="approveNumber" jdbcType="INTEGER" />
+    <result column="user_approve_type" property="userApproveType" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    discuss_comment_id, discuss_comment_author_Id, discuss_comment_content, discuss_list_number, 
+    discuss_replay_userId, discuss_comment_state, create_time, update_time, discuss_id
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from discuss_comment
+    where discuss_comment_id = #{discussCommentId,jdbcType=BIGINT}
+  </select>
+  <select id="selectByUserId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select
+    <include refid="Base_Column_List" />
+    from discuss_comment
+    where discuss_comment_author_Id = #{discussCommentAuthorId,jdbcType=BIGINT}
+    ORDER BY update_time DESC
+  </select>
+  <select id="selectDetailByDiscussId" resultMap="DetailResultMap">
+    SELECT  discuss_comment_id, discuss_comment_author_Id, discuss_comment_content, discuss_list_number,
+    discuss_replay_userId, discuss_comment_state, dc.create_time, dc.update_time, discuss_id, (
+		SELECT count(1)
+        FROM map_user_discusscomment as m
+        WHERE m.disscuss_comment_id = dc.discuss_comment_id
+    ) as approve_number, (
+			select m2.user_approve_type
+            from map_user_discusscomment as m2
+            WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.disscuss_comment_id = dc.discuss_comment_id
+        ) as user_approve_type, user_name, user_pic_url
+FROM discuss_comment as dc, user as u
+WHERE dc.discuss_id = #{discussId,jdbcType=BIGINT}
+AND dc.discuss_comment_author_Id = u.user_id
+ORDER BY dc.discuss_list_number
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from discuss_comment
+    where discuss_comment_id = #{discussCommentId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zwp.slcp.apicommon.entity.DiscussComment" >
+    insert into discuss_comment (discuss_comment_id, discuss_comment_author_Id, 
+      discuss_comment_content, discuss_list_number, 
+      discuss_replay_userId, discuss_comment_state, 
+      create_time, update_time, discuss_id
+      )
+    values (#{discussCommentId,jdbcType=BIGINT}, #{discussCommentAuthorId,jdbcType=BIGINT}, 
+      #{discussCommentContent,jdbcType=VARCHAR}, #{discussListNumber,jdbcType=INTEGER}, 
+      #{discussReplayUserid,jdbcType=BIGINT}, #{discussCommentState,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT}, #{discussId,jdbcType=BIGINT}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.zwp.slcp.apicommon.entity.DiscussComment" >
+    insert into discuss_comment
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="discussCommentId != null" >
+        discuss_comment_id,
+      </if>
+      <if test="discussCommentAuthorId != null" >
+        discuss_comment_author_Id,
+      </if>
+      <if test="discussCommentContent != null" >
+        discuss_comment_content,
+      </if>
+      <if test="discussListNumber != null" >
+        discuss_list_number,
+      </if>
+      <if test="discussReplayUserid != null" >
+        discuss_replay_userId,
+      </if>
+      <if test="discussCommentState != null" >
+        discuss_comment_state,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="discussId != null" >
+        discuss_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="discussCommentId != null" >
+        #{discussCommentId,jdbcType=BIGINT},
+      </if>
+      <if test="discussCommentAuthorId != null" >
+        #{discussCommentAuthorId,jdbcType=BIGINT},
+      </if>
+      <if test="discussCommentContent != null" >
+        #{discussCommentContent,jdbcType=VARCHAR},
+      </if>
+      <if test="discussListNumber != null" >
+        #{discussListNumber,jdbcType=INTEGER},
+      </if>
+      <if test="discussReplayUserid != null" >
+        #{discussReplayUserid,jdbcType=BIGINT},
+      </if>
+      <if test="discussCommentState != null" >
+        #{discussCommentState,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=BIGINT},
+      </if>
+      <if test="discussId != null" >
+        #{discussId,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zwp.slcp.apicommon.entity.DiscussComment" >
+    update discuss_comment
+    <set >
+      <if test="discussCommentAuthorId != null" >
+        discuss_comment_author_Id = #{discussCommentAuthorId,jdbcType=BIGINT},
+      </if>
+      <if test="discussCommentContent != null" >
+        discuss_comment_content = #{discussCommentContent,jdbcType=VARCHAR},
+      </if>
+      <if test="discussListNumber != null" >
+        discuss_list_number = #{discussListNumber,jdbcType=INTEGER},
+      </if>
+      <if test="discussReplayUserid != null" >
+        discuss_replay_userId = #{discussReplayUserid,jdbcType=BIGINT},
+      </if>
+      <if test="discussCommentState != null" >
+        discuss_comment_state = #{discussCommentState,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=BIGINT},
+      </if>
+      <if test="discussId != null" >
+        discuss_id = #{discussId,jdbcType=BIGINT},
+      </if>
+    </set>
+    where discuss_comment_id = #{discussCommentId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zwp.slcp.apicommon.entity.DiscussComment" >
+    update discuss_comment
+    set discuss_comment_author_Id = #{discussCommentAuthorId,jdbcType=BIGINT},
+      discuss_comment_content = #{discussCommentContent,jdbcType=VARCHAR},
+      discuss_list_number = #{discussListNumber,jdbcType=INTEGER},
+      discuss_replay_userId = #{discussReplayUserid,jdbcType=BIGINT},
+      discuss_comment_state = #{discussCommentState,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=BIGINT},
+      update_time = #{updateTime,jdbcType=BIGINT},
+      discuss_id = #{discussId,jdbcType=BIGINT}
+    where discuss_comment_id = #{discussCommentId,jdbcType=BIGINT}
+  </update>
+</mapper>

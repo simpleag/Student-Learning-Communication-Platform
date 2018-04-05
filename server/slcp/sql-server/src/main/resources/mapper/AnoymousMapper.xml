@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zwp.slcp.sqlserver.mapper.AnoymousMapper" >
+  <resultMap id="BaseResultMap" type="com.zwp.slcp.apicommon.entity.Anoymous" >
+    <id column="anoymous_id" property="anoymousId" jdbcType="BIGINT" />
+    <result column="anoymous_author_Id" property="anoymousAuthorId" jdbcType="BIGINT" />
+    <result column="anoymous_title" property="anoymousTitle" jdbcType="VARCHAR" />
+    <result column="anoymous_content" property="anoymousContent" jdbcType="VARCHAR" />
+    <result column="anoymous_comment_number" property="anoymousCommentNumber" jdbcType="INTEGER" />
+    <result column="anoymous_state" property="anoymousState" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="BIGINT" />
+    <result column="update_time" property="updateTime" jdbcType="BIGINT" />
+  </resultMap>
+  <resultMap id="HomeResultMap" type="com.zwp.slcp.apicommon.entity.HomeAnoymous" >
+    <id column="anoymous_id" property="anoymousId" jdbcType="BIGINT" />
+    <result column="anoymous_author_Id" property="anoymousAuthorId" jdbcType="BIGINT" />
+    <result column="anoymous_title" property="anoymousTitle" jdbcType="VARCHAR" />
+    <result column="anoymous_comment_number" property="anoymousCommentNumber" jdbcType="INTEGER" />
+    <result column="anoymous_state" property="anoymousState" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="BIGINT" />
+    <result column="update_time" property="updateTime" jdbcType="BIGINT" />
+    <result column="approve_number" property="approveNumber" jdbcType="INTEGER" />
+    <result column="favorite_number" property="favoriteNumber" jdbcType="INTEGER" />
+    <result column="userAnonymouseName" property="user_anonymouse_name" jdbcType="VARCHAR" />
+    <result column="user_approve_type" property="userApproveType" jdbcType="INTEGER" />
+    <result column="user_favorite_type" property="userFavoriteType" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="DetailResultMap" type="com.zwp.slcp.apicommon.entity.DetailAnoymous" >
+    <id column="anoymous_id" property="anoymousId" jdbcType="BIGINT" />
+    <result column="anoymous_author_Id" property="anoymousAuthorId" jdbcType="BIGINT" />
+    <result column="anoymous_title" property="anoymousTitle" jdbcType="VARCHAR" />
+    <result column="anoymous_content" property="anoymousContent" jdbcType="VARCHAR" />
+    <result column="anoymous_comment_number" property="anoymousCommentNumber" jdbcType="INTEGER" />
+    <result column="anoymous_state" property="anoymousState" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="BIGINT" />
+    <result column="update_time" property="updateTime" jdbcType="BIGINT" />
+    <result column="create_time" property="createTime" jdbcType="BIGINT" />
+    <result column="update_time" property="updateTime" jdbcType="BIGINT" />
+    <result column="approve_number" property="approveNumber" jdbcType="INTEGER" />
+    <result column="favorite_number" property="favoriteNumber" jdbcType="INTEGER" />
+    <result column="userAnonymouseName" property="user_anonymouse_name" jdbcType="VARCHAR" />
+    <result column="userAnonymouseHonor" property="user_anonymouse_honor" jdbcType="VARCHAR" />
+    <result column="user_approve_type" property="userApproveType" jdbcType="INTEGER" />
+    <result column="user_favorite_type" property="userFavoriteType" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    anoymous_id, anoymous_author_Id, anoymous_title, anoymous_content, anoymous_comment_number, 
+    anoymous_state, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from anoymous
+    where anoymous_id = #{anoymousId,jdbcType=BIGINT}
+  </select>
+  <select id="selectHomeAnoymousByTime" resultMap="HomeResultMap" parameterType="java.lang.Long">
+    select distinct anoymous_id, anoymous_author_Id, anoymous_title, anoymous_comment_number,
+    anoymous_state, a.create_time as create_time, a.update_time as update_time, user_anonymouse_name, tag_name, (
+		select count(1)
+        from map_user_anoymouse as m
+        WHERE m.anoymouse_id = a.anoymous_id AND m.user_approve_type = 1
+
+    ) as approveNumber, (select count(1)
+        from map_user_anoymouse as m
+        WHERE m.anoymouse_id = a.anoymous_id AND m.user_favorite_type = 1
+
+        ) as favoriteNumber, (
+			select m2.user_approve_type
+            from map_user_anoymouse as m2
+            WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.anoymouse_id = a.anoymous_id
+        ) as user_approve_type,
+        (
+			select m3.user_favorite_type
+            from map_user_anoymouse as m3
+            WHERE m3.user_id = #{userId,jdbcType=BIGINT} AND m3.anoymouse_id = a.anoymous_id
+        ) as user_favorite_type
+FROM anoymous as a, user as u, tag as t
+WHERE   u.user_id = a.anoymous_author_Id
+order by a.update_time DESC
+  </select>
+  <select id="selectHomeAnoymousOrderByHot" resultMap="HomeResultMap" parameterType="java.lang.Long" >
+    select distinct anoymous_id, anoymous_author_Id, anoymous_title, anoymous_comment_number,
+    anoymous_state, a.create_time as create_time, a.update_time as update_time, user_anonymouse_name, tag_name, (
+		select count(1)
+        from map_user_anoymouse as m
+        WHERE m.anoymouse_id = a.anoymous_id AND m.user_approve_type = 1
+
+    ) as approveNumber, (select count(1)
+        from map_user_anoymouse as m
+        WHERE m.anoymouse_id = a.anoymous_id AND m.user_favorite_type = 1
+
+        ) as favoriteNumber, (
+			select m2.user_approve_type
+            from map_user_anoymouse as m2
+            WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.anoymouse_id = a.anoymous_id
+        ) as user_approve_type,
+        (
+			select m3.user_favorite_type
+            from map_user_anoymouse as m3
+            WHERE m3.user_id = #{userId,jdbcType=BIGINT} AND m3.anoymouse_id = a.anoymous_id
+        ) as user_favorite_type
+FROM anoymous as a, user as u, tag as t
+WHERE   u.user_id = a.anoymous_author_Id
+order by a.anoymous_comment_number DESC
+  </select>
+  <select id="selectHomeAnoumousByAuthorId" resultMap="HomeResultMap">
+    select distinct anoymous_id, anoymous_author_Id, anoymous_title, anoymous_comment_number,
+    anoymous_state, a.create_time as create_time, a.update_time as update_time, user_anonymouse_name, tag_name, (
+		select count(1)
+        from map_user_anoymouse as m
+        WHERE m.anoymouse_id = a.anoymous_id AND m.user_approve_type = 1
+
+    ) as approveNumber, (select count(1)
+        from map_user_anoymouse as m
+        WHERE m.anoymouse_id = a.anoymous_id AND m.user_favorite_type = 1
+
+        ) as favoriteNumber, (
+			select m2.user_approve_type
+            from map_user_anoymouse as m2
+            WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.anoymouse_id = a.anoymous_id
+        ) as user_approve_type,
+        (
+			select m3.user_favorite_type
+            from map_user_anoymouse as m3
+            WHERE m3.user_id = #{userId,jdbcType=BIGINT} AND m3.anoymouse_id = a.anoymous_id
+        ) as user_favorite_type
+FROM anoymous as a, user as u, tag as t
+WHERE   a.anoymous_author_Id = #{authorId,jdbcType=INTEGER}
+AND u.user_id = a.anoymous_author_Id
+order by a.anoymous_comment_number DESC
+  </select>
+  <select id="selectUserFavoriteAnoymous" resultMap="HomeResultMap" parameterType="java.lang.Long">
+    select distinct anoymous_id, anoymous_author_Id, anoymous_title, anoymous_comment_number,
+    anoymous_state, a.create_time as create_time, a.update_time as update_time, user_anonymouse_name, tag_name, (
+		select count(1)
+        from map_user_anoymouse as m
+        WHERE m.anoymouse_id = a.anoymous_id AND m.user_approve_type = 1
+
+    ) as approveNumber, (select count(1)
+        from map_user_anoymouse as m
+        WHERE m.anoymouse_id = a.anoymous_id AND m.user_favorite_type = 1
+
+        ) as favoriteNumber, (
+			select m2.user_approve_type
+            from map_user_anoymouse as m2
+            WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.anoymouse_id = a.anoymous_id
+        ) as user_approve_type,
+        (
+			select m3.user_favorite_type
+            from map_user_anoymouse as m3
+            WHERE m3.user_id = #{userId,jdbcType=BIGINT} AND m3.anoymouse_id = a.anoymous_id
+        ) as user_favorite_type
+FROM anoymous as a, user as u, tag as t, map_user_anoymouse as m0
+WHERE  m0.user_id = #{userId,jdbcType=BIGINT}
+AND m0.user_favorite_type = 1
+AND a.anoymous_author_Id = #{authorId,jdbcType=INTEGER}
+AND u.user_id = a.anoymous_author_Id
+order by a.update_time DESC
+  </select>
+  <select id="selectAnoymousDetailById" resultMap="DetailResultMap" >
+    select distinct anoymous_id, anoymous_author_Id, anoymous_title, anoymous_content, anoymous_comment_number,
+    anoymous_state, a.create_time as create_time, a.update_time as update_time, user_anonymouse_name, user_anonymouse_honor, tag_name, (
+    select count(1)
+    from map_user_anoymouse as m
+    WHERE m.anoymouse_id = a.anoymous_id AND m.user_approve_type = 1
+
+    ) as approveNumber, (select count(1)
+    from map_user_anoymouse as m
+    WHERE m.anoymouse_id = a.anoymous_id AND m.user_favorite_type = 1
+
+    ) as favoriteNumber, (
+    select m2.user_approve_type
+    from map_user_anoymouse as m2
+    WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.anoymouse_id = a.anoymous_id
+    ) as user_approve_type,
+    (
+    select m3.user_favorite_type
+    from map_user_anoymouse as m3
+    WHERE m3.user_id = #{userId,jdbcType=BIGINT} AND m3.anoymouse_id = a.anoymous_id
+    ) as user_favorite_type
+    FROM anoymous as a, user as u, tag as t
+    WHERE  a.anoymous_id = #{anoymousId,jdbcType=BIGINT}
+    AND u.user_id = a.anoymous_author_Id
+    order by a.update_time DESC
+  </select>
+  <select id="selectAnoumousDetailByComment" resultMap="DetailResultMap">
+    select distinct anoymous_id, anoymous_author_Id, anoymous_title, anoymous_content, anoymous_comment_number,
+    anoymous_state, a.create_time as create_time, a.update_time as update_time, user_anonymouse_name, user_anonymouse_honor, user_pic_url, tag_name, (
+    select count(1)
+    from map_user_anoymouse as m
+    WHERE m.anoymouse_id = a.anoymous_id AND m.user_approve_type = 1
+
+    ) as approveNumber, (select count(1)
+    from map_user_anoymouse as m
+    WHERE m.anoymouse_id = a.anoymous_id AND m.user_favorite_type = 1
+
+    ) as favoriteNumber, (
+    select m2.user_approve_type
+    from map_user_anoymouse as m2
+    WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.anoymouse_id = a.anoymous_id
+    ) as user_approve_type,
+    (
+    select m3.user_favorite_type
+    from map_user_anoymouse as m3
+    WHERE m3.user_id = #{userId,jdbcType=BIGINT} AND m3.anoymouse_id = a.anoymous_id
+    ) as user_favorite_type
+    FROM anoymous_comment as ac, anoymous as a, user as u, tag as t
+    WHERE ac.anoymous_comment_id  = #{anoymousCommentId,jdbcType=BIGINT}
+    AND a.anoymous_id = ac.anoymous_id
+    AND u.user_id = a.anoymous_author_Id
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from anoymous
+    where anoymous_id = #{anoymousId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zwp.slcp.apicommon.entity.Anoymous" >
+    insert into anoymous (anoymous_id, anoymous_author_Id, anoymous_title, 
+      anoymous_content, anoymous_comment_number, 
+      anoymous_state, create_time, update_time
+      )
+    values (#{anoymousId,jdbcType=BIGINT}, #{anoymousAuthorId,jdbcType=BIGINT}, #{anoymousTitle,jdbcType=VARCHAR}, 
+      #{anoymousContent,jdbcType=VARCHAR}, #{anoymousCommentNumber,jdbcType=INTEGER}, 
+      #{anoymousState,jdbcType=INTEGER}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.zwp.slcp.apicommon.entity.Anoymous" >
+    insert into anoymous
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="anoymousId != null" >
+        anoymous_id,
+      </if>
+      <if test="anoymousAuthorId != null" >
+        anoymous_author_Id,
+      </if>
+      <if test="anoymousTitle != null" >
+        anoymous_title,
+      </if>
+      <if test="anoymousContent != null" >
+        anoymous_content,
+      </if>
+      <if test="anoymousCommentNumber != null" >
+        anoymous_comment_number,
+      </if>
+      <if test="anoymousState != null" >
+        anoymous_state,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="anoymousId != null" >
+        #{anoymousId,jdbcType=BIGINT},
+      </if>
+      <if test="anoymousAuthorId != null" >
+        #{anoymousAuthorId,jdbcType=BIGINT},
+      </if>
+      <if test="anoymousTitle != null" >
+        #{anoymousTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="anoymousContent != null" >
+        #{anoymousContent,jdbcType=VARCHAR},
+      </if>
+      <if test="anoymousCommentNumber != null" >
+        #{anoymousCommentNumber,jdbcType=INTEGER},
+      </if>
+      <if test="anoymousState != null" >
+        #{anoymousState,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zwp.slcp.apicommon.entity.Anoymous" >
+    update anoymous
+    <set >
+      <if test="anoymousAuthorId != null" >
+        anoymous_author_Id = #{anoymousAuthorId,jdbcType=BIGINT},
+      </if>
+      <if test="anoymousTitle != null" >
+        anoymous_title = #{anoymousTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="anoymousContent != null" >
+        anoymous_content = #{anoymousContent,jdbcType=VARCHAR},
+      </if>
+      <if test="anoymousCommentNumber != null" >
+        anoymous_comment_number = #{anoymousCommentNumber,jdbcType=INTEGER},
+      </if>
+      <if test="anoymousState != null" >
+        anoymous_state = #{anoymousState,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=BIGINT},
+      </if>
+    </set>
+    where anoymous_id = #{anoymousId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zwp.slcp.apicommon.entity.Anoymous" >
+    update anoymous
+    set anoymous_author_Id = #{anoymousAuthorId,jdbcType=BIGINT},
+      anoymous_title = #{anoymousTitle,jdbcType=VARCHAR},
+      anoymous_content = #{anoymousContent,jdbcType=VARCHAR},
+      anoymous_comment_number = #{anoymousCommentNumber,jdbcType=INTEGER},
+      anoymous_state = #{anoymousState,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=BIGINT},
+      update_time = #{updateTime,jdbcType=BIGINT}
+    where anoymous_id = #{anoymousId,jdbcType=BIGINT}
+  </update>
+  <update id="updateCommentNumber" >
+    update anoymous
+    set anoymous_comment_number = anoymous_comment_number + 1, update_time = #{updateTime,jdbcType=BIGINT}
+    WHERE anoymous_id = #{anoymousId,jdbcType=BIGINT}
+  </update>
+</mapper>

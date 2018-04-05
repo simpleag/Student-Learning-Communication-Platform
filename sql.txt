@@ -1,0 +1,210 @@
+ 
+CREATE TABLE IF NOT EXISTS `tag`(
+   `tag_id` int(11)  NOT NULL AUTO_INCREMENT,
+   `tag_name` varchar(100) NOT NULL,
+   `tag_info` varchar(100) NOT NULL,
+   `article_number` int UNSIGNED NOT NULL,
+   `discuss_number` int UNSIGNED NOT NULL,
+   PRIMARY KEY ( `tag_id` )
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `map_user_tag`(
+   `tag_id` int(11) NOT NULL,
+   `user_id` bigint NOT NULL,
+   `user_attention_type` int NOT NULL,
+   PRIMARY KEY ( `tag_id`,`user_id` )
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `map_user_discuss`(
+   `user_id` bigint NOT NULL,
+   `discuss_id` bigint NOT NULL,
+   `user_approve_type` int NOT NULL,
+   `user_favorite_type` int NOT NULL,
+   PRIMARY KEY ( `discuss_id`,`user_id` )
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `map_user_anoymouse`(
+   `user_id` bigint NOT NULL,
+   `anoymouse_id` bigint NOT NULL,
+   `user_approve_type` int NOT NULL,
+   `user_favorite_type` int NOT NULL,
+   PRIMARY KEY ( `anoymouse_id`,`user_id` )
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `map_user_article`(
+   `user_id` bigint NOT NULL,
+   `article_id` bigint NOT NULL,
+   `user_approve_type` int NOT NULL,
+   `user_favorite_type` int NOT NULL,
+   `create_time` bigint NOT NULL,
+   `update_time` bigint,
+   PRIMARY KEY ( `article_id`,`user_id` )
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `map_user_articlecomment`(
+   `user_id` bigint NOT NULL,
+   `article_comment_id` bigint NOT NULL,
+   `user_approve_type` int NOT NULL,
+   `create_time` bigint NOT NULL,
+   `update_time` bigint,
+   PRIMARY KEY ( `article_comment_id`,`user_id` )
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `map_user_discusscomment`(
+   `user_id` bigint NOT NULL,
+   `disscuss_comment_id` bigint NOT NULL,
+   `user_approve_type` int NOT NULL,
+   `create_time` bigint NOT NULL,
+   `update_time` bigint,
+   PRIMARY KEY ( `disscuss_comment_id`,`user_id` )
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `map_user_anoymousecomment`(
+   `user_id` bigint NOT NULL,
+   `anoymouse_comment_id` bigint NOT NULL,
+   `user_approve_type` int NOT NULL,
+   `create_time` bigint NOT NULL,
+   `update_time` bigint,
+   PRIMARY KEY ( `anoymouse_comment_id`,`user_id` )
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `map_user`(
+   `user_id` bigint NOT NULL,
+   `user2_id` bigint NOT NULL,
+   `user_attention_type` int NOT NULL,
+   `create_time` bigint NOT NULL,
+   `update_time` bigint,
+   PRIMARY KEY ( `user2_id`,`user_id` )
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE IF NOT EXISTS `article`(
+   `article_id` bigint NOT NULL AUTO_INCREMENT,
+   `article_author_Id` bigint NOT NULL,
+   `article_title` varchar(100) NOT NULL,
+   `article_content` varchar(10000) NOT NULL,
+   `article_comment_number` int NOT NULL,
+   `article_tag_id` int,
+   `article_state` int NOT NULL,
+   `article_pic_url` varchar(555),
+   `create_time` bigint NOT NULL,
+   `update_time` bigint,
+   PRIMARY KEY ( `article_id` )
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `discuss`(
+   `discuss_id` bigint NOT NULL AUTO_INCREMENT,
+   `discuss_author_id` bigint NOT NULL,
+   `discuss_title` varchar(100) NOT NULL,
+   `discuss_content` varchar(10000) NOT NULL,
+   `discuss_comment_number` int NOT NULL,
+   `discuss_tag_id` int,
+   `discuss_state` int NOT NULL,
+   `create_time` bigint NOT NULL,
+   `update_time` bigint,
+   PRIMARY KEY ( `discuss_id` )
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `anoymous`(
+   `anoymous_id` bigint NOT NULL AUTO_INCREMENT,
+   `anoymous_author_Id` bigint NOT NULL,
+   `anoymous_title` varchar(100) NOT NULL,
+   `anoymous_content` varchar(10000) NOT NULL,
+   `anoymous_comment_number` int NOT NULL,
+   `anoymous_state` int NOT NULL,
+   `create_time` bigint NOT NULL,
+   `update_time` bigint,
+   PRIMARY KEY ( `anoymous_id` )
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE IF NOT EXISTS `anoymous_comment`(
+   `anoymous_comment_id` bigint NOT NULL AUTO_INCREMENT,
+   `anoymous_comment_author_Id` bigint NOT NULL,
+   `anoymous_comment_content` varchar(255) NOT NULL,
+   `anoymous_list_number` int NOT NULL,
+   `anoymouse_replay_userId` bigint,
+   `anoymous_comment_state` int NOT NULL,
+   `create_time` bigint NOT NULL,
+   `update_time` bigint,
+   `anoymous_id` bigint NOT NULL,
+   PRIMARY KEY ( `anoymous_comment_id` )
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `discuss_comment`(
+   `discuss_comment_id` bigint NOT NULL AUTO_INCREMENT,
+   `discuss_comment_author_Id` bigint NOT NULL,
+   `discuss_comment_content` varchar(255) NOT NULL,
+   `discuss_list_number` int NOT NULL,
+   `discuss_replay_userId` bigint,
+   `discuss_comment_state` int NOT NULL,
+   `create_time` bigint NOT NULL,
+   `update_time` bigint,
+   `discuss_id` bigint NOT NULL,
+   PRIMARY KEY ( `discuss_comment_id` )
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `article_comment`(
+   `article_comment_id` bigint NOT NULL AUTO_INCREMENT,
+   `article_comment_author_Id` bigint NOT NULL,
+   `article_comment_content` varchar(255) NOT NULL,
+   `article_list_number` int NOT NULL,
+   `article_replay_userId` bigint,
+   `article_comment_state` int NOT NULL,
+   `create_time` bigint NOT NULL,
+   `update_time` bigint,
+   `article_id` bigint NOT NULL,
+   PRIMARY KEY ( `article_comment_id` )
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `message`(
+   `message_id` bigint NOT NULL AUTO_INCREMENT,
+   `message_author_Id` bigint NOT NULL,
+   `message_content` varchar(500) NOT NULL,
+   `message_receive_userId` bigint NOT NULL,
+   `message_state` int NOT NULL,
+   `create_time` bigint NOT NULL,
+   `update_time` bigint,
+   PRIMARY KEY ( `message_id` )
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `user`(
+   `user_id` bigint NOT NULL AUTO_INCREMENT,
+   `user_name` varchar(12) unique,
+   `user_pwd` varchar(30),
+   `user_phone_number` varchar(11),
+   `user_login_id` varchar(12) unique,
+   `user_pic_url` varchar(500),
+   `user_honor` varchar(12),
+   `user_anonymouse_name` varchar(500),
+   `user_anonymouse_honor` varchar(500),
+   `user_introduce` varchar(500),
+   `user_get_approve_number` int NOT NULL,
+   `user_article_number` int NOT NULL,
+   `user_follow_number` int NOT NULL,
+   `user_discuss_number` int NOT NULL,
+   `user_anoymouse_number` int NOT NULL,
+   `user_comment_number` int NOT NULL,
+   `user_attention_number` int NOT NULL,
+   `user_favorite_number` int NOT NULL,
+   `user_approve_number` int NOT NULL,
+   `user_born` bigint,
+   `user_sex` varchar(6),
+   `user_school` varchar(50),
+   `user_education` varchar(12),
+   `create_time` bigint NOT NULL,
+   `update_time` bigint,
+   PRIMARY KEY ( `user_id` )
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `info`(
+   `info_id` bigint NOT NULL AUTO_INCREMENT,
+   `info_receive_user_id` bigint NOT NULL,
+   `into_content` varchar(200),
+   `info_type` int NOT NULL,
+   `info_state` int NOT NULL,
+   `create_time` bigint NOT NULL,
+   `update_time` bigint,
+   PRIMARY KEY ( `info_id` )
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+

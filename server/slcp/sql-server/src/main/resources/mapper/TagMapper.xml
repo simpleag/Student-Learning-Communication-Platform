@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zwp.slcp.sqlserver.mapper.TagMapper" >
+  <resultMap id="BaseResultMap" type="com.zwp.slcp.apicommon.entity.Tag" >
+    <id column="tag_id" property="tagId" jdbcType="INTEGER" />
+    <result column="tag_name" property="tagName" jdbcType="VARCHAR" />
+    <result column="tag_info" property="tagInfo" jdbcType="VARCHAR" />
+    <result column="article_number" property="articleNumber" jdbcType="INTEGER" />
+    <result column="discuss_number" property="discussNumber" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    tag_id, tag_name, tag_info, article_number, discuss_number
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from tag
+    where tag_id = #{tagId,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectByUserId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select
+    <include refid="Base_Column_List" />
+    from tag, map_user_tag as m
+    where m.user_id = #{userId,jdbcType=BIGINT} AND m.tag_id = tag.tag_id
+  </select>
+
+  <select id="selectAllTag" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from tag
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from tag
+    where tag_id = #{tagId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zwp.slcp.apicommon.entity.Tag" >
+    insert into tag (tag_id, tag_name, tag_info, 
+      article_number, discuss_number)
+    values (#{tagId,jdbcType=INTEGER}, #{tagName,jdbcType=VARCHAR}, #{tagInfo,jdbcType=VARCHAR}, 
+      #{articleNumber,jdbcType=INTEGER}, #{discussNumber,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zwp.slcp.apicommon.entity.Tag" >
+    insert into tag
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="tagId != null" >
+        tag_id,
+      </if>
+      <if test="tagName != null" >
+        tag_name,
+      </if>
+      <if test="tagInfo != null" >
+        tag_info,
+      </if>
+      <if test="articleNumber != null" >
+        article_number,
+      </if>
+      <if test="discussNumber != null" >
+        discuss_number,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="tagId != null" >
+        #{tagId,jdbcType=INTEGER},
+      </if>
+      <if test="tagName != null" >
+        #{tagName,jdbcType=VARCHAR},
+      </if>
+      <if test="tagInfo != null" >
+        #{tagInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="articleNumber != null" >
+        #{articleNumber,jdbcType=INTEGER},
+      </if>
+      <if test="discussNumber != null" >
+        #{discussNumber,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zwp.slcp.apicommon.entity.Tag" >
+    update tag
+    <set >
+      <if test="tagName != null" >
+        tag_name = #{tagName,jdbcType=VARCHAR},
+      </if>
+      <if test="tagInfo != null" >
+        tag_info = #{tagInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="articleNumber != null" >
+        article_number = #{articleNumber,jdbcType=INTEGER},
+      </if>
+      <if test="discussNumber != null" >
+        discuss_number = #{discussNumber,jdbcType=INTEGER},
+      </if>
+    </set>
+    where tag_id = #{tagId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zwp.slcp.apicommon.entity.Tag" >
+    update tag
+    set tag_name = #{tagName,jdbcType=VARCHAR},
+      tag_info = #{tagInfo,jdbcType=VARCHAR},
+      article_number = #{articleNumber,jdbcType=INTEGER},
+      discuss_number = #{discussNumber,jdbcType=INTEGER}
+    where tag_id = #{tagId,jdbcType=INTEGER}
+  </update>
+</mapper>

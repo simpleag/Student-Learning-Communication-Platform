@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zwp.slcp.sqlserver.mapper.AnoymousCommentMapper">
+  <resultMap id="BaseResultMap" type="com.zwp.slcp.apicommon.entity.AnoymousComment">
+    <id column="anoymous_comment_id"  property="anoymousCommentId" jdbcType="BIGINT"/>
+    <result column="anoymous_comment_author_Id" jdbcType="BIGINT" property="anoymousCommentAuthorId" />
+    <result column="anoymous_comment_content" jdbcType="VARCHAR" property="anoymousCommentContent" />
+    <result column="anoymous_list_number" jdbcType="INTEGER" property="anoymousListNumber" />
+    <result column="anoymouse_replay_userId" jdbcType="BIGINT" property="anoymouseReplayUserid" />
+    <result column="anoymous_comment_state" jdbcType="INTEGER" property="anoymousCommentState" />
+    <result column="create_time" jdbcType="BIGINT" property="createTime" />
+    <result column="update_time" jdbcType="BIGINT" property="updateTime" />
+    <result column="anoymous_id" jdbcType="BIGINT" property="anoymousId" />
+  </resultMap>
+  <resultMap id="DetailResultMap" type="com.zwp.slcp.apicommon.entity.DetailAnoymousComment" >
+    <result column="anoymous_comment_author_Id" jdbcType="BIGINT" property="anoymousCommentAuthorId" />
+    <result column="anoymous_comment_content" jdbcType="VARCHAR" property="anoymousCommentContent" />
+    <result column="anoymous_list_number" jdbcType="INTEGER" property="anoymousListNumber" />
+    <result column="anoymouse_replay_userId" jdbcType="BIGINT" property="anoymouseReplayUserid" />
+    <result column="anoymous_comment_state" jdbcType="INTEGER" property="anoymousCommentState" />
+    <result column="create_time" jdbcType="BIGINT" property="createTime" />
+    <result column="update_time" jdbcType="BIGINT" property="updateTime" />
+    <result column="anoymous_id" jdbcType="BIGINT" property="anoymousId" />
+    <result column="user_anonymouse_name" property="userAnonymouseName" jdbcType="VARCHAR" />
+    <result column="approve_number" property="approveNumber" jdbcType="INTEGER" />
+    <result column="user_approve_type" property="userApproveType" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    anoymous_comment_id, anoymous_comment_author_Id, anoymous_comment_content, anoymous_list_number, 
+    anoymouse_replay_userId, anoymous_comment_state, create_time, update_time, anoymous_id
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from anoymous_comment
+    where anoymous_comment_id = #{anoymousCommentId,jdbcType=BIGINT}
+  </select>
+  <select id="selectByUserId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from anoymous_comment
+    where anoymous_comment_author_Id = #{anoymousCommentAuthorId,jdbcType=BIGINT}
+    ORDER BY update_time DESC
+  </select>
+  <select id="selectDetailByAnoymousId" resultMap="DetailResultMap">
+    SELECT  anoymous_comment_id, anoymous_comment_author_Id, anoymous_comment_content, anoymous_list_number,
+    anoymouse_replay_userId, anoymous_comment_state, ac.create_time as create_time, ac.update_time as update_time, anoymous_id, (
+		SELECT count(1)
+        FROM map_user_anoymousecomment as m
+        WHERE m.anoymouse_comment_id = ac.anoymous_comment_id
+    ) as approve_number, (
+			select m2.user_approve_type
+            from map_user_anoymousecomment as m2
+            WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.anoymouse_comment_id = ac.anoymous_comment_id
+        ) as user_approve_type, user_anonymouse_name
+FROM anoymous_comment as ac, user as u
+WHERE ac.anoymous_id = #{anoymousId,jdbcType=BIGINT}
+AND ac.anoymous_comment_author_Id = u.user_id
+ORDER BY ac.anoymous_list_number
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from anoymous_comment
+    where anoymous_comment_id = #{anoymousCommentId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zwp.slcp.apicommon.entity.AnoymousComment">
+    insert into anoymous_comment (anoymous_comment_id, anoymous_comment_author_Id, 
+      anoymous_comment_content, anoymous_list_number, 
+      anoymouse_replay_userId, anoymous_comment_state, 
+      create_time, update_time, anoymous_id
+      )
+    values (#{anoymousCommentId,jdbcType=BIGINT}, #{anoymousCommentAuthorId,jdbcType=BIGINT}, 
+      #{anoymousCommentContent,jdbcType=VARCHAR}, #{anoymousListNumber,jdbcType=INTEGER}, 
+      #{anoymouseReplayUserid,jdbcType=BIGINT}, #{anoymousCommentState,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT}, #{anoymousId,jdbcType=BIGINT}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.zwp.slcp.apicommon.entity.AnoymousComment">
+    insert into anoymous_comment
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="anoymousCommentId != null">
+        anoymous_comment_id,
+      </if>
+      <if test="anoymousCommentAuthorId != null">
+        anoymous_comment_author_Id,
+      </if>
+      <if test="anoymousCommentContent != null">
+        anoymous_comment_content,
+      </if>
+      <if test="anoymousListNumber != null">
+        anoymous_list_number,
+      </if>
+      <if test="anoymouseReplayUserid != null">
+        anoymouse_replay_userId,
+      </if>
+      <if test="anoymousCommentState != null">
+        anoymous_comment_state,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="anoymousId != null">
+        anoymous_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="anoymousCommentId != null">
+        #{anoymousCommentId,jdbcType=BIGINT},
+      </if>
+      <if test="anoymousCommentAuthorId != null">
+        #{anoymousCommentAuthorId,jdbcType=BIGINT},
+      </if>
+      <if test="anoymousCommentContent != null">
+        #{anoymousCommentContent,jdbcType=VARCHAR},
+      </if>
+      <if test="anoymousListNumber != null">
+        #{anoymousListNumber,jdbcType=INTEGER},
+      </if>
+      <if test="anoymouseReplayUserid != null">
+        #{anoymouseReplayUserid,jdbcType=BIGINT},
+      </if>
+      <if test="anoymousCommentState != null">
+        #{anoymousCommentState,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=BIGINT},
+      </if>
+      <if test="anoymousId != null">
+        #{anoymousId,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zwp.slcp.apicommon.entity.AnoymousComment">
+    update anoymous_comment
+    <set>
+      <if test="anoymousCommentAuthorId != null">
+        anoymous_comment_author_Id = #{anoymousCommentAuthorId,jdbcType=BIGINT},
+      </if>
+      <if test="anoymousCommentContent != null">
+        anoymous_comment_content = #{anoymousCommentContent,jdbcType=VARCHAR},
+      </if>
+      <if test="anoymousListNumber != null">
+        anoymous_list_number = #{anoymousListNumber,jdbcType=INTEGER},
+      </if>
+      <if test="anoymouseReplayUserid != null">
+        anoymouse_replay_userId = #{anoymouseReplayUserid,jdbcType=BIGINT},
+      </if>
+      <if test="anoymousCommentState != null">
+        anoymous_comment_state = #{anoymousCommentState,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=BIGINT},
+      </if>
+      <if test="anoymousId != null">
+        anoymous_id = #{anoymousId,jdbcType=BIGINT},
+      </if>
+    </set>
+    where anoymous_comment_id = #{anoymousCommentId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zwp.slcp.apicommon.entity.AnoymousComment">
+    update anoymous_comment
+    set anoymous_comment_author_Id = #{anoymousCommentAuthorId,jdbcType=BIGINT},
+      anoymous_comment_content = #{anoymousCommentContent,jdbcType=VARCHAR},
+      anoymous_list_number = #{anoymousListNumber,jdbcType=INTEGER},
+      anoymouse_replay_userId = #{anoymouseReplayUserid,jdbcType=BIGINT},
+      anoymous_comment_state = #{anoymousCommentState,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=BIGINT},
+      update_time = #{updateTime,jdbcType=BIGINT},
+      anoymous_id = #{anoymousId,jdbcType=BIGINT}
+    where anoymous_comment_id = #{anoymousCommentId,jdbcType=BIGINT}
+  </update>
+</mapper>

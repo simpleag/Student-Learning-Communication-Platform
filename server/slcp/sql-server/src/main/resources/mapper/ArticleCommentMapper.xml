@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zwp.slcp.sqlserver.mapper.ArticleCommentMapper" >
+  <resultMap id="BaseResultMap" type="com.zwp.slcp.apicommon.entity.ArticleComment" >
+    <id column="article_comment_id" property="articleCommentId" jdbcType="BIGINT" />
+    <result column="article_comment_author_Id" property="articleCommentAuthorId" jdbcType="BIGINT" />
+    <result column="article_comment_content" property="articleCommentContent" jdbcType="VARCHAR" />
+    <result column="article_list_number" property="articleListNumber" jdbcType="INTEGER" />
+    <result column="article_replay_userId" property="articleReplayUserid" jdbcType="BIGINT" />
+    <result column="article_comment_state" property="articleCommentState" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="BIGINT" />
+    <result column="update_time" property="updateTime" jdbcType="BIGINT" />
+    <result column="article_id" property="articleId" jdbcType="BIGINT" />
+  </resultMap>
+  <resultMap id="DetailResultMap" type="com.zwp.slcp.apicommon.entity.DetailArticleComment" >
+    <id column="article_comment_id" property="articleCommentId" jdbcType="BIGINT" />
+    <result column="article_comment_author_Id" property="articleCommentAuthorId" jdbcType="BIGINT" />
+    <result column="article_comment_content" property="articleCommentContent" jdbcType="VARCHAR" />
+    <result column="article_list_number" property="articleListNumber" jdbcType="INTEGER" />
+    <result column="article_replay_userId" property="articleReplayUserid" jdbcType="BIGINT" />
+    <result column="article_comment_state" property="articleCommentState" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="BIGINT" />
+    <result column="update_time" property="updateTime" jdbcType="BIGINT" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="user_pic_url" property="userPicUrl" jdbcType="VARCHAR" />
+    <result column="approve_number" property="approveNumber" jdbcType="INTEGER" />
+    <result column="user_approve_type" property="userApproveType" jdbcType="INTEGER" />
+    <result column="article_id" property="articleId" jdbcType="BIGINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    article_comment_id, article_comment_author_Id, article_comment_content, article_list_number, 
+    article_replay_userId, article_comment_state, create_time, update_time, article_id
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from article_comment
+    where article_comment_id = #{articleCommentId,jdbcType=BIGINT}
+  </select>
+  <select id="selectByUserId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select
+    <include refid="Base_Column_List" />
+    from article_comment
+    where article_comment_author_Id = #{articleCommentAuthorId,jdbcType=BIGINT}
+  </select>
+  <select id="selectDetailByArticleId" resultMap="DetailResultMap" >
+    SELECT article_comment_id, article_comment_author_Id, article_comment_content, article_list_number,
+    article_replay_userId, article_comment_state, ac.create_time as create_time, ac.update_time as update_time, u.user_name as user_name, user_pic_url, (
+		SELECT count(1)
+        FROM map_user_articlecomment as m
+        WHERE m.article_comment_id = ac.article_comment_id
+    ) as approve_number, (
+			select m2.user_approve_type
+            from map_user_articlecomment as m2
+            WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.article_comment_id = ac.article_comment_id
+        ) as user_approve_type, article_id
+FROM slcp.article_comment as ac, user as u
+WHERE ac.article_id = #{articleId,jdbcType=BIGINT} AND ac.article_comment_author_Id = u.user_id
+ORDER BY ac.article_list_number
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from article_comment
+    where article_comment_id = #{articleCommentId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zwp.slcp.apicommon.entity.ArticleComment" >
+    insert into article_comment (article_comment_id, article_comment_author_Id, 
+      article_comment_content, article_list_number, 
+      article_replay_userId, article_comment_state, 
+      create_time, update_time, article_id)
+    values (#{articleCommentId,jdbcType=BIGINT}, #{articleCommentAuthorId,jdbcType=BIGINT}, 
+      #{articleCommentContent,jdbcType=VARCHAR}, #{articleListNumber,jdbcType=INTEGER}, 
+      #{articleReplayUserid,jdbcType=BIGINT}, #{articleCommentState,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT}), #{articleId,jdbcType=BIGINT}
+  </insert>
+  <insert id="insertSelective" parameterType="com.zwp.slcp.apicommon.entity.ArticleComment" >
+    insert into article_comment
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="articleCommentId != null" >
+        article_comment_id,
+      </if>
+      <if test="articleCommentAuthorId != null" >
+        article_comment_author_Id,
+      </if>
+      <if test="articleCommentContent != null" >
+        article_comment_content,
+      </if>
+      <if test="articleListNumber != null" >
+        article_list_number,
+      </if>
+      <if test="articleReplayUserid != null" >
+        article_replay_userId,
+      </if>
+      <if test="articleCommentState != null" >
+        article_comment_state,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="articleId != null" >
+        article_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="articleCommentId != null" >
+        #{articleCommentId,jdbcType=BIGINT},
+      </if>
+      <if test="articleCommentAuthorId != null" >
+        #{articleCommentAuthorId,jdbcType=BIGINT},
+      </if>
+      <if test="articleCommentContent != null" >
+        #{articleCommentContent,jdbcType=VARCHAR},
+      </if>
+      <if test="articleListNumber != null" >
+        #{articleListNumber,jdbcType=INTEGER},
+      </if>
+      <if test="articleReplayUserid != null" >
+        #{articleReplayUserid,jdbcType=BIGINT},
+      </if>
+      <if test="articleCommentState != null" >
+        #{articleCommentState,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=BIGINT},
+      </if>
+      <if test="articleId != null" >
+        #{articleId,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zwp.slcp.apicommon.entity.ArticleComment" >
+    update article_comment
+    <set >
+      <if test="articleCommentAuthorId != null" >
+        article_comment_author_Id = #{articleCommentAuthorId,jdbcType=BIGINT},
+      </if>
+      <if test="articleCommentContent != null" >
+        article_comment_content = #{articleCommentContent,jdbcType=VARCHAR},
+      </if>
+      <if test="articleListNumber != null" >
+        article_list_number = #{articleListNumber,jdbcType=INTEGER},
+      </if>
+      <if test="articleReplayUserid != null" >
+        article_replay_userId = #{articleReplayUserid,jdbcType=BIGINT},
+      </if>
+      <if test="articleCommentState != null" >
+        article_comment_state = #{articleCommentState,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=BIGINT},
+      </if>
+      <if test="articleId != null" >
+        #{articleId,jdbcType=BIGINT},
+      </if>
+    </set>
+    where article_comment_id = #{articleCommentId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zwp.slcp.apicommon.entity.ArticleComment" >
+    update article_comment
+    set article_comment_author_Id = #{articleCommentAuthorId,jdbcType=BIGINT},
+      article_comment_content = #{articleCommentContent,jdbcType=VARCHAR},
+      article_list_number = #{articleListNumber,jdbcType=INTEGER},
+      article_replay_userId = #{articleReplayUserid,jdbcType=BIGINT},
+      article_comment_state = #{articleCommentState,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=BIGINT},
+      update_time = #{updateTime,jdbcType=BIGINT},
+      #{articleId,jdbcType=BIGINT}
+    where article_comment_id = #{articleCommentId,jdbcType=BIGINT}
+  </update>
+</mapper>

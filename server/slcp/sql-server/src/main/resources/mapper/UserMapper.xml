@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zwp.slcp.sqlserver.mapper.UserMapper" >
+  <resultMap id="BaseResultMap" type="com.zwp.slcp.apicommon.entity.User" >
+    <id column="user_id" property="userId" jdbcType="BIGINT" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="user_pwd" property="userPwd" jdbcType="VARCHAR" />
+    <result column="user_phone_number" property="userPhoneNumber" jdbcType="VARCHAR" />
+    <result column="user_login_id" property="userLoginId" jdbcType="VARCHAR" />
+    <result column="user_pic_url" property="userPicUrl" jdbcType="VARCHAR" />
+    <result column="user_honor" property="userHonor" jdbcType="VARCHAR" />
+    <result column="user_anonymouse_name" property="userAnonymouseName" jdbcType="VARCHAR" />
+    <result column="user_anonymouse_honor" property="userAnonymouseHonor" jdbcType="VARCHAR" />
+    <result column="user_introduce" property="userIntroduce" jdbcType="VARCHAR" />
+    <result column="user_get_approve_number" property="userGetApproveNumber" jdbcType="INTEGER" />
+    <result column="user_article_number" property="userArticleNumber" jdbcType="INTEGER" />
+    <result column="user_follow_number" property="userFollowNumber" jdbcType="INTEGER" />
+    <result column="user_discuss_number" property="userDiscussNumber" jdbcType="INTEGER" />
+    <result column="user_anoymouse_number" property="userAnoymouseNumber" jdbcType="INTEGER" />
+    <result column="user_comment_number" property="userCommentNumber" jdbcType="INTEGER" />
+    <result column="user_attention_number" property="userAttentionNumber" jdbcType="INTEGER" />
+    <result column="user_favorite_number" property="userFavoriteNumber" jdbcType="INTEGER" />
+    <result column="user_approve_number" property="userApproveNumber" jdbcType="INTEGER" />
+    <result column="user_born" property="userBorn" jdbcType="BIGINT" />
+    <result column="user_sex" property="userSex" jdbcType="VARCHAR" />
+    <result column="user_school" property="userSchool" jdbcType="VARCHAR" />
+    <result column="user_education" property="userEducation" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="BIGINT" />
+    <result column="update_time" property="updateTime" jdbcType="BIGINT" />
+  </resultMap>
+
+  <resultMap id="LimitBaseMap" type="com.zwp.slcp.apicommon.entity.User" >
+    <id column="user_id" property="userId" jdbcType="BIGINT" />
+    <result column="user_pic_url" property="userPicUrl" jdbcType="VARCHAR" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="user_login_id" property="userLoginId" jdbcType="VARCHAR" />
+    <result column="infoNumber" property="infoNumber" jdbcType="VARCHAR" />
+    <result column="messageNumber" property="messageNumber" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="UserFollowMap" type="com.zwp.slcp.apicommon.entity.UserFollow" >
+    <id column="user_id" property="userId" jdbcType="BIGINT" />
+    <result column="user_pic_url" property="userPicUrl" jdbcType="VARCHAR" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="user_attention_type" property="userAttentionType" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    user_id, user_name, user_pwd, user_phone_number, user_login_id, user_pic_url, user_honor, 
+    user_anonymouse_name, user_anonymouse_honor, user_introduce, user_get_approve_number, 
+    user_article_number, user_follow_number, user_discuss_number, user_anoymouse_number, 
+    user_comment_number, user_attention_number, user_favorite_number, user_approve_number, 
+    user_born, user_sex, user_school, user_education, create_time, update_time
+  </sql>
+  <sql id="Limite_Column_List" >
+    user_id, user_name, user_pic_url, user_login_id, infoNumber, messageNumber
+  </sql>
+  <sql id="User_Follow_Column_List" >
+    user_id, user_name, user_pic_url, user_attention_type
+  </sql>
+  <!--一些最基础的用户信息-->
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select
+    <include refid="Base_Column_List" />
+    from user
+    where user_id = #{userId,jdbcType=BIGINT}
+  </select>
+  <select id="selectUserAttetion" resultMap="UserFollowMap" parameterType="java.lang.Long" >
+    select
+    <include refid="User_Follow_Column_List" />
+    from slcp.map_user as map,user
+    where map.user_id = #{userId,jdbcType=BIGINT} AND user.user_id = map.user2_id
+  </select>
+
+  <select id="selectUserFollow" resultMap="UserFollowMap" parameterType="java.lang.Long" >
+    select
+    <include refid="User_Follow_Column_List" />
+    from slcp.map_user as map,user
+    where map.user2_id = #{userId,jdbcType=BIGINT} AND user.user_id = map.user_id
+  </select>
+
+  <select id="selectByUserPhone" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from user
+    where user_phone_number = #{userPhoneNumber,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectByUserLoginId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from user
+    where user_login_id = #{userLoginId,jdbcType=VARCHAR}
+  </select>
+
+
+  <!---->
+  <select id="selectUserLimitInfo" resultMap="LimitBaseMap" parameterType="java.lang.Long">
+
+SELECT user_id, user_name, user_login_id, (
+	SELECT count(1)
+    FROM info
+    WHERE info.info_receive_user_id = #{userId,jdbcType=BIGINT}
+) as infoNumber,  (
+	SELECT count(1)
+    FROM message
+    WHERE message_receive_userId = #{userId,jdbcType=BIGINT}
+) as  messageNumber
+FROM user
+WHERE user_id = #{userId,jdbcType=BIGINT}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from user
+    where user_id = #{userId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zwp.slcp.apicommon.entity.User" >
+  insert into user (user_id, user_name, user_pwd,
+  user_phone_number, user_login_id, user_pic_url,
+  user_honor, user_anonymouse_name, user_anonymouse_honor,
+  user_introduce, user_get_approve_number, user_article_number,
+  user_follow_number, user_discuss_number, user_anoymouse_number,
+  user_comment_number, user_attention_number,
+  user_favorite_number, user_approve_number,
+  user_born, user_sex, user_school,
+  user_education, create_time, update_time
+  )
+  values (#{userId,jdbcType=BIGINT}, #{userName,jdbcType=VARCHAR}, #{userPwd,jdbcType=VARCHAR},
+  #{userPhoneNumber,jdbcType=VARCHAR}, #{userLoginId,jdbcType=VARCHAR}, #{userPicUrl,jdbcType=VARCHAR},
+  #{userHonor,jdbcType=VARCHAR}, #{userAnonymouseName,jdbcType=VARCHAR}, #{userAnonymouseHonor,jdbcType=VARCHAR},
+  #{userIntroduce,jdbcType=VARCHAR}, #{userGetApproveNumber,jdbcType=INTEGER}, #{userArticleNumber,jdbcType=INTEGER},
+  #{userFollowNumber,jdbcType=INTEGER}, #{userDiscussNumber,jdbcType=INTEGER}, #{userAnoymouseNumber,jdbcType=INTEGER},
+  #{userCommentNumber,jdbcType=INTEGER}, #{userAttentionNumber,jdbcType=INTEGER},
+  #{userFavoriteNumber,jdbcType=INTEGER}, #{userApproveNumber,jdbcType=INTEGER},
+  #{userBorn,jdbcType=BIGINT}, #{userSex,jdbcType=VARCHAR}, #{userSchool,jdbcType=VARCHAR},
+  #{userEducation,jdbcType=VARCHAR}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT}
+  )
+</insert>
+  <insert id="insertMapUser" >
+    insert into map_user (user_id, user2_id, user_attention_type, create_time, update_time
+    )
+    values (#{userId,jdbcType=BIGINT}, #{user2Id,jdbcType=BIGINT},
+    #{user_attention_type,jdbcType=INTEGER}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT}
+    )
+  </insert>
+  <insert id="insertSelective" parameterType="com.zwp.slcp.apicommon.entity.User" >
+    insert into user
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="userName != null" >
+        user_name,
+      </if>
+      <if test="userPwd != null" >
+        user_pwd,
+      </if>
+      <if test="userPhoneNumber != null" >
+        user_phone_number,
+      </if>
+      <if test="userLoginId != null" >
+        user_login_id,
+      </if>
+      <if test="userPicUrl != null" >
+        user_pic_url,
+      </if>
+      <if test="userHonor != null" >
+        user_honor,
+      </if>
+      <if test="userAnonymouseName != null" >
+        user_anonymouse_name,
+      </if>
+      <if test="userAnonymouseHonor != null" >
+        user_anonymouse_honor,
+      </if>
+      <if test="userIntroduce != null" >
+        user_introduce,
+      </if>
+      <if test="userGetApproveNumber != null" >
+        user_get_approve_number,
+      </if>
+      <if test="userArticleNumber != null" >
+        user_article_number,
+      </if>
+      <if test="userFollowNumber != null" >
+        user_follow_number,
+      </if>
+      <if test="userDiscussNumber != null" >
+        user_discuss_number,
+      </if>
+      <if test="userAnoymouseNumber != null" >
+        user_anoymouse_number,
+      </if>
+      <if test="userCommentNumber != null" >
+        user_comment_number,
+      </if>
+      <if test="userAttentionNumber != null" >
+        user_attention_number,
+      </if>
+      <if test="userFavoriteNumber != null" >
+        user_favorite_number,
+      </if>
+      <if test="userApproveNumber != null" >
+        user_approve_number,
+      </if>
+      <if test="userBorn != null" >
+        user_born,
+      </if>
+      <if test="userSex != null" >
+        user_sex,
+      </if>
+      <if test="userSchool != null" >
+        user_school,
+      </if>
+      <if test="userEducation != null" >
+        user_education,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="userName != null" >
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="userPwd != null" >
+        #{userPwd,jdbcType=VARCHAR},
+      </if>
+      <if test="userPhoneNumber != null" >
+        #{userPhoneNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="userLoginId != null" >
+        #{userLoginId,jdbcType=VARCHAR},
+      </if>
+      <if test="userPicUrl != null" >
+        #{userPicUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="userHonor != null" >
+        #{userHonor,jdbcType=VARCHAR},
+      </if>
+      <if test="userAnonymouseName != null" >
+        #{userAnonymouseName,jdbcType=VARCHAR},
+      </if>
+      <if test="userAnonymouseHonor != null" >
+        #{userAnonymouseHonor,jdbcType=VARCHAR},
+      </if>
+      <if test="userIntroduce != null" >
+        #{userIntroduce,jdbcType=VARCHAR},
+      </if>
+      <if test="userGetApproveNumber != null" >
+        #{userGetApproveNumber,jdbcType=INTEGER},
+      </if>
+      <if test="userArticleNumber != null" >
+        #{userArticleNumber,jdbcType=INTEGER},
+      </if>
+      <if test="userFollowNumber != null" >
+        #{userFollowNumber,jdbcType=INTEGER},
+      </if>
+      <if test="userDiscussNumber != null" >
+        #{userDiscussNumber,jdbcType=INTEGER},
+      </if>
+      <if test="userAnoymouseNumber != null" >
+        #{userAnoymouseNumber,jdbcType=INTEGER},
+      </if>
+      <if test="userCommentNumber != null" >
+        #{userCommentNumber,jdbcType=INTEGER},
+      </if>
+      <if test="userAttentionNumber != null" >
+        #{userAttentionNumber,jdbcType=INTEGER},
+      </if>
+      <if test="userFavoriteNumber != null" >
+        #{userFavoriteNumber,jdbcType=INTEGER},
+      </if>
+      <if test="userApproveNumber != null" >
+        #{userApproveNumber,jdbcType=INTEGER},
+      </if>
+      <if test="userBorn != null" >
+        #{userBorn,jdbcType=BIGINT},
+      </if>
+      <if test="userSex != null" >
+        #{userSex,jdbcType=VARCHAR},
+      </if>
+      <if test="userSchool != null" >
+        #{userSchool,jdbcType=VARCHAR},
+      </if>
+      <if test="userEducation != null" >
+        #{userEducation,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zwp.slcp.apicommon.entity.User" >
+    update user
+    <set >
+      <if test="userName != null" >
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="userPwd != null" >
+        user_pwd = #{userPwd,jdbcType=VARCHAR},
+      </if>
+      <if test="userPhoneNumber != null" >
+        user_phone_number = #{userPhoneNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="userLoginId != null" >
+        user_login_id = #{userLoginId,jdbcType=VARCHAR},
+      </if>
+      <if test="userPicUrl != null" >
+        user_pic_url = #{userPicUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="userHonor != null" >
+        user_honor = #{userHonor,jdbcType=VARCHAR},
+      </if>
+      <if test="userAnonymouseName != null" >
+        user_anonymouse_name = #{userAnonymouseName,jdbcType=VARCHAR},
+      </if>
+      <if test="userAnonymouseHonor != null" >
+        user_anonymouse_honor = #{userAnonymouseHonor,jdbcType=VARCHAR},
+      </if>
+      <if test="userIntroduce != null" >
+        user_introduce = #{userIntroduce,jdbcType=VARCHAR},
+      </if>
+      <if test="userGetApproveNumber != null" >
+        user_get_approve_number = #{userGetApproveNumber,jdbcType=INTEGER},
+      </if>
+      <if test="userArticleNumber != null" >
+        user_article_number = #{userArticleNumber,jdbcType=INTEGER},
+      </if>
+      <if test="userFollowNumber != null" >
+        user_follow_number = #{userFollowNumber,jdbcType=INTEGER},
+      </if>
+      <if test="userDiscussNumber != null" >
+        user_discuss_number = #{userDiscussNumber,jdbcType=INTEGER},
+      </if>
+      <if test="userAnoymouseNumber != null" >
+        user_anoymouse_number = #{userAnoymouseNumber,jdbcType=INTEGER},
+      </if>
+      <if test="userCommentNumber != null" >
+        user_comment_number = #{userCommentNumber,jdbcType=INTEGER},
+      </if>
+      <if test="userAttentionNumber != null" >
+        user_attention_number = #{userAttentionNumber,jdbcType=INTEGER},
+      </if>
+      <if test="userFavoriteNumber != null" >
+        user_favorite_number = #{userFavoriteNumber,jdbcType=INTEGER},
+      </if>
+      <if test="userApproveNumber != null" >
+        user_approve_number = #{userApproveNumber,jdbcType=INTEGER},
+      </if>
+      <if test="userBorn != null" >
+        user_born = #{userBorn,jdbcType=BIGINT},
+      </if>
+      <if test="userSex != null" >
+        user_sex = #{userSex,jdbcType=VARCHAR},
+      </if>
+      <if test="userSchool != null" >
+        user_school = #{userSchool,jdbcType=VARCHAR},
+      </if>
+      <if test="userEducation != null" >
+        user_education = #{userEducation,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=BIGINT},
+      </if>
+    </set>
+    where user_id = #{userId,jdbcType=BIGINT}
+  </update>
+  <update id="updatePwdByUserLoninId" parameterType="com.zwp.slcp.apicommon.entity.User" >
+    update user
+    <set >
+      <if test="userPwd != null" >
+        user_pwd = #{userPwd,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=BIGINT},
+      </if>
+    </set>
+    where user_login_id = #{userLoginId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zwp.slcp.apicommon.entity.User" >
+    update user
+    set user_name = #{userName,jdbcType=VARCHAR},
+      user_pwd = #{userPwd,jdbcType=VARCHAR},
+      user_phone_number = #{userPhoneNumber,jdbcType=VARCHAR},
+      user_login_id = #{userLoginId,jdbcType=VARCHAR},
+      user_pic_url = #{userPicUrl,jdbcType=VARCHAR},
+      user_honor = #{userHonor,jdbcType=VARCHAR},
+      user_anonymouse_name = #{userAnonymouseName,jdbcType=VARCHAR},
+      user_anonymouse_honor = #{userAnonymouseHonor,jdbcType=VARCHAR},
+      user_introduce = #{userIntroduce,jdbcType=VARCHAR},
+      user_get_approve_number = #{userGetApproveNumber,jdbcType=INTEGER},
+      user_article_number = #{userArticleNumber,jdbcType=INTEGER},
+      user_follow_number = #{userFollowNumber,jdbcType=INTEGER},
+      user_discuss_number = #{userDiscussNumber,jdbcType=INTEGER},
+      user_anoymouse_number = #{userAnoymouseNumber,jdbcType=INTEGER},
+      user_comment_number = #{userCommentNumber,jdbcType=INTEGER},
+      user_attention_number = #{userAttentionNumber,jdbcType=INTEGER},
+      user_favorite_number = #{userFavoriteNumber,jdbcType=INTEGER},
+      user_approve_number = #{userApproveNumber,jdbcType=INTEGER},
+      user_born = #{userBorn,jdbcType=BIGINT},
+      user_sex = #{userSex,jdbcType=VARCHAR},
+      user_school = #{userSchool,jdbcType=VARCHAR},
+      user_education = #{userEducation,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=BIGINT},
+      update_time = #{updateTime,jdbcType=BIGINT}
+    where user_id = #{userId,jdbcType=BIGINT}
+  </update>
+
+  <update id="updateUserMap"  >
+    update map_user
+    set
+    user_attention_type= #{userAttentionType,jdbcType=BIGINT},
+    update_time = #{updateTime,jdbcType=BIGINT}
+    where user_id = #{userId,jdbcType=BIGINT} AND user2_id = #{user2Id,jdbcType=BIGINT}
+  </update>
+  <update id="updateNumber" >
+    update user
+    <set >
+      <if test="userGetApproveNumber != null" >
+        user_get_approve_number = user_get_approve_number + 10,
+      </if>
+      <if test="userArticleNumber != null" >
+        user_article_number = user_article_number + 1,
+      </if>
+      <if test="userFollowNumber != null" >
+        user_follow_number = user_follow_number + 1,
+      </if>
+      <if test="userDiscussNumber != null" >
+        user_discuss_number = user_discuss_number + 1,
+      </if>
+      <if test="userAnoymouseNumber != null" >
+        user_anoymouse_number = user_anoymouse_number + 1,
+      </if>
+      <if test="userCommentNumber != null" >
+        user_comment_number = user_comment_number + 1,
+      </if>
+      <if test="userAttentionNumber != null" >
+        user_attention_number = user_attention_number + 1,
+      </if>
+      <if test="userFavoriteNumber != null" >
+        user_favorite_number = user_favorite_number + 1,
+      </if>
+      <if test="userApproveNumber != null" >
+        user_approve_number = user_approve_number + 1,
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=BIGINT},
+      </if>
+    </set>
+    where user_id = #{userId,jdbcType=BIGINT}
+  </update>
+</mapper>

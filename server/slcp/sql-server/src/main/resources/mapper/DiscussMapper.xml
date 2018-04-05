@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zwp.slcp.sqlserver.mapper.DiscussMapper" >
+  <resultMap id="BaseResultMap" type="com.zwp.slcp.apicommon.entity.Discuss" >
+    <id column="discuss_id" property="discussId" jdbcType="BIGINT" />
+    <result column="discuss_author_id" property="discussAuthorId" jdbcType="BIGINT" />
+    <result column="discuss_title" property="discussTitle" jdbcType="VARCHAR" />
+    <result column="discuss_content" property="discussContent" jdbcType="VARCHAR" />
+    <result column="discuss_comment_number" property="discussCommentNumber" jdbcType="INTEGER" />
+    <result column="discuss_tag_id" property="discussTagId" jdbcType="INTEGER" />
+    <result column="discuss_state" property="discussState" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="BIGINT" />
+    <result column="update_time" property="updateTime" jdbcType="BIGINT" />
+  </resultMap>
+  <resultMap id="HomeResultMap" type="com.zwp.slcp.apicommon.entity.HomeDiscuss" >
+    <id column="discuss_id" property="discussId" jdbcType="BIGINT" />
+    <result column="discuss_author_id" property="discussAuthorId" jdbcType="BIGINT" />
+    <result column="discuss_title" property="discussTitle" jdbcType="VARCHAR" />
+    <result column="discuss_comment_number" property="discussCommentNumber" jdbcType="INTEGER" />
+    <result column="discuss_tag_id" property="discussTagId" jdbcType="INTEGER" />
+    <result column="discuss_state" property="discussState" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="BIGINT" />
+    <result column="update_time" property="updateTime" jdbcType="BIGINT" />
+    <result column="approve_number" property="approveNumber" jdbcType="INTEGER" />
+    <result column="favorite_number" property="favoriteNumber" jdbcType="INTEGER" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="user_pic_url" property="userPicUrl" jdbcType="VARCHAR" />
+    <result column="tag_name" property="tagName" jdbcType="VARCHAR" />
+    <result column="user_approve_type" property="userApproveType" jdbcType="INTEGER" />
+    <result column="user_favorite_type" property="userFavoriteType" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="DetailResultMap" type="com.zwp.slcp.apicommon.entity.Discuss" >
+    <id column="discuss_id" property="discussId" jdbcType="BIGINT" />
+    <result column="discuss_author_id" property="discussAuthorId" jdbcType="BIGINT" />
+    <result column="discuss_title" property="discussTitle" jdbcType="VARCHAR" />
+    <result column="discuss_content" property="discussContent" jdbcType="VARCHAR" />
+    <result column="discuss_comment_number" property="discussCommentNumber" jdbcType="INTEGER" />
+    <result column="discuss_tag_id" property="discussTagId" jdbcType="INTEGER" />
+    <result column="discuss_state" property="discussState" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="BIGINT" />
+    <result column="update_time" property="updateTime" jdbcType="BIGINT" />
+    <result column="approve_number" property="approveNumber" jdbcType="INTEGER" />
+    <result column="favorite_number" property="favoriteNumber" jdbcType="INTEGER" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="user_honor" property="userHonor" jdbcType="VARCHAR" />
+    <result column="user_pic_url" property="userPicUrl" jdbcType="VARCHAR" />
+    <result column="tag_name" property="tagName" jdbcType="VARCHAR" />
+    <result column="user_approve_type" property="userApproveType" jdbcType="INTEGER" />
+    <result column="user_favorite_type" property="userFavoriteType" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    discuss_id, discuss_author_id, discuss_title, discuss_content, discuss_comment_number, 
+    discuss_tag_id, discuss_state, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from discuss
+    where discuss_id = #{discussId,jdbcType=BIGINT}
+  </select>
+  <select id="selectHomeDiscussOrderByTime" resultMap="HomeResultMap" parameterType="java.lang.Long" >
+select distinct d.discuss_id as discuss_id, discuss_author_id, discuss_title, discuss_comment_number,
+    discuss_tag_id, discuss_state, d.create_time as create_time, d.update_time as update_time, user_name, user_pic_url, tag_name, (
+		select count(1)
+        from map_user_discuss as m
+        WHERE m.discuss_id = d.discuss_id AND m.user_approve_type = 1
+
+    ) as approveNumber, (select count(1)
+        from map_user_discuss as m
+        WHERE m.discuss_id = d.discuss_id AND m.user_favorite_type = 1
+
+        ) as favoriteNumber, (
+			select m2.user_approve_type
+            from map_user_discuss as m2
+            WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.discuss_id = d.discuss_id
+        ) as user_approve_type,
+        (
+			select m3.user_favorite_type
+            from map_user_discuss as m3
+            WHERE m3.user_id = #{userId,jdbcType=BIGINT} AND m3.discuss_id = d.discuss_id
+        ) as user_favorite_type
+FROM discuss as d, user as u, tag as t, map_user_discuss as m
+WHERE   u.user_id = d.discuss_author_id AND d.discuss_tag_id = t.tag_id
+order by d.update_time DESC
+  </select>
+  <select id="selectHomeDiscussOrderByHot" resultMap="HomeResultMap" parameterType="java.lang.Long" >
+    select distinct d.discuss_id as discuss_id, discuss_author_id, discuss_title, discuss_comment_number,
+    discuss_tag_id, discuss_state, d.create_time as create_time, d.update_time as update_time, user_name, user_pic_url, tag_name, (
+    select count(1)
+    from map_user_discuss as m
+    WHERE m.discuss_id = d.discuss_id AND m.user_approve_type = 1
+
+    ) as approveNumber, (select count(1)
+    from map_user_discuss as m
+    WHERE m.discuss_id = d.discuss_id AND m.user_favorite_type = 1
+
+    ) as favoriteNumber, (
+    select m2.user_approve_type
+    from map_user_discuss as m2
+    WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.discuss_id = d.discuss_id
+    ) as user_approve_type,
+    (
+    select m3.user_favorite_type
+    from map_user_discuss as m3
+    WHERE m3.user_id = #{userId,jdbcType=BIGINT} AND m3.discuss_id = d.discuss_id
+    ) as user_favorite_type
+    FROM discuss as d, user as u, tag as t, map_user_discuss as m
+    WHERE   u.user_id = d.discuss_author_id AND d.discuss_tag_id = t.tag_id
+    order by d.discuss_comment_number DESC
+  </select>
+  <select id="selectTagsDiscussOrderByHot" resultMap="HomeResultMap" >
+    select distinct d.discuss_id as discuss_id, discuss_author_id, discuss_title, discuss_comment_number,
+    discuss_tag_id, discuss_state, d.create_time as create_time, d.update_time as update_time, user_name, user_pic_url, tag_name, (
+    select count(1)
+    from map_user_discuss as m
+    WHERE m.discuss_id = d.discuss_id AND m.user_approve_type = 1
+
+    ) as approveNumber, (select count(1)
+    from map_user_discuss as m
+    WHERE m.discuss_id = d.discuss_id AND m.user_favorite_type = 1
+
+    ) as favoriteNumber, (
+    select m2.user_approve_type
+    from map_user_discuss as m2
+    WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.discuss_id = d.discuss_id
+    ) as user_approve_type,
+    (
+    select m3.user_favorite_type
+    from map_user_discuss as m3
+    WHERE m3.user_id = #{userId,jdbcType=BIGINT} AND m3.discuss_id = d.discuss_id
+    ) as user_favorite_type
+    FROM discuss as d, user as u, tag as t, map_user_discuss as m
+    WHERE  t.tag_id = #{tagId,jdbcType=INTEGER}
+    AND u.user_id = d.discuss_author_id
+    AND d.discuss_tag_id = t.tag_id
+    order by d.discuss_comment_number DESC
+  </select>
+  <select id="selectTagsDiscussOrderByTime" resultMap="HomeResultMap">
+    select distinct d.discuss_id as discuss_id, discuss_author_id, discuss_title, discuss_comment_number,
+    discuss_tag_id, discuss_state, d.create_time as create_time, d.update_time as update_time, user_name, user_pic_url, tag_name, (
+    select count(1)
+    from map_user_discuss as m
+    WHERE m.discuss_id = d.discuss_id AND m.user_approve_type = 1
+
+    ) as approveNumber, (select count(1)
+    from map_user_discuss as m
+    WHERE m.discuss_id = d.discuss_id AND m.user_favorite_type = 1
+
+    ) as favoriteNumber, (
+    select m2.user_approve_type
+    from map_user_discuss as m2
+    WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.discuss_id = d.discuss_id
+    ) as user_approve_type,
+    (
+    select m3.user_favorite_type
+    from map_user_discuss as m3
+    WHERE m3.user_id = #{userId,jdbcType=BIGINT} AND m3.discuss_id = d.discuss_id
+    ) as user_favorite_type
+    FROM discuss as d, user as u, tag as t, map_user_discuss as m
+    WHERE  t.tag_id = #{tagId,jdbcType=INTEGER}
+    AND u.user_id = d.discuss_author_id
+    AND d.discuss_tag_id = t.tag_id
+    order by d.update_time DESC
+  </select>
+  <select id="selectHomeDiscussByAuthorId" resultMap="HomeResultMap" >
+    select distinct d.discuss_id as discuss_id, discuss_author_id, discuss_title, discuss_comment_number,
+    discuss_tag_id, discuss_state, d.create_time as create_time, d.update_time as update_time, user_name, user_pic_url, tag_name, (
+    select count(1)
+    from map_user_discuss as m
+    WHERE m.discuss_id = d.discuss_id AND m.user_approve_type = 1
+
+    ) as approveNumber, (select count(1)
+    from map_user_discuss as m
+    WHERE m.discuss_id = d.discuss_id AND m.user_favorite_type = 1
+
+    ) as favoriteNumber, (
+    select m2.user_approve_type
+    from map_user_discuss as m2
+    WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.discuss_id = d.discuss_id
+    ) as user_approve_type,
+    (
+    select m3.user_favorite_type
+    from map_user_discuss as m3
+    WHERE m3.user_id = #{userId,jdbcType=BIGINT} AND m3.discuss_id = d.discuss_id
+    ) as user_favorite_type
+    FROM discuss as d, user as u, tag as t, map_user_discuss as m
+    WHERE  d.discuss_author_id = #{authorId,jdbcType=INTEGER}
+    AND u.user_id = d.discuss_author_id
+    AND d.discuss_tag_id = t.tag_id
+    order by d.update_time DESC
+  </select>
+  <select id="selectUserFavoriteDiscuss" resultMap="HomeResultMap" parameterType="java.lang.Long">
+    select distinct d.discuss_id as discuss_id, discuss_author_id, discuss_title, discuss_content, discuss_comment_number,
+    discuss_tag_id, discuss_state, d.create_time as create_time, d.update_time as update_time, user_name, user_honor, user_pic_url, tag_name, (
+		select count(1)
+        from map_user_discuss as m
+        WHERE m.discuss_id = d.discuss_id AND m.user_approve_type = 1
+
+    ) as approveNumber, (select count(1)
+        from map_user_discuss as m
+        WHERE m.discuss_id = d.discuss_id AND m.user_favorite_type = 1
+
+        ) as favoriteNumber, (
+			select m2.user_approve_type
+            from map_user_discuss as m2
+            WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.discuss_id = d.discuss_id
+        ) as user_approve_type,
+        (
+			select m3.user_favorite_type
+            from map_user_discuss as m3
+            WHERE m3.user_id = #{userId,jdbcType=BIGINT} AND m3.discuss_id = d.discuss_id
+        ) as user_favorite_type
+FROM discuss as d, user as u, tag as t, map_user_discuss as m0
+WHERE m0.user_id = #{userId,jdbcType=BIGINT}
+AND m0.user_favorite_type = 1
+AND t.tag_id = d.discuss_tag_id
+AND u.user_id = d.discuss_author_id
+AND d.discuss_tag_id = t.tag_id
+order by d.update_time DESC
+
+
+  </select>
+  <select id="selectDiscussDetailById" resultMap="DetailResultMap">
+    select distinct d.discuss_id as discuss_id, discuss_author_id, discuss_title, discuss_content, discuss_comment_number,
+    discuss_tag_id, discuss_state, d.create_time as create_time, d.update_time as update_time, user_name, user_honor, user_pic_url, tag_name, (
+		select count(1)
+        from map_user_discuss as m
+        WHERE m.discuss_id = d.discuss_id AND m.user_approve_type = 1
+
+    ) as approveNumber, (select count(1)
+        from map_user_discuss as m
+        WHERE m.discuss_id = d.discuss_id AND m.user_favorite_type = 1
+
+        ) as favoriteNumber, (
+			select m2.user_approve_type
+            from map_user_discuss as m2
+            WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m.discuss_id = d.discuss_id
+        ) as user_approve_type,
+        (
+			select m3.user_favorite_type
+            from map_user_discuss as m3
+            WHERE m3.user_id = #{userId,jdbcType=BIGINT} AND m.discuss_id = d.discuss_id
+        ) as user_favorite_type
+FROM discuss as d, user as u, tag as t, map_user_discuss as m
+WHERE   d.discuss_id = #{discussId,jdbcType=BIGINT}
+AND u.user_id = d.discuss_author_id
+AND d.discuss_tag_id = t.tag_id
+order by d.update_time DESC
+  </select>
+
+  <select id="selectDiscussDetailByComment" resultMap="DetailResultMap">
+    select distinct d.discuss_id as discuss_id, discuss_author_id, discuss_title, discuss_content, discuss_comment_number,
+    discuss_tag_id, discuss_state, d.create_time as create_time, d.update_time as update_time, user_name, user_honor, user_pic_url, tag_name, (
+    select count(1)
+    from map_user_discuss as m
+    WHERE m.discuss_id = d.discuss_id AND m.user_approve_type = 1
+
+    ) as approveNumber, (select count(1)
+    from map_user_discuss as m
+    WHERE m.discuss_id = d.discuss_id AND m.user_favorite_type = 1
+
+    ) as favoriteNumber, (
+    select m2.user_approve_type
+    from map_user_discuss as m2
+    WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m.discuss_id = d.discuss_id
+    ) as user_approve_type,
+    (
+    select m3.user_favorite_type
+    from map_user_discuss as m3
+    WHERE m3.user_id = #{userId,jdbcType=BIGINT} AND m.discuss_id = d.discuss_id
+    ) as user_favorite_type
+    FROM discuss as d, user as u, tag as t, map_user_discuss as m,discuss_comment as dc
+WHERE dc.discuss_comment_id = #{discussCommentId,jdbcType=BIGINT}
+AND d.discuss_id = dc.discuss_id
+AND u.user_id = d.discuss_author_id
+AND d.discuss_tag_id = t.tag_id
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from discuss
+    where discuss_id = #{discussId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zwp.slcp.apicommon.entity.Discuss" >
+    insert into discuss (discuss_id, discuss_author_id, discuss_title, 
+      discuss_content, discuss_comment_number, discuss_tag_id, 
+      discuss_state, create_time, update_time
+      )
+    values (#{discussId,jdbcType=BIGINT}, #{discussAuthorId,jdbcType=BIGINT}, #{discussTitle,jdbcType=VARCHAR}, 
+      #{discussContent,jdbcType=VARCHAR}, #{discussCommentNumber,jdbcType=INTEGER}, #{discussTagId,jdbcType=INTEGER}, 
+      #{discussState,jdbcType=INTEGER}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.zwp.slcp.apicommon.entity.Discuss" >
+    insert into discuss
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="discussId != null" >
+        discuss_id,
+      </if>
+      <if test="discussAuthorId != null" >
+        discuss_author_id,
+      </if>
+      <if test="discussTitle != null" >
+        discuss_title,
+      </if>
+      <if test="discussContent != null" >
+        discuss_content,
+      </if>
+      <if test="discussCommentNumber != null" >
+        discuss_comment_number,
+      </if>
+      <if test="discussTagId != null" >
+        discuss_tag_id,
+      </if>
+      <if test="discussState != null" >
+        discuss_state,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="discussId != null" >
+        #{discussId,jdbcType=BIGINT},
+      </if>
+      <if test="discussAuthorId != null" >
+        #{discussAuthorId,jdbcType=BIGINT},
+      </if>
+      <if test="discussTitle != null" >
+        #{discussTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="discussContent != null" >
+        #{discussContent,jdbcType=VARCHAR},
+      </if>
+      <if test="discussCommentNumber != null" >
+        #{discussCommentNumber,jdbcType=INTEGER},
+      </if>
+      <if test="discussTagId != null" >
+        #{discussTagId,jdbcType=INTEGER},
+      </if>
+      <if test="discussState != null" >
+        #{discussState,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zwp.slcp.apicommon.entity.Discuss" >
+    update discuss
+    <set >
+      <if test="discussAuthorId != null" >
+        discuss_author_id = #{discussAuthorId,jdbcType=BIGINT},
+      </if>
+      <if test="discussTitle != null" >
+        discuss_title = #{discussTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="discussContent != null" >
+        discuss_content = #{discussContent,jdbcType=VARCHAR},
+      </if>
+      <if test="discussCommentNumber != null" >
+        discuss_comment_number = #{discussCommentNumber,jdbcType=INTEGER},
+      </if>
+      <if test="discussTagId != null" >
+        discuss_tag_id = #{discussTagId,jdbcType=INTEGER},
+      </if>
+      <if test="discussState != null" >
+        discuss_state = #{discussState,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=BIGINT},
+      </if>
+    </set>
+    where discuss_id = #{discussId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zwp.slcp.apicommon.entity.Discuss" >
+    update discuss
+    set discuss_author_id = #{discussAuthorId,jdbcType=BIGINT},
+      discuss_title = #{discussTitle,jdbcType=VARCHAR},
+      discuss_content = #{discussContent,jdbcType=VARCHAR},
+      discuss_comment_number = #{discussCommentNumber,jdbcType=INTEGER},
+      discuss_tag_id = #{discussTagId,jdbcType=INTEGER},
+      discuss_state = #{discussState,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=BIGINT},
+      update_time = #{updateTime,jdbcType=BIGINT}
+    where discuss_id = #{discussId,jdbcType=BIGINT}
+  </update>
+
+  <update id="updateCommentNumber" >
+    update discuss
+    set discuss_comment_number = discuss_comment_number + 1, update_time = #{updateTime,jdbcType=BIGINT}
+    WHERE discuss_id = #{discussId,jdbcType=BIGINT}
+  </update>
+</mapper>

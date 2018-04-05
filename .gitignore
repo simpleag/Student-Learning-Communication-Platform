@@ -1,0 +1,14 @@
+
+server/slcp/\.idea/
+
+server/slcp/apicommon/target/
+
+server/slcp/front-api/\.mvn/
+
+server/slcp/gateway/\.mvn/
+
+server/slcp/nosql-server/\.mvn/
+
+server/slcp/register/\.mvn/
+
+server/slcp/sql-server/\.mvn/
