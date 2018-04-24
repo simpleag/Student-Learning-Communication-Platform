@@ -63,6 +63,12 @@
     from user
     where user_id = #{userId,jdbcType=BIGINT}
   </select>
+  <select id="selectByUserPhoneNumber" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from user
+    where user_phone_number = #{userPhoneNumber,jdbcType=VARCHAR}
+  </select>
   <select id="selectUserAttetion" resultMap="UserFollowMap" parameterType="java.lang.Long" >
     select
     <include refid="User_Follow_Column_List" />
@@ -388,6 +394,13 @@ WHERE user_id = #{userId,jdbcType=BIGINT}
     </set>
     where user_login_id = #{userLoginId,jdbcType=VARCHAR}
   </update>
+  <update id="updateFollowNumberByUserId" parameterType="com.zwp.slcp.apicommon.entity.User" >
+    update user
+    <set >
+      user_follow_number = user_follow_numbe + #{userFollowNumber,jdbcType=INTEGER},
+    </set>
+    where user_id = #{userId,jdbcType=BIGINT}
+  </update>
   <update id="updateByPrimaryKey" parameterType="com.zwp.slcp.apicommon.entity.User" >
     update user
     set user_name = #{userName,jdbcType=VARCHAR},
@@ -428,31 +441,31 @@ WHERE user_id = #{userId,jdbcType=BIGINT}
     update user
     <set >
       <if test="userGetApproveNumber != null" >
-        user_get_approve_number = user_get_approve_number + 10,
+        user_get_approve_number = user_get_approve_number + #{userGetApproveNumber,jdbcType=INTEGER},
       </if>
       <if test="userArticleNumber != null" >
-        user_article_number = user_article_number + 1,
+        user_article_number = user_article_number + #{userArticleNumber,jdbcType=INTEGER},
       </if>
       <if test="userFollowNumber != null" >
-        user_follow_number = user_follow_number + 1,
+        user_follow_number = user_follow_number + #{userFollowNumber,jdbcType=INTEGER},
       </if>
       <if test="userDiscussNumber != null" >
-        user_discuss_number = user_discuss_number + 1,
+        user_discuss_number = user_discuss_number + #{userDiscussNumber,jdbcType=INTEGER},
       </if>
       <if test="userAnoymouseNumber != null" >
-        user_anoymouse_number = user_anoymouse_number + 1,
+        user_anoymouse_number = user_anoymouse_number + #{userAnoymouseNumber,jdbcType=INTEGER},
       </if>
       <if test="userCommentNumber != null" >
-        user_comment_number = user_comment_number + 1,
+        user_comment_number = user_comment_number + #{userCommentNumber,jdbcType=INTEGER},
       </if>
       <if test="userAttentionNumber != null" >
-        user_attention_number = user_attention_number + 1,
+        user_attention_number = user_attention_number + #{userAttentionNumber,jdbcType=INTEGER},
       </if>
       <if test="userFavoriteNumber != null" >
-        user_favorite_number = user_favorite_number + 1,
+        user_favorite_number = user_favorite_number + #{userFavoriteNumber,jdbcType=INTEGER},
       </if>
       <if test="userApproveNumber != null" >
-        user_approve_number = user_approve_number + 1,
+        user_approve_number = user_approve_number + #{userApproveNumber,jdbcType=INTEGER},
       </if>
       <if test="updateTime != null" >
         update_time = #{updateTime,jdbcType=BIGINT},

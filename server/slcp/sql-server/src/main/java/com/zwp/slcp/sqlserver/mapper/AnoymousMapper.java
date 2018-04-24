@@ -5,6 +5,7 @@ import com.zwp.slcp.apicommon.entity.DetailAnoymous;
 import com.zwp.slcp.apicommon.entity.DetailDiscuss;
 import com.zwp.slcp.apicommon.entity.HomeAnoymous;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -28,9 +29,9 @@ public interface AnoymousMapper {
 
     List<HomeAnoymous> selectUserFavoriteAnoymous(Long userId);
 
-    DetailAnoymous selectAnoymousDetailById(Long userId, Long anoymousId);
+    DetailAnoymous selectAnoymousDetailById(@Param("userId")Long userId, @Param("anoymousId") Long anoymousId);
 
-    DetailAnoymous selectAnoumousDetailByComment(Long userId, Long anoymousCommentId);
+    DetailAnoymous selectAnoumousDetailByComment(@Param("userId") Long userId, @Param("anoymousCommentId") Long anoymousCommentId);
 
     int updateByPrimaryKeySelective(Anoymous record);
 

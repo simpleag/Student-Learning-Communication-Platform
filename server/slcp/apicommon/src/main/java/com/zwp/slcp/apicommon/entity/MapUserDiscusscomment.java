@@ -7,6 +7,18 @@ public class MapUserDiscusscomment extends MapUserDiscusscommentKey {
 
     private Long updateTime;
 
+    public MapUserDiscusscomment() {
+    }
+
+    public MapUserDiscusscomment(Integer userApproveType) {
+        this.userApproveType = userApproveType;
+    }
+
+    public MapUserDiscusscomment(Long disscussCommentId, Long userId, Integer userApproveType) {
+        super(disscussCommentId, userId);
+        this.userApproveType = userApproveType;
+    }
+
     public Integer getUserApproveType() {
         return userApproveType;
     }

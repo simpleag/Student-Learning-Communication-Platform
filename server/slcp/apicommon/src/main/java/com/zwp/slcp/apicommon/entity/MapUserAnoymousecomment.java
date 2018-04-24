@@ -7,6 +7,18 @@ public class MapUserAnoymousecomment extends MapUserAnoymousecommentKey {
 
     private Long updateTime;
 
+    public MapUserAnoymousecomment() {
+    }
+
+    public MapUserAnoymousecomment(Integer userApproveType) {
+        this.userApproveType = userApproveType;
+    }
+
+    public MapUserAnoymousecomment(Long anoymouseCommentId, Long userId, Integer userApproveType) {
+        super(anoymouseCommentId, userId);
+        this.userApproveType = userApproveType;
+    }
+
     public Integer getUserApproveType() {
         return userApproveType;
     }

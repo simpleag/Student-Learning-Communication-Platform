@@ -2,7 +2,9 @@ package com.zwp.slcp.sqlserver.mapper;
 
 import com.zwp.slcp.apicommon.entity.MapUserTag;
 import com.zwp.slcp.apicommon.entity.MapUserTagKey;
+import org.apache.ibatis.annotations.Mapper;
 
+@Mapper
 public interface MapUserTagMapper {
     int deleteByPrimaryKey(MapUserTagKey key);
 

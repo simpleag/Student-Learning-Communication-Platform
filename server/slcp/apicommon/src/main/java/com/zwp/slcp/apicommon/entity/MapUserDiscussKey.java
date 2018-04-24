@@ -5,6 +5,14 @@ public class MapUserDiscussKey {
 
     private Long userId;
 
+    public MapUserDiscussKey() {
+    }
+
+    public MapUserDiscussKey(Long discussId, Long userId) {
+        this.discussId = discussId;
+        this.userId = userId;
+    }
+
     public Long getDiscussId() {
         return discussId;
     }

@@ -3,6 +3,7 @@ package com.zwp.slcp.sqlserver.mapper;
 import com.zwp.slcp.apicommon.entity.FullMessage;
 import com.zwp.slcp.apicommon.entity.Message;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ public interface MessageMapper {
     List<FullMessage> selectByReceiveUserId(Long messageAuthorId);
 
     //用户之间的私信
-    List<FullMessage> selectByUsersId(Long messageReceiveId, Long messageAuthorId);
+    List<FullMessage> selectByUsersId(@Param("messageReceiveId") Long messageReceiveId, @Param("messageAuthorId") Long messageAuthorId);
 
     int updateByPrimaryKeySelective(Message record);
 

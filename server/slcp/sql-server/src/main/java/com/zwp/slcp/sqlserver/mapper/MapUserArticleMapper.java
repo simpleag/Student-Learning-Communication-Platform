@@ -2,7 +2,9 @@ package com.zwp.slcp.sqlserver.mapper;
 
 import com.zwp.slcp.apicommon.entity.MapUserArticle;
 import com.zwp.slcp.apicommon.entity.MapUserArticleKey;
+import org.apache.ibatis.annotations.Mapper;
 
+@Mapper
 public interface MapUserArticleMapper {
     int deleteByPrimaryKey(MapUserArticleKey key);
 

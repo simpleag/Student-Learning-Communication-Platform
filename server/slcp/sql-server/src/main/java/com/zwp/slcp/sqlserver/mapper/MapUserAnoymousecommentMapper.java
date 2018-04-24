@@ -2,7 +2,10 @@ package com.zwp.slcp.sqlserver.mapper;
 
 import com.zwp.slcp.apicommon.entity.MapUserAnoymousecomment;
 import com.zwp.slcp.apicommon.entity.MapUserAnoymousecommentKey;
+import org.apache.ibatis.annotations.Mapper;
+import org.springframework.stereotype.Service;
 
+@Mapper
 public interface MapUserAnoymousecommentMapper {
     int deleteByPrimaryKey(MapUserAnoymousecommentKey key);
 

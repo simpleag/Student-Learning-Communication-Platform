@@ -2,7 +2,9 @@ package com.zwp.slcp.sqlserver.mapper;
 
 import com.zwp.slcp.apicommon.entity.MapUserArticlecomment;
 import com.zwp.slcp.apicommon.entity.MapUserArticlecommentKey;
+import org.apache.ibatis.annotations.Mapper;
 
+@Mapper
 public interface MapUserArticlecommentMapper {
     int deleteByPrimaryKey(MapUserArticlecommentKey key);
 

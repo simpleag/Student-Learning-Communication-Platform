@@ -2,7 +2,9 @@ package com.zwp.slcp.sqlserver.mapper;
 
 import com.zwp.slcp.apicommon.entity.MapUserDiscuss;
 import com.zwp.slcp.apicommon.entity.MapUserDiscussKey;
+import org.apache.ibatis.annotations.Mapper;
 
+@Mapper
 public interface MapUserDiscussMapper {
     int deleteByPrimaryKey(MapUserDiscussKey key);
 

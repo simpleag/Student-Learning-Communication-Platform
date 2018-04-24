@@ -9,19 +9,29 @@ eureka:
       defaultZone: http://localhost:1122/eureka
 spring:
   datasource:
-
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/slcp?characterEncoding=utf-8
     username: zwpjava
     password: 12345678
+    initialize: true
+    #连接池配置
+    initialSize: 5
+    minIdle: 5
+    maxActive: 20
+    # 配置获取连接等待超时的时间
+    maxWait: 60000
+    # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+    timeBetweenEvictionRunsMillis: 60000
+    # 配置一个连接在池中最小生存的时间，单位是毫秒
+    minEvictableIdleTimeMillis: 300000
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.zwp.slcp.apicommon.entity
 
 pagehelper.helperDialect: mysql
 pagehelper.reasonable: true
 pagehelper.supportMethodsArguments: true
 pagehelper.params=count: countSql
-
-
-
-mybatis:
-  mapper-locations: classpath:mapper/*.xml
-  type-aliases-package: com.example.demo.entity

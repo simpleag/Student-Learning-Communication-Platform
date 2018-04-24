@@ -51,6 +51,14 @@ public class User {
 
     private Long updateTime;
 
+    public User() {
+    }
+
+    public User(Long userId) {
+        this.userId = userId;
+        this.updateTime = System.currentTimeMillis();
+    }
+
     public Long getUserId() {
         return userId;
     }

@@ -12,3 +12,5 @@ server/slcp/nosql-server/\.mvn/
 server/slcp/register/\.mvn/
 
 server/slcp/sql-server/\.mvn/
+
+ui/vue-jq-bootstrap-master/

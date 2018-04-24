@@ -5,6 +5,14 @@ public class MapUserAnoymouseKey {
 
     private Long userId;
 
+    public MapUserAnoymouseKey() {
+    }
+
+    public MapUserAnoymouseKey(Long anoymouseId, Long userId) {
+        this.anoymouseId = anoymouseId;
+        this.userId = userId;
+    }
+
     public Long getAnoymouseId() {
         return anoymouseId;
     }

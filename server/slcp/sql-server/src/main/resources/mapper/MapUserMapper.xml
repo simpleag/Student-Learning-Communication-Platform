@@ -11,12 +11,21 @@
   <sql id="Base_Column_List">
     user2_id, user_id, user_attention_type, create_time, update_time
   </sql>
-  <select id="selectByPrimaryKey" parameterType="com.zwp.slcp.apicommon.entity.MapUserKey" resultMap="BaseResultMap">
+  <select id="selectByUserId" parameterType="com.zwp.slcp.apicommon.entity.MapUserKey" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from map_user
+    where (user2_id = #{user2Id,jdbcType=BIGINT}
+      and user_id = #{userId,jdbcType=BIGINT} )
+      or (user2_id = #{userId,jdbcType=BIGINT}
+    and user_id = #{user2Id,jdbcType=BIGINT})
+  </select>
+  <select id="selectByPrimaryKey" parameterType="com.zwp.slcp.apicommon.entity.MapUserKey" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from map_user
     where user2_id = #{user2Id,jdbcType=BIGINT}
-      and user_id = #{userId,jdbcType=BIGINT}
+    and user_id = #{userId,jdbcType=BIGINT}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="com.zwp.slcp.apicommon.entity.MapUserKey">
     delete from map_user

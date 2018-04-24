@@ -58,11 +58,27 @@ WHERE ac.anoymous_id = #{anoymousId,jdbcType=BIGINT}
 AND ac.anoymous_comment_author_Id = u.user_id
 ORDER BY ac.anoymous_list_number
   </select>
+  <select id="selectDetailByAuthorId" resultMap="DetailResultMap">
+    SELECT  anoymous_comment_id, anoymous_comment_author_Id, anoymous_comment_content, anoymous_list_number,
+    anoymouse_replay_userId, anoymous_comment_state, ac.create_time as create_time, ac.update_time as update_time, anoymous_id, (
+    SELECT count(1)
+    FROM map_user_anoymousecomment as m
+    WHERE m.anoymouse_comment_id = ac.anoymous_comment_id
+    ) as approve_number, (
+    select m2.user_approve_type
+    from map_user_anoymousecomment as m2
+    WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.anoymouse_comment_id = ac.anoymous_comment_id
+    ) as user_approve_type, user_anonymouse_name
+    FROM anoymous_comment as ac, user as u
+    WHERE ac.anoymous_comment_author_Id = #{authorId,jdbcType=BIGINT}
+    AND ac.anoymous_comment_author_Id = u.user_id
+    ORDER BY ac.anoymous_list_number
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from anoymous_comment
     where anoymous_comment_id = #{anoymousCommentId,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.zwp.slcp.apicommon.entity.AnoymousComment">
+  <insert id="insert" parameterType="com.zwp.slcp.apicommon.entity.AnoymousComment" useGeneratedKeys="true" keyProperty="anoymousCommentId" keyColumn="anoymous_comment_id">
     insert into anoymous_comment (anoymous_comment_id, anoymous_comment_author_Id, 
       anoymous_comment_content, anoymous_list_number, 
       anoymouse_replay_userId, anoymous_comment_state, 

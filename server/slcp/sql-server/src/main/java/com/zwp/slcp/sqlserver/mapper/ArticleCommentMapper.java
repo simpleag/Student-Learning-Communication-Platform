@@ -3,6 +3,7 @@ package com.zwp.slcp.sqlserver.mapper;
 import com.zwp.slcp.apicommon.entity.ArticleComment;
 import com.zwp.slcp.apicommon.entity.DetailArticleComment;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -10,7 +11,7 @@ import java.util.List;
 public interface ArticleCommentMapper {
     int deleteByPrimaryKey(Long articleCommentId);
 
-    int insert(ArticleComment record);
+    Long insert(ArticleComment record);
 
     int insertSelective(ArticleComment record);
 
@@ -18,9 +19,9 @@ public interface ArticleCommentMapper {
 
     List<ArticleComment> selectByUserId(Long articleCommentId);
 
-    List<ArticleComment> articleCommentAuthorId(Long articleCommentAuthorId);
+    List<ArticleComment> selectDetailByAuthorId(@Param("userId") Long userId, @Param("authorId") Long authorId);
     //根据文章id搜索对应的评论
-    List<DetailArticleComment> selectDetailByArticleId(Long userId, Long articleId);
+    List<DetailArticleComment> selectDetailByArticleId(@Param("userId") Long userId, @Param("articleId") Long articleId);
 
 
     int updateByPrimaryKeySelective(ArticleComment record);

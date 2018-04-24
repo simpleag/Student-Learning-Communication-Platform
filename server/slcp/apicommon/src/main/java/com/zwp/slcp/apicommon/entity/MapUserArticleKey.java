@@ -5,6 +5,14 @@ public class MapUserArticleKey {
 
     private Long userId;
 
+    public MapUserArticleKey() {
+    }
+
+    public MapUserArticleKey(Long articleId, Long userId) {
+        this.articleId = articleId;
+        this.userId = userId;
+    }
+
     public Long getArticleId() {
         return articleId;
     }

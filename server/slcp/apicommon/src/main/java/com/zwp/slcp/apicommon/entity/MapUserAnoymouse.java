@@ -5,6 +5,20 @@ public class MapUserAnoymouse extends MapUserAnoymouseKey {
 
     private Integer userFavoriteType;
 
+    public MapUserAnoymouse() {
+    }
+
+    public MapUserAnoymouse(Integer userApproveType, Integer userFavoriteType) {
+        this.userApproveType = userApproveType;
+        this.userFavoriteType = userFavoriteType;
+    }
+
+    public MapUserAnoymouse(Long anoymouseId, Long userId, Integer userApproveType, Integer userFavoriteType) {
+        super(anoymouseId, userId);
+        this.userApproveType = userApproveType;
+        this.userFavoriteType = userFavoriteType;
+    }
+
     public Integer getUserApproveType() {
         return userApproveType;
     }

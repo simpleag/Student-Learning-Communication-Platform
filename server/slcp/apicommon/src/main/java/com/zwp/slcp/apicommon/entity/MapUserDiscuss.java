@@ -5,6 +5,20 @@ public class MapUserDiscuss extends MapUserDiscussKey {
 
     private Integer userFavoriteType;
 
+    public MapUserDiscuss() {
+    }
+
+    public MapUserDiscuss(Integer userApproveType, Integer userFavoriteType) {
+        this.userApproveType = userApproveType;
+        this.userFavoriteType = userFavoriteType;
+    }
+
+    public MapUserDiscuss(Long discussId, Long userId, Integer userApproveType, Integer userFavoriteType) {
+        super(discussId, userId);
+        this.userApproveType = userApproveType;
+        this.userFavoriteType = userFavoriteType;
+    }
+
     public Integer getUserApproveType() {
         return userApproveType;
     }

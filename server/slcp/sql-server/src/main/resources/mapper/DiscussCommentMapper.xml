@@ -60,11 +60,27 @@ WHERE dc.discuss_id = #{discussId,jdbcType=BIGINT}
 AND dc.discuss_comment_author_Id = u.user_id
 ORDER BY dc.discuss_list_number
   </select>
+  <select id="selectDetailByAuthorId" resultMap="DetailResultMap">
+    SELECT  discuss_comment_id, discuss_comment_author_Id, discuss_comment_content, discuss_list_number,
+    discuss_replay_userId, discuss_comment_state, dc.create_time, dc.update_time, discuss_id, (
+    SELECT count(1)
+    FROM map_user_discusscomment as m
+    WHERE m.disscuss_comment_id = dc.discuss_comment_id
+    ) as approve_number, (
+    select m2.user_approve_type
+    from map_user_discusscomment as m2
+    WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.disscuss_comment_id = dc.discuss_comment_id
+    ) as user_approve_type, user_name, user_pic_url
+    FROM discuss_comment as dc, user as u
+    WHERE dc.discuss_comment_author_Id = #{authorId,jdbcType=BIGINT}
+    AND dc.discuss_comment_author_Id = u.user_id
+    ORDER BY dc.discuss_list_number
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
     delete from discuss_comment
     where discuss_comment_id = #{discussCommentId,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.zwp.slcp.apicommon.entity.DiscussComment" >
+  <insert id="insert" parameterType="com.zwp.slcp.apicommon.entity.DiscussComment" useGeneratedKeys="true" keyProperty="discussCommentId" keyColumn="discuss_comment_id">
     insert into discuss_comment (discuss_comment_id, discuss_comment_author_Id, 
       discuss_comment_content, discuss_list_number, 
       discuss_replay_userId, discuss_comment_state, 

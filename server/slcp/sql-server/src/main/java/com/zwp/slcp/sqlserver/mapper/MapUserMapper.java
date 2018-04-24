@@ -2,7 +2,10 @@ package com.zwp.slcp.sqlserver.mapper;
 
 import com.zwp.slcp.apicommon.entity.MapUser;
 import com.zwp.slcp.apicommon.entity.MapUserKey;
+import org.apache.ibatis.annotations.Mapper;
+import org.springframework.stereotype.Service;
 
+@Mapper
 public interface MapUserMapper {
     int deleteByPrimaryKey(MapUserKey key);
 
@@ -11,6 +14,9 @@ public interface MapUserMapper {
     int insertSelective(MapUser record);
 
     MapUser selectByPrimaryKey(MapUserKey key);
+
+    //查找两个用户之间的关系
+    MapUser selectByUserId(MapUserKey key);
 
     int updateByPrimaryKeySelective(MapUser record);
 

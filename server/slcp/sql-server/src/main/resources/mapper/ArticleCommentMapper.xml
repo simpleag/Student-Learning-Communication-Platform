@@ -58,11 +58,26 @@ FROM slcp.article_comment as ac, user as u
 WHERE ac.article_id = #{articleId,jdbcType=BIGINT} AND ac.article_comment_author_Id = u.user_id
 ORDER BY ac.article_list_number
   </select>
+  <select id="selectDetailByAuthorId" resultMap="DetailResultMap" >
+    SELECT article_comment_id, article_comment_author_Id, article_comment_content, article_list_number,
+    article_replay_userId, article_comment_state, ac.create_time as create_time, ac.update_time as update_time, u.user_name as user_name, user_pic_url, (
+    SELECT count(1)
+    FROM map_user_articlecomment as m
+    WHERE m.article_comment_id = ac.article_comment_id
+    ) as approve_number, (
+    select m2.user_approve_type
+    from map_user_articlecomment as m2
+    WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.article_comment_id = ac.article_comment_id
+    ) as user_approve_type, article_id
+    FROM slcp.article_comment as ac, user as u
+    WHERE ac.article_comment_author_Id = #{authorId,jdbcType=BIGINT} AND ac.article_comment_author_Id = u.user_id
+    ORDER BY ac.article_list_number
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
     delete from article_comment
     where article_comment_id = #{articleCommentId,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.zwp.slcp.apicommon.entity.ArticleComment" >
+  <insert id="insert" parameterType="com.zwp.slcp.apicommon.entity.ArticleComment" useGeneratedKeys="true" keyProperty="articleCommentId" keyColumn="article_comment_id">
     insert into article_comment (article_comment_id, article_comment_author_Id, 
       article_comment_content, article_list_number, 
       article_replay_userId, article_comment_state, 

@@ -1,5 +1,6 @@
 package com.zwp.slcp.sqlserver.mapper;
 
+import com.zwp.slcp.apicommon.entity.FullTag;
 import com.zwp.slcp.apicommon.entity.Tag;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -17,7 +18,9 @@ public interface TagMapper {
 
     List<Tag> selectAllTag(Integer tagId);
 
-    List<Tag> selectByUserId(Long userId);
+    List<Tag> selectNotAttentionByUserId(Long userId);
+
+    List<FullTag> selectByUserId(Long userId);
 
     int updateByPrimaryKeySelective(Tag record);
 

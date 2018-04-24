@@ -1,0 +1,9 @@
+spring.application.name: nosql
+server:
+    port: 8092
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://localhost:1122/eureka

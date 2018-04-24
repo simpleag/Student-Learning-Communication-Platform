@@ -5,6 +5,14 @@ public class MapUserAnoymousecommentKey {
 
     private Long userId;
 
+    public MapUserAnoymousecommentKey() {
+    }
+
+    public MapUserAnoymousecommentKey(Long anoymouseCommentId, Long userId) {
+        this.anoymouseCommentId = anoymouseCommentId;
+        this.userId = userId;
+    }
+
     public Long getAnoymouseCommentId() {
         return anoymouseCommentId;
     }

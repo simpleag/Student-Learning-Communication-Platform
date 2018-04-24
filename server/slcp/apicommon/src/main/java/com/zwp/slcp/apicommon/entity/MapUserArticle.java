@@ -1,5 +1,6 @@
 package com.zwp.slcp.apicommon.entity;
 
+
 public class MapUserArticle extends MapUserArticleKey {
     private Integer userApproveType;
 
@@ -8,6 +9,27 @@ public class MapUserArticle extends MapUserArticleKey {
     private Long createTime;
 
     private Long updateTime;
+
+    public MapUserArticle() {
+    }
+    public MapUserArticle(Long articleId, Long userId) {
+        super(articleId, userId);
+    }
+
+    public MapUserArticle(Integer userApproveType, Integer userFavoriteType, Long createTime, Long updateTime) {
+        this.userApproveType = userApproveType;
+        this.userFavoriteType = userFavoriteType;
+        this.createTime = createTime;
+        this.updateTime = updateTime;
+    }
+
+    public MapUserArticle(Long articleId, Long userId, Integer userApproveType, Integer userFavoriteType, Long createTime, Long updateTime) {
+        super(articleId, userId);
+        this.userApproveType = userApproveType;
+        this.userFavoriteType = userFavoriteType;
+        this.createTime = createTime;
+        this.updateTime = updateTime;
+    }
 
     public Integer getUserApproveType() {
         return userApproveType;

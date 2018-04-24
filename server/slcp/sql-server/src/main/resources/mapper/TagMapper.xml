@@ -7,6 +7,15 @@
     <result column="tag_info" property="tagInfo" jdbcType="VARCHAR" />
     <result column="article_number" property="articleNumber" jdbcType="INTEGER" />
     <result column="discuss_number" property="discussNumber" jdbcType="INTEGER" />
+
+  </resultMap>
+  <resultMap id="FullResultMap" type="com.zwp.slcp.apicommon.entity.FullTag" >
+    <id column="tag_id" property="tagId" jdbcType="INTEGER" />
+    <result column="tag_name" property="tagName" jdbcType="VARCHAR" />
+    <result column="tag_info" property="tagInfo" jdbcType="VARCHAR" />
+    <result column="article_number" property="articleNumber" jdbcType="INTEGER" />
+    <result column="discuss_number" property="discussNumber" jdbcType="INTEGER" />
+    <result column="user_attention_type" jdbcType="INTEGER" property="userAttentionType" />
   </resultMap>
   <sql id="Base_Column_List" >
     tag_id, tag_name, tag_info, article_number, discuss_number
@@ -18,11 +27,22 @@
     where tag_id = #{tagId,jdbcType=INTEGER}
   </select>
 
-  <select id="selectByUserId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+  <select id="selectByUserId" resultMap="FullResultMap" parameterType="java.lang.Long" >
+    select
+    t.tag_id as tag_id, tag_name, tag_info, article_number, discuss_number, user_attention_type
+    from tag as t, map_user_tag as m
+    where m.user_id = #{userId,jdbcType=BIGINT} and m.tag_id = t.tag_id
+  </select>
+
+  <select id="selectNotAttentionByUserId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select
     <include refid="Base_Column_List" />
-    from tag, map_user_tag as m
-    where m.user_id = #{userId,jdbcType=BIGINT} AND m.tag_id = tag.tag_id
+    from tag
+    where tag_id NOT IN (
+      select m.tag_id as tag_id
+      from tag as t, map_user_tag as m
+      where m.user_id = #{userId,jdbcType=BIGINT} and m.tag_id = t.tag_id
+	)
   </select>
 
   <select id="selectAllTag" resultMap="BaseResultMap" >

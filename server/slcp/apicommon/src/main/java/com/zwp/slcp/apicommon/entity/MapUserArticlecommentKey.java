@@ -5,6 +5,14 @@ public class MapUserArticlecommentKey {
 
     private Long userId;
 
+    public MapUserArticlecommentKey() {
+    }
+
+    public MapUserArticlecommentKey(Long articleCommentId, Long userId) {
+        this.articleCommentId = articleCommentId;
+        this.userId = userId;
+    }
+
     public Long getArticleCommentId() {
         return articleCommentId;
     }

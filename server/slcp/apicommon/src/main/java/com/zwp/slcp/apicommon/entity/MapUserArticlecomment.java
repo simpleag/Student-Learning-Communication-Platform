@@ -7,6 +7,21 @@ public class MapUserArticlecomment extends MapUserArticlecommentKey {
 
     private Long updateTime;
 
+    public MapUserArticlecomment() {
+    }
+
+    public MapUserArticlecomment(Integer userApproveType) {
+        this.userApproveType = userApproveType;
+        this.createTime = createTime;
+        this.updateTime = updateTime;
+    }
+
+    public MapUserArticlecomment(Long articleCommentId, Long userId, Integer userApproveType) {
+        super(articleCommentId, userId);
+        this.userApproveType = userApproveType;
+
+    }
+
     public Integer getUserApproveType() {
         return userApproveType;
     }
