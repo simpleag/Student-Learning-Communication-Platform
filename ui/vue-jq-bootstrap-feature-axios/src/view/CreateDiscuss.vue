@@ -51,7 +51,7 @@
     <div class="col-md-3" id='div3'>
         <el-row>
             <el-button plain @click="createDiscuss">发布</el-button>
-             <el-button plain>取消发布</el-button>
+             <el-button plain @click="notCreate" >取消发布</el-button>
              <el-select v-model="value2" placeholder="请选择标签" id='tagSelect' @change="tagChangeValue">
                 <el-option
                 v-for="item in tags"
@@ -127,6 +127,9 @@ export default {
       this.tagType = value;
       console.log("value"+ value+" "+ this.tagType)
     },
+    notCreate(){
+      this.$router.push({ name: "Main"});
+    },
     ajaxCreateDiscuss: function(tiltle, content, tagId) {
       var _this = this;
       console.log(tiltle)
@@ -135,7 +138,7 @@ export default {
       console.log(this.userId)
       axios
         .post(
-          "http://localhost:8093/discuss/create",
+          "http://localhost:5555/sclp/discuss/create",
           qs.stringify({
             userId: this.userId,
             tiltle: tiltle,
@@ -145,20 +148,25 @@ export default {
         )
         .then(function(res) {
           console.log(res.data.code)
+          if (res.dta.code == '200') {
+            this.$router.push({ name: "Main"});
+          } else {
+            this.errorNotice('res.data.code');
+          }
         })
         .catch(function(err) {
           console.log("error" + err);
+          this.errorNet('权限验证失败');
         });
     },
     ajaxTag: function() {
       var _this = this;
       axios
         .post(
-          "http://localhost:8093/tag/userAttentionTags",
+          "http://localhost:5555/sclp/tag/allTags",
           qs.stringify({
             userId: this.userId,
-            pageNumber: "1",
-            pageSize: "5"
+            
           })
         )
         .then(function(res) {
@@ -169,15 +177,32 @@ export default {
         });
     },
     initTags(res){
-      console.log("row: "+res.data.attentionTags.endRow)
-      this.tags = res.data.attentionTags.list
+      console.log("row: "+res.data.listTags.endRow)
+      this.tags = res.data.listTags.list
       
     },
     initPage(){
-      this.userId = this.$route.params.userId;
+      this.userId = window.localStorage.getItem("userId");
       console.log("userId"+ this.userId)
       this.ajaxTag();
     },
+    errorNotice(message){
+        console.log("error")
+        this.$notify({
+          title: '出错',
+          message: message,
+          type: 'error'
+        });
+      },
+    errorNet(message){
+        console.log("error")
+        this.$notify({
+          title: '出错',
+          message: message,
+          type: 'error'
+        });
+        this.$router.push({ name: "Login" });
+      },
     createDiscuss(){
       let content  = this.$refs.ue.getUEContent();;
       console.log("1: "+ content)
@@ -185,10 +210,12 @@ export default {
       console.log( this.discussType+ " "+  this.tagType)
       if ( this.tagType==undefined) {
         console.log("fail")
+        this.errorNotice('输入不完整');
        
       } else{
         var title = this.input;
         this.ajaxCreateDiscuss(title, content, this.tagType);
+        // this.$router.push({ name: "Main"});
       }
 
     }

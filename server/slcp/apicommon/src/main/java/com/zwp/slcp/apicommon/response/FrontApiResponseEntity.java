@@ -51,9 +51,7 @@ public class FrontApiResponseEntity implements Serializable {
         return new Builder(ResponseCode.SUCC);
     }
 
-    public static Builder LOGIN_EXPIRED(){
-        return new Builder(ResponseCode.LOGIN_EXPIRED);
-    }
+
 
     public FrontApiResponseEntity(Builder builder) {
         this.code = builder.code;

@@ -1,5 +1,7 @@
 package com.zwp.slcp.nosqlserver.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.zwp.slcp.apicommon.entity.AccessToken;
 import com.zwp.slcp.apicommon.redis.RedisUtils;
 import com.zwp.slcp.apicommon.response.FrontApiResponseEntity;
@@ -10,6 +12,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -38,7 +42,9 @@ public class JwtToken {
                 .signWith(SignatureAlgorithm.HS256,
                         randomCode.toString()).compact();
         AccessToken accessTokenEntity = new AccessToken(accessToken, randomCode.toString());
-        if (!RedisUtils.setStrTime(String.valueOf(userId), accessToken, 600)) {
+
+        String jsontString = JSON.toJSONString(accessTokenEntity);
+        if (!RedisUtils.setStrTime(String.valueOf(userId), jsontString, 6000)) {
             return FrontApiResponseEntity.SYS_ERR().build();
         } else {
             return FrontApiResponseEntity.SUCC().data("accessToken", accessToken).build();

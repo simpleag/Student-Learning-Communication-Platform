@@ -18,6 +18,11 @@ public interface TagService {
     @ResponseBody
     PageInfo<FullTag> userAttentionTags(@RequestParam(value = "userId") Long userId, @RequestParam(value = "pageNumber") Integer pageNumber, @RequestParam(value = "pageSize") Integer pageSize);
 
+
+    @RequestMapping("/tag/listAllTags")
+    @ResponseBody
+    PageInfo<Tag> listAllTags(@RequestParam(value = "userId") Long userId);
+
     @RequestMapping("/tag/listUnattentionTags")
     @ResponseBody
     PageInfo<Tag> listUnattentionTags(@RequestParam(value = "userId") Long userId, @RequestParam(value = "pageNumber") Integer pageNumber, @RequestParam(value = "pageSize") Integer pageSize);

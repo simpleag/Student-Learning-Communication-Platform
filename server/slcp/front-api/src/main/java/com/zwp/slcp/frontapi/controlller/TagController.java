@@ -1,5 +1,6 @@
 package com.zwp.slcp.frontapi.controlller;
 
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import com.zwp.slcp.apicommon.entity.FullTag;
 import com.zwp.slcp.apicommon.entity.Tag;
@@ -31,7 +32,7 @@ public class TagController {
     private static final String LOGIN_USER_ID = "LOGIN_USER_ID";
     private final Logger logger = LoggerFactory.getLogger(TagController.class);
 
-    @RequestMapping(value = "/allTags")
+    @RequestMapping(value = "/allUserAttentionAndUnattention")
     @ResponseBody
     String allTags(Long userId, Integer pageNumber, Integer pageSize) {
         if (StringUtils.isBlank(userId, pageNumber, pageSize)) {
@@ -50,6 +51,22 @@ public class TagController {
                     .data("unAttentionTags", userUnAttentionTags).build();
 
         }
+    }
+
+    @RequestMapping(value = "/allTags")
+    @ResponseBody
+    String allTags(Long userId){
+        if (StringUtils.isBlank(userId)) {
+            return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
+        } else {
+            PageInfo<Tag> tagPageInfo = tagService.listAllTags(userId);
+            if (tagPageInfo==null) {
+                return FrontApiResponseEntity.SYS_ERR().build();
+            } else {
+                return FrontApiResponseEntity.SUCC().data("listTags", tagPageInfo).build();
+            }
+        }
+
     }
 
     @RequestMapping(value = "/userAttentionTags")

@@ -68,6 +68,18 @@ public class TagController {
         }
     }
 
+    @RequestMapping("/listAllTags")
+    @ResponseBody
+    PageInfo<Tag> listAllTags(Long userId) {
+        if (StringUtils.isBlank(userId)) {
+            return null;
+        } else {
+            List<Tag> tagList = tagMapper.selectAllTag();
+            PageInfo<Tag> tagPageInfo = new PageInfo<Tag>(tagList);
+            return tagPageInfo;
+        }
+    }
+
     @RequestMapping("/updateUserAttentionTag")
     @ResponseBody
     String updateUserAttentionTag(Long userId, Integer tagId) {

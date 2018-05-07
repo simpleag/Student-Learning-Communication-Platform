@@ -54,12 +54,34 @@ public class User {
     public User() {
     }
 
+
+
     public User(String userPhoneNumber, String userLoginId, String userName) {
         this.userName = userName;
         this.userPhoneNumber = userPhoneNumber;
         this.userLoginId = userLoginId;
         this.createTime = System.currentTimeMillis();
         this.updateTime = System.currentTimeMillis();
+        this.userPicUrl = "https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=2050412877,3119814341&fm=27&gp=0.jpg";
+        this.userGetApproveNumber = 0;
+        this.userArticleNumber = 0;
+        this.userFollowNumber = 0;
+        this.userDiscussNumber = 0;
+        this.userAnoymouseNumber = 0;
+        this.userCommentNumber = 0;
+        this.userAttentionNumber = 0;
+        this.userFavoriteNumber = 0;
+        this.userApproveNumber = 0;
+        this.userAnonymouseHonor = "empty";
+        this.userPhoneNumber = userPhoneNumber;
+        this.userHonor = "empty";
+        this.userAnonymouseName = "empty";
+        this.userAnonymouseHonor = "empty";
+        this.userIntroduce = "empty";
+        this.userBorn = 0L;
+        this.userSex = "empty";
+        this.userSchool = "empty";
+        this.userEducation = "empty";
 
     }
 

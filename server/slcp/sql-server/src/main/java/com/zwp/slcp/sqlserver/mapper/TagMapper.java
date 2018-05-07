@@ -16,7 +16,7 @@ public interface TagMapper {
 
     Tag selectByPrimaryKey(Integer tagId);
 
-    List<Tag> selectAllTag(Integer tagId);
+    List<Tag> selectAllTag();
 
     List<Tag> selectNotAttentionByUserId(Long userId);
 

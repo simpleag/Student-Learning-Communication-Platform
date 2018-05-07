@@ -46,13 +46,27 @@ public class UserController {
     @RequestMapping("/create")
     @ResponseBody
     public String createUser(@RequestBody User user) {
+        String message = "";
+        int result = 0;
         if (StringUtils.isBlank(user)) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         } else {
-            if (userMapper.insert(user) == 0) {
-                return FrontApiResponseEntity.ERR(ResponseCode.FAIl).build();
-            } else {
-                return FrontApiResponseEntity.SUCC().build();
+
+            try {
+                result = userMapper.insert(user);
+//                if (result == 0) {
+//                    return FrontApiResponseEntity.ERR(ResponseCode.FAIl).build();
+//                } else {
+//                    return FrontApiResponseEntity.SUCC().build();
+//                }
+            } catch (Exception e) {
+                message = e.getMessage();
+            } finally {
+                if (!message.equals("") || result==0) {
+                    return FrontApiResponseEntity.ERR(ResponseCode.FAIl).build();
+                } else {
+                    return FrontApiResponseEntity.SUCC().build();
+                }
             }
         }
     }

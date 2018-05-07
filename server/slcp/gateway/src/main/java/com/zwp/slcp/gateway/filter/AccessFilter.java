@@ -1,9 +1,13 @@
 package com.zwp.slcp.gateway.filter;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.zwp.slcp.apicommon.constant.MyConstant;
 import com.zwp.slcp.apicommon.redis.RedisUtils;
+import com.zwp.slcp.apicommon.response.FrontApiResponseEntity;
+import com.zwp.slcp.apicommon.response.ResponseCode;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -42,16 +46,17 @@ public class AccessFilter extends ZuulFilter {
 
     @Override
     public boolean shouldFilter() {
-        return false;
+        return true;
     }
 
     @Override
     public Object run() {
+        String frontResult = FrontApiResponseEntity.ERR(ResponseCode.TOKEN_ERROR).build();
         RequestContext context = RequestContext.getCurrentContext();
         HttpServletRequest request = context.getRequest();
         System.out.println("request" + request.toString());
         logger.info(String.format("%s >>> %s", request.getMethod(), request.getRequestURL().toString()));
-        if (request.getRequestURI().contains("/user/login/") || request.getRequestURI().contains("/user/register/")) {
+        if (request.getRequestURI().contains("/user/login") || request.getRequestURI().contains("/user/register")) {
 
         } else {
             try {
@@ -71,9 +76,10 @@ public class AccessFilter extends ZuulFilter {
                 }
                 if (accessToken == null || accessToken.isEmpty()) {
                     System.out.println(accessToken);
-                    logger.error("token is empty");
+                    logger.error(frontResult);
                     context.setSendZuulResponse(false);
                     context.setResponseStatusCode(401);
+//                    context.setRes
                     try {
                         context.getResponse().getWriter().write("token is empty");
                     } catch (Exception e) {
@@ -81,7 +87,14 @@ public class AccessFilter extends ZuulFilter {
                     return null;
                 } else {
                     String userId = request.getParameter("userId");
-                    String secret = RedisUtils.getString(accessToken);
+                    logger.info("userId"+ userId);
+                    String accessTokenEntityString = RedisUtils.getString(userId);
+                    System.out.println("token: "+ accessTokenEntityString);
+                    JSONObject jsonObject = JSON.parseObject(accessTokenEntityString);
+                    String secret = jsonObject.getString("secret");
+                    logger.info(secret);
+                    String tokenFromRedis = jsonObject.getString("token");
+                    logger.info(tokenFromRedis);
                     if (secret==null || userId==null) {
                         context.setSendZuulResponse(false);
                         context.setResponseStatusCode(401);
@@ -91,25 +104,28 @@ public class AccessFilter extends ZuulFilter {
                         }
                         return null;
                     }
-                    Jws<Claims> claimsJws = Jwts.parser().setSigningKey(secret).parseClaimsJws(accessToken);
-                    Long tokenUserId = Long.valueOf(claimsJws.getBody().get("accountId").toString());
-                    if (!tokenUserId.equals(userId)) {
+//                    Jws<Claims> claimsJws = Jwts.parser().setSigningKey(secret).parseClaimsJws(accessToken);
+//                    Long tokenUserId = Long.valueOf(claimsJws.getBody().get("accountId").toString());
+                    if (accessToken.equals(tokenFromRedis)) {
+
+                        return null;
+                    } else {
                         context.setSendZuulResponse(false);
                         context.setResponseStatusCode(401);
                         try {
                             context.getResponse().getWriter().write("token is error");
                         } catch (Exception e) {
                         }
-                        return null;
                     }
 
                 }
             } catch (Exception e) {
                 if (logger.isErrorEnabled()) {
-                    logger.error(ExceptionUtils.getStackTrace(e));
+                    frontResult = FrontApiResponseEntity.ERR(401, ExceptionUtils.getStackTrace(e)).build();
+                    logger.error(frontResult);
                 }
                 // header中令牌不对, 可能被篡改
-                logger.error("token is error");
+                logger.error(frontResult);
                 //过滤该请求，不往下级服务去转发请求，到此结束
                 context.setSendZuulResponse(false);
                 context.setResponseStatusCode(401);

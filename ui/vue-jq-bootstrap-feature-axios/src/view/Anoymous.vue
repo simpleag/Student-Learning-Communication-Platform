@@ -124,6 +124,7 @@ var defaultMsg = '在这里输入回复'
 var replayUserId = 0;
 var discussCommentNumber = 0;
 var commentTotal = 0;
+var userId;
 export default {
   components: {UE,
   formatDate:formatDate},
@@ -176,7 +177,7 @@ export default {
               var item = this.commentList[i];
             //   console.log('atteath2'+item.discussCommentId)
               if (item.discussCommentId == discussCommentId) {
-                  this.ajaxApproveDiscussComment(this.$route.params.userId, discussCommentId);
+                  this.ajaxApproveDiscussComment(this.userId, discussCommentId);
                   if (item.userApproveType==null || item.userApproveType==0) {
                       item.userApproveType=1;
                       item.approveNumber += 1;
@@ -196,7 +197,7 @@ export default {
               this.discussDetail.approveNumber -= 1;
               this.discussDetail.userApproveType = null;
           }
-          this.ajaxApproveDiscuss(this.$route.params.userId, this.$route.params.discussId);
+          this.ajaxApproveDiscuss(this.userId, this.$route.params.discussId);
       },
       clickDiscussFavorite(){
           
@@ -207,12 +208,12 @@ export default {
               this.discussDetail.favoriteNumber -= 1;
               this.discussDetail.userFavoriteType = null;
           }
-          this.ajaxFavoriteDiscuss(this.$route.params.userId, this.$route.params.discussId);
+          this.ajaxFavoriteDiscuss(this.userId, this.$route.params.discussId);
       },
       ajaxDiscuss: function(userId, articleId) {
             var _this = this;
             console.log('userIDd: '+ userId);
-            axios.post('http://localhost:8093/discuss/detail',qs.stringify(
+            axios.post('http://localhost:5555/sclp/discuss/detail',qs.stringify(
                     {
                         userId: userId,
                         articleId: articleId
@@ -236,7 +237,7 @@ export default {
         // });
         console.log(content);
         this.discussCommentNumber = this.discussCommentNumber+1
-        this.ajaxCreateDiscussComment(this.$route.params.userId, content,this.discussCommentNumber, this.replayUserId , this.$route.params.discussId)
+        this.ajaxCreateDiscussComment(this.userId, content,this.discussCommentNumber, this.replayUserId , this.$route.params.discussId)
         
       },
       ajaxCreateDiscussComment: function(userId, content, number, replayUserId, discussId) {
@@ -246,8 +247,9 @@ export default {
             console.log('number: '+ number);
             console.log('replayUserId: '+ replayUserId);
             console.log('discussId: '+ discussId);
-            axios.post('http://localhost:8093/comment/createDiscussComment',qs.stringify(
+            axios.post('http://localhost:5555/sclp/comment/createDiscussComment',qs.stringify(
                     {
+                        userId: userId,
                         discussCommentAuthorId: userId,
                         discussCommentContent: content,
                         discussListNumber: number,
@@ -266,7 +268,7 @@ export default {
            ajaxFavoriteDiscuss: function(userId, articleId) {
             var _this = this;
             console.log('userIDd: '+ userId);
-            axios.post('http://localhost:8093/discuss/favorite',qs.stringify(
+            axios.post('http://localhost:5555/sclp/discuss/favorite',qs.stringify(
                     {
                         userId: userId,
                         articleId: articleId
@@ -282,7 +284,7 @@ export default {
            ajaxApproveDiscuss: function(userId, articleId) {
             var _this = this;
             console.log('userIDd: '+ userId);
-            axios.post('http://localhost:8093/discuss/approve',qs.stringify(
+            axios.post('http://localhost:5555/sclp/discuss/approve',qs.stringify(
                     {
                         userId: userId,
                         articleId: articleId
@@ -298,7 +300,7 @@ export default {
            ajaxApproveDiscussComment: function(userId, commentId) {
             var _this = this;
             console.log('userIDd: '+ userId);
-            axios.post('http://localhost:8093/comment/approveComment',qs.stringify(
+            axios.post('http://localhost:5555/sclp/comment/approveComment',qs.stringify(
                     {
                         userId: userId,
                         commentId: commentId,
@@ -315,7 +317,7 @@ export default {
            ajaxComment: function(userId, articleId,pageNumber,pageSize) {
             var _this = this;
             // console.log('userIDd: '+ userId);
-            axios.post('http://localhost:8093/comment/listComment',qs.stringify(
+            axios.post('http://localhost:5555/sclp/comment/listComment',qs.stringify(
                     {
                         userId: userId,
                         targetId: articleId,
@@ -369,15 +371,16 @@ export default {
             commentHandleCurrentChange(val) {
                 this.commentPagesNow = val;
                 console.log('changeNumber'+ val)
-                this.ajaxComment(this.$route.params.userId, this.$route.params.discussId,val,10)
+                this.ajaxComment(this.userId, this.$route.params.discussId,val,10)
             }
   },
   mounted() {
       console.log('statr')
       var id = this.$route.params.discussId;
       console.log(id)
-      console.log(this.$route.params.userId)
-      this.ajaxDiscuss(this.$route.params.userId, this.$route.params.discussId);
+      this.userId = window.localStorage.getItem("userId");
+    //   console.log(this.$route.params.userId)
+      this.ajaxDiscuss(this.userId, this.$route.params.discussId);
   },filters: {
         formatDate(time) {
         var date = new Date(time);

@@ -17,6 +17,11 @@ public class TagFailCallBack implements TagService{
     }
 
     @Override
+    public PageInfo<Tag> listAllTags(Long userId) {
+        return null;
+    }
+
+    @Override
     public PageInfo<Tag> listUnattentionTags(Long userId, Integer pageNumber, Integer pageSize) {
         return null;
     }

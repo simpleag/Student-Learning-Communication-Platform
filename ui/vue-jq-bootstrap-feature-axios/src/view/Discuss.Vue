@@ -69,7 +69,7 @@
                                     </span>
                                     <span>
                                     <button @click="clickCommentApprove(item.discussCommentId)" type="button" class="btn btn-default">{{item.approveNumber}}个赞同</button>
-                                    <button @click="clickReplayComment(item.userName, item.discussCommentAuthorId)" type="button" class="btn btn-default">回复评论</button>
+                                    <button @click="clickReplayComment(item.userName, item.discussCommentAuthorId, item.discussListNumber)" type="button" class="btn btn-default">回复评论</button>
                                     </span>
                                     </td>
                                 </tr>
@@ -124,6 +124,7 @@ var defaultMsg = '在这里输入回复'
 var replayUserId = 0;
 var discussCommentNumber = 0;
 var commentTotal = 0;
+var userId;
 export default {
   components: {UE,
   formatDate:formatDate},
@@ -157,9 +158,17 @@ export default {
         });
         console.log(content)
       },
-      
-      clickReplayComment(userName, userId){
-          this.defaultMsg = '回复'+userName+': ';
+      errorNet(message){
+        console.log("error")
+        this.$notify({
+          title: '出错',
+          message: message,
+          type: 'error'
+        });
+        this.$router.push({ name: "Login" });
+      },
+      clickReplayComment(userName, userId,listNumber){
+          this.defaultMsg = '回复#'+listNumber+": "+userName+': ';
           this.replayUserId = userId;
           console.log('set')
           
@@ -176,7 +185,7 @@ export default {
               var item = this.commentList[i];
             //   console.log('atteath2'+item.discussCommentId)
               if (item.discussCommentId == discussCommentId) {
-                  this.ajaxApproveDiscussComment(this.$route.params.userId, discussCommentId);
+                  this.ajaxApproveDiscussComment(this.userId, discussCommentId);
                   if (item.userApproveType==null || item.userApproveType==0) {
                       item.userApproveType=1;
                       item.approveNumber += 1;
@@ -196,7 +205,7 @@ export default {
               this.discussDetail.approveNumber -= 1;
               this.discussDetail.userApproveType = null;
           }
-          this.ajaxApproveDiscuss(this.$route.params.userId, this.$route.params.discussId);
+          this.ajaxApproveDiscuss(this.userId, this.$route.params.discussId);
       },
       clickDiscussFavorite(){
           
@@ -207,22 +216,23 @@ export default {
               this.discussDetail.favoriteNumber -= 1;
               this.discussDetail.userFavoriteType = null;
           }
-          this.ajaxFavoriteDiscuss(this.$route.params.userId, this.$route.params.discussId);
+          this.ajaxFavoriteDiscuss(this.userId, this.$route.params.discussId);
       },
       ajaxDiscuss: function(userId, articleId) {
             var _this = this;
-            console.log('userIDd: '+ userId);
-            axios.post('http://localhost:8093/discuss/detail',qs.stringify(
+            // console.log('userIDd: '+ userId);
+            axios.post('http://localhost:5555/sclp/discuss/detail',qs.stringify(
                     {
                         userId: userId,
                         articleId: articleId
                     }
                 )).then(function(res) {
-                    
+                console.log("code"+ res.data.code)
                 _this.initDiscuss(res);
                
             }).catch(function(err) {
-                console.log('error'+err);
+                console.log('error: '+err);
+                _this.errorNet('权限验证出错');
             });
 
            },
@@ -236,7 +246,7 @@ export default {
         // });
         console.log(content);
         this.discussCommentNumber = this.discussCommentNumber+1
-        this.ajaxCreateDiscussComment(this.$route.params.userId, content,this.discussCommentNumber, this.replayUserId , this.$route.params.discussId)
+        this.ajaxCreateDiscussComment(this.userId, content,this.discussCommentNumber, this.replayUserId , this.$route.params.discussId)
         
       },
       ajaxCreateDiscussComment: function(userId, content, number, replayUserId, discussId) {
@@ -246,8 +256,9 @@ export default {
             console.log('number: '+ number);
             console.log('replayUserId: '+ replayUserId);
             console.log('discussId: '+ discussId);
-            axios.post('http://localhost:8093/comment/createDiscussComment',qs.stringify(
+            axios.post('http://localhost:5555/sclp/comment/createDiscussComment',qs.stringify(
                     {
+                        userId: userId,
                         discussCommentAuthorId: userId,
                         discussCommentContent: content,
                         discussListNumber: number,
@@ -256,8 +267,9 @@ export default {
                     }
                 )).then(function(res) {
                 console.localhost(res.data.code+" "+res.data.message)
+                this.initPage();
                 // _this.initDiscuss(res);
-            //    this.ajaxComment(this.$route.params.userId, this.$route.params.discussId,1,10)
+            //    this.ajaxComment(this.userId, this.$route.params.discussId,1,10)
             }).catch(function(err) {
                 console.log('error'+err);
             });
@@ -266,7 +278,7 @@ export default {
            ajaxFavoriteDiscuss: function(userId, articleId) {
             var _this = this;
             console.log('userIDd: '+ userId);
-            axios.post('http://localhost:8093/discuss/favorite',qs.stringify(
+            axios.post('http://localhost:5555/sclp/discuss/favorite',qs.stringify(
                     {
                         userId: userId,
                         articleId: articleId
@@ -282,7 +294,7 @@ export default {
            ajaxApproveDiscuss: function(userId, articleId) {
             var _this = this;
             console.log('userIDd: '+ userId);
-            axios.post('http://localhost:8093/discuss/approve',qs.stringify(
+            axios.post('http://localhost:5555/sclp/discuss/approve',qs.stringify(
                     {
                         userId: userId,
                         articleId: articleId
@@ -298,7 +310,7 @@ export default {
            ajaxApproveDiscussComment: function(userId, commentId) {
             var _this = this;
             console.log('userIDd: '+ userId);
-            axios.post('http://localhost:8093/comment/approveComment',qs.stringify(
+            axios.post('http://localhost:5555/sclp/comment/approveComment',qs.stringify(
                     {
                         userId: userId,
                         commentId: commentId,
@@ -315,7 +327,7 @@ export default {
            ajaxComment: function(userId, articleId,pageNumber,pageSize) {
             var _this = this;
             // console.log('userIDd: '+ userId);
-            axios.post('http://localhost:8093/comment/listComment',qs.stringify(
+            axios.post('http://localhost:5555/sclp/comment/listComment',qs.stringify(
                     {
                         userId: userId,
                         targetId: articleId,
@@ -369,15 +381,27 @@ export default {
             commentHandleCurrentChange(val) {
                 this.commentPagesNow = val;
                 console.log('changeNumber'+ val)
-                this.ajaxComment(this.$route.params.userId, this.$route.params.discussId,val,10)
+                this.ajaxComment(this.userId, this.$route.params.discussId,val,10)
+            },
+            initPage(){
+                // if (this.$route.params.discussId==undefine || this.userId==undefine) {
+                //     this.errorNet()
+                // }
+                console.log('statr')
+                if (window.localStorage.getItem("userId") == null) {
+                    this.errorNet('非正常访问');
+                } else {
+                
+                    var id = this.$route.params.discussId;
+                    console.log(id)
+                    this.userId = window.localStorage.getItem("userId");
+                    console.log(this.userId)
+                    this.ajaxDiscuss(this.userId, this.$route.params.discussId);
+                }
             }
   },
   mounted() {
-      console.log('statr')
-      var id = this.$route.params.discussId;
-      console.log(id)
-      console.log(this.$route.params.userId)
-      this.ajaxDiscuss(this.$route.params.userId, this.$route.params.discussId);
+      this.initPage()
   },filters: {
         formatDate(time) {
         var date = new Date(time);
@@ -387,21 +411,7 @@ export default {
 };
 
 var items = [
-  {
-    discussId: "Foo",
-    discussTitle: "一直不会微积分，今后生活会比别人困难吗？",
-    authorId: "1",
-    userName: "用户1",
-    authorPicUrl:
-      "https://cdn.v2ex.com/avatar/c2db/c77d/146640_normal.png?m=1452582980",
-    createTime: "20180410 12:05:00",
-    approveNumber: "0",
-    commentNumber: "0",
-    TagId: "TagId",
-    TagName: "微积分",
-    Info:
-      "微积分（Calculus）是高等数学中研究函数的微分（Differentiation）、积分(Integration)以及有关概念和应用的数学分支。它是数学的一个基础学科。"
-  }
+  
 ];
 </script>
 

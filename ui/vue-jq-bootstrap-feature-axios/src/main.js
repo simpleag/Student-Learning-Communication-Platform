@@ -12,6 +12,8 @@ import '../static/UE/ueditor.config.js'
 import '../static/UE/ueditor.all.min.js'
 import '../static/UE/lang/zh-cn/zh-cn.js'
 import '../static/UE/ueditor.parse.min.js'
+//支持跨域cookie
+axios.defaults.withCredentials = true 
 window.axios = axios
 
 Vue.config.productionTip = false
@@ -23,3 +25,7 @@ new Vue({
   template: '<App/>',
   components: { App }
 })
+
+export default function(a=1,b=2){
+
+}

@@ -30,7 +30,7 @@
                                 <tr >
                                     <td  class="col-md-2">
                                         <div class="sep100 pull-center" >
-                                            <a href="wwww.baidu.com">
+                                            <!-- <a href="/"> -->
                                             <img :src="item.userPicUrl" width="100%" class="img-responsive img-circle" border="0" align="default" >
                                             </a>
                                         </div>
@@ -44,18 +44,24 @@
                                     <div class="sep5"></div>
                                     <span>
                                         <strong>{{item.userName}}</strong>发表于:{{item.createTime | formatDate}} </strong>
+                                        <p></p>
+                                        <P>来自<strong>{{item.tagName}}</strong></P>
                                     </span>
 
                                     </td>
                                     <td class="col-md-3">
                                         <div class="sep5"></div>
                                    <span>
-                                        <strong>{{item.discussCommentNumber}}</strong>条回复
+                                        <el-tag type="danger"><strong>{{item.discussCommentNumber}}</strong>条回复</el-tag>
+                                        <!-- <strong>{{item.discussCommentNumber}}</strong>条回复 -->
                                         <p></p>
                                     </span>
                                     <span>
-                                    <button @click="clickDiscussApprove()" type="button" class="btn btn-default" >{{discussDetail.approveNumber}}个赞同</button>
-                                    <button @click="clickDiscussFavorite()" type="button" class="btn btn-default">{{discussDetail.favoriteNumber}}个收藏</button>
+                                    <el-tag type="success">{{item.approveNumber}}个赞同</el-tag>
+                                    <p></p>
+                                    <el-tag type="warning">{{item.favoriteNumber}}个收藏</el-tag>
+                                    <!-- <button @click="clickDiscussApprove(item.discussId,1)" type="button" class="btn btn-default" >{{item.approveNumber}}个赞同</button>
+                                    <button @click="clickDiscussFavorite(item.discussId,1)" type="button" class="btn btn-default">{{item.favoriteNumber}}个收藏</button> -->
                                     </span>
                                     </td>
                                 </tr>
@@ -103,18 +109,24 @@
                                     <div class="sep5"></div>
                                     <span>
                                         <strong>{{item.userName}}</strong>发表于:{{item.createTime | formatDate}} </strong>
+                                        <p></p>
+                                        <P>来自<strong>{{item.tagName}}</strong></P>
                                     </span>
 
                                     </td>
                                     <td class="col-md-3">
                                         <div class="sep5"></div>
                                    <span>
-                                        <strong>{{item.articleCommentNumber}}</strong>条回复
+                                        <!-- <strong>{{item.articleCommentNumber}}</strong>条回复 -->
+                                        <el-tag type="danger"><strong>{{item.articleCommentNumber}}</strong>条回复</el-tag>
                                     </span>
                                     <p></p>
                                     <span >
-                                    <button type="button" class="btn btn-default">{{item.approveNumber}}个赞同</button>
-                                    <button type="button" class="btn btn-default">{{item.approveNumber}}个收藏</button>
+                                        <el-tag type="success">{{item.approveNumber}}个赞同</el-tag>
+                                        <p></p>
+	                                    <el-tag type="warning">{{item.favoriteNumber}}个收藏</el-tag>
+                                    <!-- <button type="button" class="btn btn-default">{{item.approveNumber}}个赞同</button>
+                                    <button type="button" class="btn btn-default">{{item.favoriteNumber}}个收藏</button> -->
                                     </span>
                                     </td>
                                 </tr>
@@ -162,18 +174,24 @@
                                     <div class="sep5"></div>
                                     <span>
                                         <strong>{{item.userAnonymouseName}}</strong>发表于:{{item.createTime | formatDate}} </strong>
+                                        <!-- <p></p>
+                                        <P>来自<strong>{{item.tagName}}</strong></P> -->
                                     </span>
 
                                     </td>
                                     <td class="col-md-3">
                                         <div class="sep5"></div>
                                    <span>
-                                        <strong>{{item.anoymousCommentNumber}}</strong>条回复
+                                       <el-tag type="danger"><strong>{{item.anoymousCommentNumber}}</strong>条回复</el-tag>
+                                        <!-- <strong>{{item.anoymousCommentNumber}}</strong>条回复 -->
                                         <p></p>
                                     </span>
                                     <span>
-                                    <button type="button" class="btn btn-default">{{item.approveNumber}}个赞同</button>
-                                    <button type="button" class="btn btn-default">{{item.approveNumber}}个收藏</button>
+                                        <el-tag type="success">{{item.approveNumber}}个赞同</el-tag>
+                                        <p></p>
+	                                    <el-tag type="warning">{{item.favoriteNumber}}个收藏</el-tag>
+                                    <!-- <button type="button" class="btn btn-default">{{item.approveNumber}}个赞同</button>
+                                    <button type="button" class="btn btn-default">{{item.favoriteNumber}}个收藏</button> -->
                                     </span>
                                     </td>
                                 </tr>
@@ -247,7 +265,7 @@ import { formatDate } from "../common/date.js";
 
 var userLoginId = "";
 var userpwd = "";
-var userId = 1;
+var userId;
 var user = "";
 var tags = [];
 var discussPages = 0;
@@ -280,13 +298,50 @@ export default {
       articleNow: articleNow,
       disscussNow: disscussNow,
       anoymousNow: anoymousNow,
-      userId: userId
+      userId: this.userId
     };
   },
   methods: {
+    // clickDiscussApprove(id, type) {
+    //     var tempList;
+    //     // var temp;
+    //     if (type == 1) {
+    //         tempList = this.items;
+    //     } else if (type == 2) {
+    //         tempList = this.articlesList;
+    //     } else if (type == 3) {
+    //         tempList = this.anoymousList;
+    //     } else {
+
+    //     }
+    //     if (tempList == undefined || tempList.length == 0) {
+
+    //     } else {
+    //         for(var i=0;i<tempList.length;i++) {
+    //             var temp = tempList[i];
+    //             if (type==1 && id==temp.discussId ) {
+
+    //             } else if (type==2 && id==temp.articleId) {
+
+    //             } else if (type==3 && id==temp.anoymousId) {
+
+    //             }
+    //         }
+    //     }
+
+    // },
     createDiscuss() {
-      this.$router.push({ name: "CreateDiscuss", params : { userId: userId} });
+      this.$router.push({ name: "CreateDiscuss", params: { userId: this.userId } });
     },
+    errorNet(message){
+        console.log("error")
+        this.$notify({
+          title: '出错',
+          message: message,
+          type: 'error'
+        });
+        this.$router.push({ name: "Login" });
+      },
     handleClick(tab, event) {
       console.log("tab:" + tab.name + "+" + event);
       if (tab.name == "article") {
@@ -316,9 +371,9 @@ export default {
       var _this = this;
       axios
         .post(
-          "http://localhost:8093/discuss/listOrderByTime",
+          "http://localhost:5555/sclp/discuss/listOrderByTime",
           qs.stringify({
-            userId: userId,
+            userId: this.userId,
             pageNumber: number,
             pageSize: "10"
           })
@@ -348,9 +403,9 @@ export default {
       var _this = this;
       axios
         .post(
-          "http://localhost:8093/user/baseInfo",
+          "http://localhost:5555/sclp/user/baseInfo",
           qs.stringify({
-            userId: userId
+            userId: this.userId
           })
         )
         .then(function(res) {
@@ -369,9 +424,9 @@ export default {
       var _this = this;
       axios
         .post(
-          "http://localhost:8093/tag/userAttentionTags",
+          "http://localhost:5555/sclp/tag/userAttentionTags",
           qs.stringify({
-            userId: userId,
+            userId: this.userId,
             pageNumber: "1",
             pageSize: "5"
           })
@@ -392,9 +447,9 @@ export default {
       var _this = this;
       axios
         .post(
-          "http://localhost:8093/article/listOrderByTime",
+          "http://localhost:5555/sclp/article/listOrderByTime",
           qs.stringify({
-            userId: userId,
+            userId: this.userId,
             pageNumber: number,
             pageSize: "10"
           })
@@ -418,9 +473,9 @@ export default {
       var _this = this;
       axios
         .post(
-          "http://localhost:8093/anoymous/listOrderByTime",
+          "http://localhost:5555/sclp/anoymous/listOrderByTime",
           qs.stringify({
-            userId: userId,
+            userId: this.userId,
             pageNumber: number,
             pageSize: "10"
           })
@@ -442,6 +497,8 @@ export default {
     },
 
     init() {
+      console.log("testUserId"+ window.localStorage.getItem("userId"))
+      this.userId = window.localStorage.getItem("userId");
       this.ajaxTag();
       this.ajax(1);
       this.ajaxUser();

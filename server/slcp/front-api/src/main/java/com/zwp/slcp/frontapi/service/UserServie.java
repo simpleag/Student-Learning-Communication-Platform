@@ -29,7 +29,7 @@ public interface UserServie {
     @ResponseBody
     User findOneByUserPhoneNumber(@RequestParam(value = "userPhoneNumber") String userPhoneNumber);
 
-    @RequestMapping("/findOneByUserLoginId")
+    @RequestMapping("/user/findOneByUserLoginId")
     @ResponseBody
     User findOneByUserLoginId(@RequestParam(value = "userLogInId") String userLogInId);
 

@@ -61,15 +61,15 @@ export default new Router({
           name: 'TagDetail',
           component: TagDetail
         },{
-          path: 'Discuss/:discussId/:userId',
+          path: 'Discuss/:discussId',
           name: 'Discuss',
           component: Discuss
         },{
-          path: 'Article/:articleId/:userId',
+          path: 'Article/:articleId',
           name: 'Article',
           component: Article
         },{
-          path: 'Anoymous/:anoymousId/:userId',
+          path: 'Anoymous/:anoymousId',
           name: 'Anoymous',
           component: Anoymous
         },{
@@ -85,7 +85,7 @@ export default new Router({
           name: 'CreateArticle',
           component : CreateArticle     
         },{
-          path: 'CreateDiscuss/:userId',
+          path: 'CreateDiscuss',
           name: 'CreateDiscuss',
           component : CreateDiscuss     
         },{

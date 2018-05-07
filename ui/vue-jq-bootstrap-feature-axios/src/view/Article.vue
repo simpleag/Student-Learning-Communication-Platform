@@ -284,6 +284,7 @@ export default {
         .post(
           "http://localhost:8093/comment/createArticleComment",
           qs.stringify({
+            userId: userId,
             articleCommentAuthorId: userId,
             articleCommentContent: content,
             articleListNumber: number,
@@ -376,6 +377,15 @@ export default {
           console.log("error" + err);
         });
     },
+    errorNet(message){
+        console.log("error")
+        this.$notify({
+          title: '出错',
+          message: message,
+          type: 'error'
+        });
+        this.$router.push({ name: "Login" });
+      },
     initArticle: function(res) {
       console.log("code" + res.data.code);
       this.articleDetail = res.data.article;
@@ -417,15 +427,15 @@ export default {
     console.log("statr");
     this.articleId = this.$route.params.articleId;
 
-    this.userId = this.$route.params.userId;
+    this.userId = window.localStorage.getItem("userId");
     console.log(
       "userId: " +
-        this.$route.params.userId +
+        this.userId +
         " articleId: " +
         this.$route.params.articleId
     );
     console.log("userId: " + this.userId + " articleId: " + this.articleId);
-    this.ajaxArticle(this.$route.params.userId, this.$route.params.articleId);
+    this.ajaxArticle(this.userId, this.$route.params.articleId);
   },
   filters: {
     formatDate(time) {
@@ -436,21 +446,7 @@ export default {
 };
 
 var items = [
-  {
-    discussId: "Foo",
-    discussTitle: "一直不会微积分，今后生活会比别人困难吗？",
-    authorId: "1",
-    userName: "用户1",
-    authorPicUrl:
-      "https://cdn.v2ex.com/avatar/c2db/c77d/146640_normal.png?m=1452582980",
-    createTime: "20180410 12:05:00",
-    approveNumber: "0",
-    commentNumber: "0",
-    TagId: "TagId",
-    TagName: "微积分",
-    Info:
-      "微积分（Calculus）是高等数学中研究函数的微分（Differentiation）、积分(Integration)以及有关概念和应用的数学分支。它是数学的一个基础学科。"
-  }
+  
 ];
 </script>
 

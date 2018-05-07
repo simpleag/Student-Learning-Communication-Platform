@@ -4,13 +4,15 @@ server:
 zuul:
   ribbon-isolation-strategy: thread
   host:
-    connect-timeout-millis: 10000
-    socket-timeout-millis: 60000
+    connect-timeout-millis: 600000
+    socket-timeout-millis: 600000
   routes:
     api-a:
       path: /sclp/**
       serviceId: FRONT-API
   add-host-header: true
+# 确保cookie可以返回给客户端
+  sensitive-headers: true
 eureka:
   instance:
     prefer-ip-address: true

@@ -82,9 +82,15 @@ public class UserController {
         //将密码用Md5加密
 
         User user = new User(phoneNumber, userLoginId, userName);
-        user.setUserPwd(pwd);
+        String md5pwd = MD5Utils.MD5(pwd);
+        user.setUserPwd(md5pwd);
 
-        return userServie.createUser(user);
+        String str = userServie.createUser(user);
+        if (str != null) {
+            return FrontApiResponseEntity.SYS_ERR().build();
+        } else {
+            return FrontApiResponseEntity.SUCC().build();
+        }
     }
 
     @RequestMapping(value = "/login")
@@ -99,7 +105,7 @@ public class UserController {
             if (user == null) {
                 return FrontApiResponseEntity.SYS_ERR().message("查无此用户").build();
             } else {
-                if (pwdMd5 != user.getUserPwd()) {
+                if (!pwdMd5.equals(user.getUserPwd())) {
                     return FrontApiResponseEntity.SYS_ERR().message("密码不匹配").build();
                 } else {
                     //创建jwt token
@@ -110,9 +116,11 @@ public class UserController {
                     }
                     //存放到cookie中
                     Cookie cookie = new Cookie(MyConstant.TOKEN, accessTokenResult.getString("accessToken"));
+                    cookie.setValue(accessTokenResult.getString("accessToken"));
+                    cookie.setMaxAge(36000);
                     cookie.setPath("/");
                     rep.addCookie(cookie);
-                    return FrontApiResponseEntity.SUCC().data("user", user).build();
+                    return FrontApiResponseEntity.SUCC().data("user", user).data("token", accessTokenResult.getString("accessToken")).build();
                 }
             }
         }
