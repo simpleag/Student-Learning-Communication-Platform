@@ -11,10 +11,7 @@ import com.zwp.slcp.sqlserver.mapper.DiscussMapper;
 import com.zwp.slcp.sqlserver.mapper.MapUserDiscussMapper;
 import com.zwp.slcp.sqlserver.service.DiscussService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -109,6 +106,7 @@ public class DiscussController {
             PageHelper.startPage(1,10);
             List<DetailDiscussComment> detailDiscussCommentList = discussCommentMapper.selectDetailByDiscussId(userId, discussId);
             PageInfo<DetailDiscussComment > detailDiscussCommentPageInfo = new PageInfo<>(detailDiscussCommentList);
+//            System.out.println(detailDiscussCommentPageInfo.getSize());
             return FrontApiResponseEntity.SUCC().data("discuss", detailDiscuss).data("comment", detailDiscussCommentPageInfo).build();
         }
     }
@@ -158,20 +156,27 @@ public class DiscussController {
 
     @RequestMapping("/createDiscuss")
     @ResponseBody
-    String createDiscuss(Discuss discuss) {
+    String createDiscuss(@RequestBody Discuss discuss) {
         discuss.setCreateTime(System.currentTimeMillis());
         discuss.setUpdateTime(System.currentTimeMillis());
         discuss.setDiscussState(1);
+        discuss.setDiscussCommentNumber(0);
         if (StringUtils.isBlank(discuss.getDiscussAuthorId())) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         } else {
-            return discussService.createDiscuss(discuss);
+            Long discussId = discussService.createDiscuss(discuss);
+            System.out.println("discussId"+ discussId);
+            if (discussId==null || discussId==0L ) {
+                return FrontApiResponseEntity.SYS_ERR().build();
+            } else {
+                return FrontApiResponseEntity.SUCC().data("discussId", discussId).build();
+            }
         }
     }
 
     @RequestMapping("/updateDiscuss")
     @ResponseBody
-    String updateDiscuss(Discuss discuss) {
+    String updateDiscuss(@RequestBody Discuss discuss) {
         discuss.setCreateTime(System.currentTimeMillis());
         if (StringUtils.isBlank(discuss.getDiscussAuthorId())) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
@@ -188,6 +193,7 @@ public class DiscussController {
     @ResponseBody
     String updateUserAttentionType (Long userId, Long discussId, Integer type) {
         boolean success = false;
+//        System.out.println("sql"+userId+"+"+discussId+"+"+type);
         Integer sqlUpdateType = 1;
         if (StringUtils.isBlank(userId, discussId, type)) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();

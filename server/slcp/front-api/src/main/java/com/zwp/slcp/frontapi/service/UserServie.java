@@ -5,7 +5,9 @@ import com.zwp.slcp.apicommon.entity.User;
 import com.zwp.slcp.apicommon.entity.UserFollow;
 import com.zwp.slcp.frontapi.service.failCallBack.UserFailCallBack;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
@@ -17,38 +19,42 @@ import java.util.List;
 public interface UserServie {
     @RequestMapping("/user/findOne")
     @ResponseBody
-    User findOne(Long userId);
+    User findOne(@RequestParam(value = "userId") Long userId);
 
     @RequestMapping("/user/create")
     @ResponseBody
-    public String createUser(User user);
+    String createUser(@RequestBody User user);
 
     @RequestMapping("/user/findOneByUserPhoneNumber")
     @ResponseBody
-    public User findOneByUserPhoneNumber(String userPhoneNumber);
+    User findOneByUserPhoneNumber(@RequestParam(value = "userPhoneNumber") String userPhoneNumber);
+
+    @RequestMapping("/findOneByUserLoginId")
+    @ResponseBody
+    User findOneByUserLoginId(@RequestParam(value = "userLogInId") String userLogInId);
 
     @RequestMapping("/user/findOneLimitById")
     @ResponseBody
-    public LimitUser findOneLimitById(Long userId);
+    LimitUser findOneLimitById(@RequestParam(value = "userId") Long userId);
 
     @RequestMapping("/user/listUserFollows")
     @ResponseBody
-    List<UserFollow> listUserFollows(Long userId);
+    List<UserFollow> listUserFollows(@RequestParam(value = "userId") Long userId, @RequestParam(value = "pageNumber") Integer pageNumber, @RequestParam(value = "pageSize") Integer pageSize);
 
     @RequestMapping("/user/listUserAttention")
     @ResponseBody
-    public List<UserFollow> listUserAttention(Long userId);
+    List<UserFollow> listUserAttention(@RequestParam(value = "userId") Long userId, @RequestParam(value = "pageNumber") Integer pageNumber, @RequestParam(value = "pageSize") Integer pageSize);
 
     @RequestMapping("/user/userAttention")
     @ResponseBody
-    public String userAttention(Long userId, Long user2Id);
+    String userAttention(@RequestParam(value = "userId") Long userId, @RequestParam(value = "user2Id") Long user2Id);
 
     @RequestMapping("/user/userUnAttention")
     @ResponseBody
-    public String userUnAttention(Long userId, Long user2Id);
+    String userUnAttention(@RequestParam(value = "userId") Long userId, @RequestParam(value = "user2Id") Long user2Id);
 
     @RequestMapping("/user/userUpdate")
     @ResponseBody
-    public String userUpdate(User user);
+    String userUpdate(@RequestBody User user);
 
 }

@@ -48,7 +48,7 @@
     article_replay_userId, article_comment_state, ac.create_time as create_time, ac.update_time as update_time, u.user_name as user_name, user_pic_url, (
 		SELECT count(1)
         FROM map_user_articlecomment as m
-        WHERE m.article_comment_id = ac.article_comment_id
+        WHERE m.article_comment_id = ac.article_comment_id AND m.user_approve_type = 1
     ) as approve_number, (
 			select m2.user_approve_type
             from map_user_articlecomment as m2
@@ -63,7 +63,7 @@ ORDER BY ac.article_list_number
     article_replay_userId, article_comment_state, ac.create_time as create_time, ac.update_time as update_time, u.user_name as user_name, user_pic_url, (
     SELECT count(1)
     FROM map_user_articlecomment as m
-    WHERE m.article_comment_id = ac.article_comment_id
+    WHERE m.article_comment_id = ac.article_comment_id AND m.user_approve_type = 1
     ) as approve_number, (
     select m2.user_approve_type
     from map_user_articlecomment as m2
@@ -77,7 +77,7 @@ ORDER BY ac.article_list_number
     delete from article_comment
     where article_comment_id = #{articleCommentId,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.zwp.slcp.apicommon.entity.ArticleComment" useGeneratedKeys="true" keyProperty="articleCommentId" keyColumn="article_comment_id">
+  <insert id="insert" useGeneratedKeys="true" keyProperty="articleCommentId" keyColumn="article_comment_id" parameterType="com.zwp.slcp.apicommon.entity.ArticleComment" >
     insert into article_comment (article_comment_id, article_comment_author_Id, 
       article_comment_content, article_list_number, 
       article_replay_userId, article_comment_state, 
@@ -85,9 +85,9 @@ ORDER BY ac.article_list_number
     values (#{articleCommentId,jdbcType=BIGINT}, #{articleCommentAuthorId,jdbcType=BIGINT}, 
       #{articleCommentContent,jdbcType=VARCHAR}, #{articleListNumber,jdbcType=INTEGER}, 
       #{articleReplayUserid,jdbcType=BIGINT}, #{articleCommentState,jdbcType=INTEGER}, 
-      #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT}), #{articleId,jdbcType=BIGINT}
+      #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT}, #{articleId,jdbcType=BIGINT})
   </insert>
-  <insert id="insertSelective" parameterType="com.zwp.slcp.apicommon.entity.ArticleComment" >
+  <insert id="insertSelective" useGeneratedKeys="true" keyProperty="articleCommentId" keyColumn="article_comment_id" parameterType="com.zwp.slcp.apicommon.entity.ArticleComment" >
     insert into article_comment
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="articleCommentId != null" >

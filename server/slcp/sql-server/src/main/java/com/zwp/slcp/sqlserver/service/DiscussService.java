@@ -24,24 +24,28 @@ public class DiscussService {
     private InfoMapper infoMapper;
 
     @Transactional(timeout=36000,rollbackFor=Exception.class)
-    public String createDiscuss(Discuss discuss) {
-        boolean success = false;
+    public Long createDiscuss(Discuss discuss) {
+        Long discussId = 0L;
         try {
-            if (discussMapper.insert(discuss) == 0) {
+            discussId = discussMapper.insert(discuss);
+            if (discussId == 0L) {
                 throw new Exception("操作异常");
             }
-            User user = new User(discuss.getDiscussId());
+            discussId = discuss.getDiscussId();
+            User user = new User(discuss.getDiscussAuthorId());
             user.setUserDiscussNumber(1);
-            if (userMapper.updateNumber(user) == 0) {
+            Integer result = userMapper.updateNumber(user);
+            if (result == 0) {
                 throw new Exception("操作异常");
             }
-            success = true;
+
         } catch (Exception e) {
             //执行事务回滚
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            discussId = 0L;
             throw new Exception("操作异常");
         } finally {
-            return success ? FrontApiResponseEntity.SUCC().build():FrontApiResponseEntity.SYS_ERR().message("数据库操作异常").build();
+            return discussId;
         }
     }
 

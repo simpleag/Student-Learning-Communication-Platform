@@ -2,6 +2,7 @@ package com.zwp.slcp.sqlserver.controller;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.sun.xml.internal.ws.server.provider.AsyncProviderInvokerTube;
 import com.zwp.slcp.apicommon.entity.*;
 import com.zwp.slcp.apicommon.response.FrontApiResponseEntity;
 import com.zwp.slcp.apicommon.response.ResponseCode;
@@ -11,10 +12,7 @@ import com.zwp.slcp.sqlserver.mapper.ArticleMapper;
 import com.zwp.slcp.sqlserver.mapper.MapUserArticleMapper;
 import com.zwp.slcp.sqlserver.service.ArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -161,20 +159,25 @@ public class ArticleController {
 
     @RequestMapping("/createArticle")
     @ResponseBody
-    String createArticle(Article article) {
+    String createArticle(@RequestBody Article article) {
         article.setCreateTime(System.currentTimeMillis());
         article.setUpdateTime(System.currentTimeMillis());
         article.setArticleState(1);
         if (StringUtils.isBlank(article.getArticleAuthorId())) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         } else {
-            return articleService.createArticle(article);
+            Long articleId = articleService.createArticle(article);
+            if (articleId == 0L) {
+                return FrontApiResponseEntity.SYS_ERR().build();
+            } else {
+                return FrontApiResponseEntity.SUCC().data("articleId", articleId).build();
+            }
         }
     }
 
     @RequestMapping("/updateArticle")
     @ResponseBody
-    String updateArticle(Article article) {
+    String updateArticle(@RequestBody Article article) {
         if (StringUtils.isBlank(article.getArticleId())) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         } else {

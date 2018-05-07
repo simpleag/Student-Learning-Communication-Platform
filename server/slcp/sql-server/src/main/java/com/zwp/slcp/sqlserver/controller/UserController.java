@@ -1,6 +1,7 @@
 package com.zwp.slcp.sqlserver.controller;
 
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.zwp.slcp.apicommon.entity.*;
 import com.zwp.slcp.apicommon.response.FrontApiResponseEntity;
 import com.zwp.slcp.apicommon.response.ResponseCode;
@@ -9,10 +10,7 @@ import com.zwp.slcp.sqlserver.mapper.MapUserMapper;
 import com.zwp.slcp.sqlserver.mapper.UserMapper;
 import com.zwp.slcp.sqlserver.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -47,7 +45,7 @@ public class UserController {
      */
     @RequestMapping("/create")
     @ResponseBody
-    public String createUser(User user) {
+    public String createUser(@RequestBody User user) {
         if (StringUtils.isBlank(user)) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         } else {
@@ -79,23 +77,46 @@ public class UserController {
         }
     }
 
-    @RequestMapping("/listUserFollows")
+    @RequestMapping("/findOneByUserLoginId")
     @ResponseBody
-    public List<UserFollow> listUserFollows(Long userId){
-        if (StringUtils.isBlank(userId)) {
+    public User findOneByUserLoginId(String userLogInId) {
+        if (StringUtils.isBlank(userLogInId)) {
             return null;
         } else {
-            return userMapper.selectUserFollow(userId);
+            return userMapper.selectByUserLoginId(userLogInId);
         }
     }
 
-    @RequestMapping("/listUserAttention")
+    @RequestMapping("/listUserFollows")
     @ResponseBody
-    public List<UserFollow> listUserAttention(Long userId){
+    public PageInfo<UserFollow> listUserFollows(Long userId, Integer pageNumber, Integer pageSize){
         if (StringUtils.isBlank(userId)) {
             return null;
         } else {
-            return userMapper.selectUserAttetion(userId);
+            PageHelper.startPage(pageNumber, pageSize);
+            List<UserFollow> userFollowList = userMapper.selectUserFollow(userId);
+            if (userFollowList.size() == 0) {
+                return null;
+            }
+            PageInfo<UserFollow> userFollowPageInfo = new PageInfo<>(userFollowList);
+            return userFollowPageInfo;
+        }
+    }
+
+
+    @RequestMapping("/listUserAttention")
+    @ResponseBody
+    public PageInfo<UserFollow> listUserAttention(Long userId, Integer pageNumber, Integer pageSize){
+        if (StringUtils.isBlank(userId)) {
+            return null;
+        } else {
+            PageHelper.startPage(pageNumber, pageSize);
+            List<UserFollow> userFollowList = userMapper.selectUserAttetion(userId);
+            if (userFollowList.size() == 0) {
+                return null;
+            }
+            PageInfo<UserFollow> userFollowPageInfo = new PageInfo<>(userFollowList);
+            return userFollowPageInfo;
         }
     }
 
@@ -119,7 +140,7 @@ public class UserController {
 
     @RequestMapping("/userUpdate")
     @ResponseBody
-    public String userUpdate(User user) {
+    public String userUpdate(@RequestBody User user) {
         if (StringUtils.isBlank(user.getUserId())) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         }

@@ -29,17 +29,22 @@ public class UserFailCallBack implements UserServie {
     }
 
     @Override
+    public User findOneByUserLoginId(String userLogInId) {
+        return null;
+    }
+
+    @Override
     public LimitUser findOneLimitById(Long userId) {
         return null;
     }
 
     @Override
-    public List<UserFollow> listUserFollows(Long userId) {
+    public List<UserFollow> listUserFollows(Long userId, Integer pageNumber, Integer pageSize) {
         return null;
     }
 
     @Override
-    public List<UserFollow> listUserAttention(Long userId) {
+    public List<UserFollow> listUserAttention(Long userId, Integer pageNumber, Integer pageSize) {
         return null;
     }
 

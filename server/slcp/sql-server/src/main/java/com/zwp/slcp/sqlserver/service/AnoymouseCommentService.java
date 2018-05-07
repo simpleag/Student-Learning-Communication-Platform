@@ -24,15 +24,24 @@ public class AnoymouseCommentService {
     private AnoymousMapper anoymousMapper;
 
     @Transactional(timeout=36000,rollbackFor=Exception.class)
-    public boolean createAnoymousComment(AnoymousComment anoymousComment) {
-        boolean isSuccess = false;
+    public Long createAnoymousComment(AnoymousComment anoymousComment) {
+        Long commentId = 0L;
         try {
+            Anoymous anoymous = anoymousMapper.selectByPrimaryKey(anoymousComment.getAnoymousId());
+            if (anoymous == null) {
+                throw new Exception("数据库操作异常");
+            }
+            anoymous.setAnoymousCommentNumber(anoymous.getAnoymousCommentNumber()+1);
+            anoymous.setUpdateTime(System.currentTimeMillis());
+            anoymousComment.setAnoymousListNumber(anoymous.getAnoymousCommentNumber());
             Long anoymousCommentId = anoymousCommentMapper.insert(anoymousComment);
             if (anoymousCommentId == 0L) {
                 throw new Exception("数据库操作异常");
+            } else {
+                commentId = anoymousCommentId;
             }
-            Anoymous anoymous = anoymousMapper.selectByPrimaryKey(anoymousComment.getAnoymousId());
-            if (anoymous == null) {
+            anoymousCommentId = anoymousComment.getAnoymousCommentId();
+            if (anoymousMapper.updateByPrimaryKeySelective(anoymous) == 0) {
                 throw new Exception("数据库操作异常");
             }
             User commentAuthor = new User(anoymousComment.getAnoymousCommentAuthorId());
@@ -41,23 +50,24 @@ public class AnoymouseCommentService {
                 throw new Exception("数据库操作异常");
             }
             Info info = new Info(anoymous.getAnoymousAuthorId(), 9, 1, anoymousCommentId);
-            info.setIntoContent("您的文章"+anoymous.getAnoymousTitle()+"有一条评论");
+            info.setIntoContent("您的匿名讨论"+anoymous.getAnoymousTitle()+"有一条评论");
+            info.setCreateTime(System.currentTimeMillis());
 
             if (infoMapper.insert(info) == 0) {
                 throw new Exception("数据库操作异常");
             }
-            if (anoymousComment.getAnoymouseReplayUserid() != null) {
+            if (anoymousComment.getAnoymouseReplayUserid() != null && anoymousComment.getAnoymouseReplayUserid() != 0) {
                 Info replayInfo = new Info(anoymousComment.getAnoymouseReplayUserid(),9,1,anoymousCommentId);
                 replayInfo.setIntoContent("有人回复了您的一条评论");
+                replayInfo.setCreateTime(System.currentTimeMillis());
                 if (infoMapper.insert(replayInfo) == 0) {
                     throw new Exception("数据库操作异常");
                 }
             }
-            isSuccess = true;
         } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         } finally {
-            return isSuccess;
+            return commentId;
         }
     }
 
@@ -74,7 +84,7 @@ public class AnoymouseCommentService {
             }
             Info info = new Info(anoymousComment.getAnoymousCommentAuthorId(), 12, 1, anoymousComment.getAnoymousCommentId());
             info.setIntoContent("您的一条评论收到了赞");
-
+            info.setCreateTime(System.currentTimeMillis());
             if (infoMapper.insert(info) == 0) {
                 throw new Exception("数据库操作异常");
             }
@@ -83,7 +93,7 @@ public class AnoymouseCommentService {
             if (userMapper.updateNumber(user) == 0) {
                 throw new Exception("数据库操作异常");
             }
-
+            isSuccess = true;
         } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         } finally {
@@ -104,6 +114,7 @@ public class AnoymouseCommentService {
             if (userMapper.updateNumber(user) == 0) {
                 throw new Exception("数据库操作异常");
             }
+            isSuccess = true;
 
         } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();

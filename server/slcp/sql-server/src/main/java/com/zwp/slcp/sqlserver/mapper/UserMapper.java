@@ -44,7 +44,7 @@ public interface UserMapper {
 
 
     //查找用户的基本信息，包括受到的消息和私信数量
-    LimitUser selectUserLimitInfo(Long userId);
+    LimitUser selectUserLimitInfo(@Param("userId") Long userId);
 
     //用户关注的人
     List<UserFollow> selectUserAttetion(Long userId);

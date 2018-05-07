@@ -29,7 +29,7 @@
     <result column="user_approve_type" property="userApproveType" jdbcType="INTEGER" />
     <result column="user_favorite_type" property="userFavoriteType" jdbcType="INTEGER" />
   </resultMap>
-  <resultMap id="DetailResultMap" type="com.zwp.slcp.apicommon.entity.Discuss" >
+  <resultMap id="DetailResultMap" type="com.zwp.slcp.apicommon.entity.DetailDiscuss" >
     <id column="discuss_id" property="discussId" jdbcType="BIGINT" />
     <result column="discuss_author_id" property="discussAuthorId" jdbcType="BIGINT" />
     <result column="discuss_title" property="discussTitle" jdbcType="VARCHAR" />
@@ -234,14 +234,14 @@ order by d.update_time DESC
         ) as favoriteNumber, (
 			select m2.user_approve_type
             from map_user_discuss as m2
-            WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m.discuss_id = d.discuss_id
+            WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.discuss_id = d.discuss_id
         ) as user_approve_type,
         (
 			select m3.user_favorite_type
             from map_user_discuss as m3
-            WHERE m3.user_id = #{userId,jdbcType=BIGINT} AND m.discuss_id = d.discuss_id
+            WHERE m3.user_id = #{userId,jdbcType=BIGINT} AND m3.discuss_id = d.discuss_id
         ) as user_favorite_type
-FROM discuss as d, user as u, tag as t, map_user_discuss as m
+FROM discuss as d, user as u, tag as t
 WHERE   d.discuss_id = #{discussId,jdbcType=BIGINT}
 AND u.user_id = d.discuss_author_id
 AND d.discuss_tag_id = t.tag_id
@@ -279,7 +279,7 @@ AND d.discuss_tag_id = t.tag_id
     delete from discuss
     where discuss_id = #{discussId,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.zwp.slcp.apicommon.entity.Discuss" >
+  <insert id="insert" useGeneratedKeys="true" keyProperty="discussId" keyColumn="discuss_id" parameterType="com.zwp.slcp.apicommon.entity.Discuss" >
     insert into discuss (discuss_id, discuss_author_id, discuss_title, 
       discuss_content, discuss_comment_number, discuss_tag_id, 
       discuss_state, create_time, update_time

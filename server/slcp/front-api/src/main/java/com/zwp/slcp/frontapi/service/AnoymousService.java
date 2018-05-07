@@ -7,7 +7,9 @@ import com.zwp.slcp.apicommon.entity.HomeAnoymous;
 import com.zwp.slcp.frontapi.service.failCallBack.AnoymousFailCallBack;
 import com.zwp.slcp.frontapi.service.failCallBack.UserFailCallBack;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
@@ -17,43 +19,43 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public interface AnoymousService {
     @RequestMapping("/anoymous/listHomeAnoymouseByTime")
     @ResponseBody
-    PageInfo<HomeAnoymous> listHomeAnoymouseByTime(Long userId, Integer pageNumber, Integer pageSize);
+    PageInfo<HomeAnoymous> listHomeAnoymouseByTime(@RequestParam(value = "userId") Long userId, @RequestParam(value = "pageNumber") Integer pageNumber, @RequestParam(value = "pageSize") Integer pageSize);
 
     @RequestMapping("/anoymous/listHomeAnoymouseByHot")
     @ResponseBody
-    PageInfo<HomeAnoymous> listHomeAnoymouseByHot(Long userId, Integer pageNumber, Integer pageSize);
+    PageInfo<HomeAnoymous> listHomeAnoymouseByHot(@RequestParam(value = "userId") Long userId, @RequestParam(value = "pageNumber") Integer pageNumber, @RequestParam(value = "pageSize") Integer pageSize);
 
     @RequestMapping("/anoymous/findOneById")
     @ResponseBody
-    DetailAnoymous findOneById(Long userId, Long anoymousId);
+    DetailAnoymous findOneById(@RequestParam(value = "userId") Long userId, @RequestParam(value = "anoymousId") Long anoymousId);
 
     @RequestMapping("/anoymous/findOneWithCommentById")
     @ResponseBody
-    String findOneWithCommentById(Long userId, Long anoymousId);
+    String findOneWithCommentById(@RequestParam(value = "userId") Long userId, @RequestParam(value = "anoymousId") Long anoymousId);
 
     @RequestMapping("/anoymous/findOneWithCommentByCommentId")
     @ResponseBody
-    String findOneByCommentId(Long userId, Long anoumousCommentId);
+    String findOneByCommentId(@RequestParam(value = "userId") Long userId, @RequestParam(value = "anoumousCommentId") Long anoumousCommentId);
 
     @RequestMapping("/anoymous/listUsersAnoymous")
     @ResponseBody
-    PageInfo<HomeAnoymous> listUsersAnoymous(Long userId, Long authorId, Integer pageNum, Integer pageSize);
+    PageInfo<HomeAnoymous> listUsersAnoymous(@RequestParam(value = "userId") Long userId, @RequestParam(value = "authorId") Long authorId, @RequestParam(value = "pageNum") Integer pageNum, @RequestParam(value = "pageSize") Integer pageSize);
 
     @RequestMapping("/anoymous/listUsersFavoriteAnoymous")
     @ResponseBody
-    PageInfo<HomeAnoymous> listUsersFavoriteAnoymous(Long userId, Integer pageNum, Integer pageSize);
+    PageInfo<HomeAnoymous> listUsersFavoriteAnoymous(@RequestParam(value = "userId") Long userId, @RequestParam(value = "pageNum") Integer pageNum, @RequestParam(value = "pageSize") Integer pageSize);
 
     @RequestMapping("/anoymous/createAnoymous")
     @ResponseBody
-    String createAnoymous(Anoymous anoymous);
+    String createAnoymous(@RequestBody Anoymous anoymous);
 
     @RequestMapping("/anoymous/updateAnoymous")
     @ResponseBody
-    String updateAnoymous(Anoymous anoymous);
+    String updateAnoymous(@RequestBody Anoymous anoymous);
 
     @RequestMapping("/anoymous/updateUserAttentionType")
     @ResponseBody
-    String updateUserAttentionType (Long userId, Long discussId, Integer type);
+    String updateUserAttentionType (@RequestParam(value = "userId") Long userId, @RequestParam(value = "discussId") Long discussId, @RequestParam(value = "type") Integer type);
 
 
 }

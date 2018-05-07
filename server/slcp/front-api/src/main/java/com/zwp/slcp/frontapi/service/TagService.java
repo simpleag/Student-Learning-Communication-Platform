@@ -6,6 +6,7 @@ import com.zwp.slcp.apicommon.entity.Tag;
 import com.zwp.slcp.frontapi.service.failCallBack.TagFailCallBack;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
@@ -13,17 +14,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @FeignClient(value = "SQLSERVER", fallback = TagFailCallBack.class)
 public interface TagService {
-    @RequestMapping("/userAttentionTags")
+    @RequestMapping("/tag/userAttentionTags")
     @ResponseBody
-    PageInfo<FullTag> userAttentionTags(Long userId, Integer pageNumber, Integer pageSize);
+    PageInfo<FullTag> userAttentionTags(@RequestParam(value = "userId") Long userId, @RequestParam(value = "pageNumber") Integer pageNumber, @RequestParam(value = "pageSize") Integer pageSize);
 
-    @RequestMapping("/listUnattentionTags")
+    @RequestMapping("/tag/listUnattentionTags")
     @ResponseBody
-    PageInfo<Tag> listUnattentionTags(Long userId, Integer pageNumber, Integer pageSize);
+    PageInfo<Tag> listUnattentionTags(@RequestParam(value = "userId") Long userId, @RequestParam(value = "pageNumber") Integer pageNumber, @RequestParam(value = "pageSize") Integer pageSize);
 
-    @RequestMapping("/updateUserAttentionTag")
+    @RequestMapping("/tag/updateUserAttentionTag")
     @ResponseBody
-    String updateUserAttentionTag(Long userId, Integer tagId);
+    String updateUserAttentionTag(@RequestParam(value = "userId") Long userId, @RequestParam(value = "tagId") Integer tagId);
 
 
 }

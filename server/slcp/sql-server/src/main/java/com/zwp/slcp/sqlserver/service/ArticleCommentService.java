@@ -25,17 +25,24 @@ public class ArticleCommentService {
     private InfoMapper infoMapper;
 
     @Transactional(timeout=36000,rollbackFor=Exception.class)
-    public boolean createArticleComment(ArticleComment articleComment) {
-        boolean isSuccess = false;
+    public Long createArticleComment(ArticleComment articleComment) {
+        Long articleCommentId = 0L;
         try {
-            Long articleCommentId = articleCommentMapper.insert(articleComment);
-            if (articleCommentId == 0L) {
-                throw new Exception("数据库操作异常");
-            }
             Article article = articleMapper.selectByPrimaryKey(articleComment.getArticleId());
             if (article == null) {
                 throw new Exception("数据库操作异常");
             }
+            article.setArticleCommentNumber(article.getArticleCommentNumber()+1);
+            article.setUpdateTime(System.currentTimeMillis());
+            if (articleMapper.updateByPrimaryKeySelective(article) == 0) {
+                throw new Exception("数据库操作异常");
+            }
+            articleComment.setArticleListNumber(article.getArticleCommentNumber());
+            articleCommentId = articleCommentMapper.insert(articleComment);
+            if (articleCommentId == 0L) {
+                throw new Exception("数据库操作异常");
+            }
+            articleCommentId = articleComment.getArticleCommentId();
             User commentAuthor = new User(articleComment.getArticleCommentAuthorId());
             commentAuthor.setUserCommentNumber(1);
             if (userMapper.updateNumber(commentAuthor) == 0) {
@@ -43,22 +50,24 @@ public class ArticleCommentService {
             }
             Info info = new Info(article.getArticleAuthorId(), 7, 1, articleCommentId);
             info.setIntoContent("您的文章"+article.getArticleTitle()+"有一条评论");
-
+            info.setCreateTime(System.currentTimeMillis());
             if (infoMapper.insert(info) == 0) {
                 throw new Exception("数据库操作异常");
             }
-            if (articleComment.getArticleReplayUserid() != null) {
+            if (articleComment.getArticleReplayUserid() != null && articleComment.getArticleReplayUserid() != 0) {
                 Info replayInfo = new Info(articleComment.getArticleReplayUserid(),7,1,articleCommentId);
                 replayInfo.setIntoContent("有人回复了您的一条评论");
+                replayInfo.setCreateTime(System.currentTimeMillis());
                 if (infoMapper.insert(replayInfo) == 0) {
                     throw new Exception("数据库操作异常");
                 }
             }
-            isSuccess = true;
+
         } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            e.printStackTrace();
         } finally {
-            return isSuccess;
+            return articleCommentId;
         }
     }
 
@@ -75,6 +84,7 @@ public class ArticleCommentService {
             }
             Info info = new Info(articleComment.getArticleCommentAuthorId(), 10, 1, articleComment.getArticleCommentId());
             info.setIntoContent("您的一条评论收到了赞");
+            info.setCreateTime(System.currentTimeMillis());
 
             if (infoMapper.insert(info) == 0) {
                 throw new Exception("数据库操作异常");
@@ -84,7 +94,7 @@ public class ArticleCommentService {
             if (userMapper.updateNumber(user) == 0) {
                 throw new Exception("数据库操作异常");
             }
-
+            isSuccess = true;
         } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         } finally {
@@ -105,7 +115,7 @@ public class ArticleCommentService {
             if (userMapper.updateNumber(user) == 0) {
                 throw new Exception("数据库操作异常");
             }
-
+            isSuccess = true;
         } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         } finally {

@@ -12,7 +12,7 @@ import java.util.List;
 public interface DiscussMapper {
     int deleteByPrimaryKey(Long discussId);
 
-    int insert(Discuss record);
+    Long insert(Discuss record);
 
     int insertSelective(Discuss record);
 
@@ -35,7 +35,7 @@ public interface DiscussMapper {
     List<HomeDiscuss> selectHomeDiscussByAuthorId(@Param("userId") Long userId, @Param("authorId") Long authorId);
 
     //根据讨论Id显示讨论具体内容
-    DetailDiscuss selectDiscussDetailById(Long userId, Long discussId);
+    DetailDiscuss selectDiscussDetailById(@Param("userId") Long userId, @Param("discussId") Long discussId);
 
     //根据讨论评论id查找对应的讨论
     DetailDiscuss selectDiscussDetailByComment(@Param("userId") Long userId, @Param("discussCommentId") Long discussCommentId);

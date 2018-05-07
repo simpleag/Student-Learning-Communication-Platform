@@ -1,4 +1,4 @@
-spring.application.name: sqlmanage
+spring.application.name: SQLSERVER
 server:
     port: 8091
 eureka:

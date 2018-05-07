@@ -22,12 +22,18 @@
                     </form>  
     
                     <ul class="nav navbar-nav navbar-right">  
-                        <li><a href="#">0条未读私信</a></li> 
-                        <li><a href="#">0条未读消息</a></li>  
+                      <!-- <li><el-badge :value= messageNumber :max="99" class="item">
+                        <el-button size="small">未读私信</el-button>
+                      </el-badge></li> 
+                      <li><el-badge :value= infoNumber :max="99" class="item">
+                        <el-button size="small">未读消息</el-button>
+                      </el-badge></li>  -->
+                        <!-- <li><a href="#">0条未读私信</a></li> 
+                        <li><a href="#">0条未读消息</a></li>   -->
                         <li class="dropdown">  
                             <!--data-toggle与JS文件有关-->  
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">  
-                                用户个人主页  
+                                用户个人主页 
     `                           <span class="caret"></span>  
                             </a>  
                             <ul class="dropdown-menu" role="menu">  
@@ -50,19 +56,41 @@
 
 <script>
 // import Main from './Main'
+var user = {
+  userId: '1',
+  userName: "user1",
+  userPicUrl : "https://cdn.v2ex.com/gravatar/ffe9848d066049b0b85b228165dc4420?s=48&d=retro"
 
+}
 export default {
     name: 'home',
     data () {
       return {
         msg: 'Welcome to Your Vue.js App',
+        cc: '',
+        infoNumber:0,
+        messageNumber:0,
+        user: user
       }
     },
     methods:{
+       ajax: function() {
+            var _this = this;
+            axios.get('http://localhost:8093/user/usersInfoAndMessageNumber?userId=2', {}).then(function(res) {
+                _this.init(res);
+            }).catch(function(err) {
+                console.log(err);
+            });
+        },
+        
+        init: function(res) {
+            this.messageNumber = res.data.messageNumber;
+            this.infoNumber = res.data.infoNumber;
+        }
      
     },
     mounted(){
-      
+      this.ajax();
     },
     // components: {
     //   Main: Main
@@ -113,4 +141,9 @@ export default {
     color: #fff;
     outline: none;
   }
+
+  .item {
+  margin-top: 10px;
+  margin-right: 40px;
+}
 </style>

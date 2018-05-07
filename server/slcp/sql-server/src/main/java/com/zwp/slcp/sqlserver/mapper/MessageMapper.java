@@ -19,7 +19,9 @@ public interface MessageMapper {
     Message selectByPrimaryKey(Long messageId);
 
     //用户收到的的私信
-    List<FullMessage> selectByReceiveUserId(Long messageAuthorId);
+    List<FullMessage> selectByReceiveUserId(@Param("messageAuthorId") Long messageAuthorId);
+
+    List<FullMessage> selectNewMessageByReceiveUserId(@Param("messageAuthorId") Long messageAuthorId);
 
     //用户之间的私信
     List<FullMessage> selectByUsersId(@Param("messageReceiveId") Long messageReceiveId, @Param("messageAuthorId") Long messageAuthorId);

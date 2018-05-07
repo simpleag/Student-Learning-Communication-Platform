@@ -11,6 +11,7 @@ import com.zwp.slcp.sqlserver.mapper.AnoymousMapper;
 import com.zwp.slcp.sqlserver.mapper.MapUserAnoymousecommentMapper;
 import com.zwp.slcp.sqlserver.service.AnoymouseCommentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,13 +46,28 @@ public class AnoymousCommentController {
         }
     }
 
+    @RequestMapping("/listAnoymousComment")
+    @ResponseBody
+    PageInfo<DetailAnoymousComment> listAnoymousComment(Long userId, Long anoymousId, Integer pageNumber, Integer pageSize) {
+        if (StringUtils.isBlank(userId, anoymousId, pageNumber, pageSize)) {
+            return null;
+        } else {
+            PageHelper.startPage(pageNumber, pageSize);
+            List<DetailAnoymousComment> detailAnoymousCommentList = anoymousCommentMapper.selectDetailByAnoymousId(userId, anoymousId);
+            PageInfo<DetailAnoymousComment> detailAnoymousCommentPageInfo = new PageInfo<>(detailAnoymousCommentList);
+            return detailAnoymousCommentPageInfo;
+        }
+    }
+
     @RequestMapping("/createComment")
     @ResponseBody
-    String createComment(AnoymousComment anoymousComment) {
-        if (anoymouseCommentService.createAnoymousComment(anoymousComment)) {
-            return FrontApiResponseEntity.SUCC().build();
-        } else {
+    String createComment(@RequestBody AnoymousComment anoymousComment) {
+        Long commentId = anoymouseCommentService.createAnoymousComment(anoymousComment);
+        if (commentId == 0L) {
             return FrontApiResponseEntity.ERR(ResponseCode.SQLFAIl).build();
+
+        } else {
+            return FrontApiResponseEntity.SUCC().data("commentId", commentId).build();
         }
     }
 

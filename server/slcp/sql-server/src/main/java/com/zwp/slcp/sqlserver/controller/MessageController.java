@@ -8,11 +8,10 @@ import com.zwp.slcp.apicommon.response.FrontApiResponseEntity;
 import com.zwp.slcp.apicommon.response.ResponseCode;
 import com.zwp.slcp.apicommon.utils.StringUtils;
 import com.zwp.slcp.sqlserver.mapper.MessageMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,16 +25,45 @@ public class MessageController {
     @Autowired
     private MessageMapper messageMapper;
 
+    private final Logger logger = LoggerFactory.getLogger(MessageController.class);
+
+    @RequestMapping("/test")
+    @ResponseBody
+    public String test(){
+        System.out.println("test");
+        return "successs";
+    }
     @RequestMapping("/listUserReceiveMessage")
     @ResponseBody
     PageInfo<FullMessage> listUserReceiveMessage(Long userId, Integer pageNumber, Integer pageSize) {
         if (StringUtils.isBlank(userId, pageNumber, pageSize)) {
             return null;
         } else {
+            logger.info("userId" + userId+ "message"+ pageNumber + " " +pageSize);
             PageHelper.startPage(pageNumber, pageSize);
             List<FullMessage> fullMessageList = messageMapper.selectByReceiveUserId(userId);
             PageInfo<FullMessage> messagePageInfo = new PageInfo<>(fullMessageList);
+//            List<FullMessage> list = messageMapper.selectByReceiveUserId(userId);
             return messagePageInfo;
+        }
+    }
+
+    @RequestMapping("/listUserNewReceiveNumber")
+    @ResponseBody
+    Long listUserNewReceiveNumber(Long userId) {
+        if (StringUtils.isBlank(userId)) {
+            return null;
+        } else {
+            PageHelper.startPage(1, 1);
+            List<FullMessage> fullMessageList = messageMapper.selectByReceiveUserId(userId);
+            PageInfo<FullMessage> messagePageInfo = new PageInfo<>(fullMessageList);
+//            List<FullMessage> list = messageMapper.selectByReceiveUserId(userId);
+            if (messagePageInfo != null) {
+
+                return messagePageInfo.getTotal();
+            } else {
+                return 0L;
+            }
         }
     }
 
@@ -54,7 +82,7 @@ public class MessageController {
 
     @RequestMapping("/createMessage")
     @ResponseBody
-    String createMessage(Message message) {
+    String createMessage(@RequestBody Message message) {
         if (StringUtils.isBlank(message)) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         } else {
@@ -69,7 +97,7 @@ public class MessageController {
     }
     @RequestMapping("/updateMessage")
     @ResponseBody
-    String updateMessage(Message message) {
+    String updateMessage(@RequestBody Message message) {
         if (StringUtils.isBlank(message)) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         } else {

@@ -54,8 +54,35 @@ public class User {
     public User() {
     }
 
+    public User(String userPhoneNumber, String userLoginId, String userName) {
+        this.userName = userName;
+        this.userPhoneNumber = userPhoneNumber;
+        this.userLoginId = userLoginId;
+        this.createTime = System.currentTimeMillis();
+        this.updateTime = System.currentTimeMillis();
+
+    }
+
     public User(Long userId) {
         this.userId = userId;
+        this.updateTime = System.currentTimeMillis();
+    }
+
+    public User(Long userId, String userName, Long userBorn, String userSex, String userSchool, String userEducation) {
+        this.userId = userId;
+        this.userName = userName;
+        this.userBorn = userBorn;
+        this.userSex = userSex;
+        this.userSchool = userSchool;
+        this.userEducation = userEducation;
+        this.updateTime = System.currentTimeMillis();
+    }
+
+    public User(Long userId, String userHonor, String userAnonymouseName, String userAnonymouseHonor) {
+        this.userId = userId;
+        this.userHonor = userHonor;
+        this.userAnonymouseName = userAnonymouseName;
+        this.userAnonymouseHonor = userAnonymouseHonor;
         this.updateTime = System.currentTimeMillis();
     }
 

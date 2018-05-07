@@ -30,10 +30,11 @@ public class ArticleService {
     private static final Logger logger = LoggerFactory.getLogger(ArticleService.class);
 
     @Transactional(timeout=36000,rollbackFor=Exception.class)
-    public String createArticle(Article article) {
-        boolean success = false;
+    public Long createArticle(Article article) {
+        Long articleId = 0L;
         try {
-            if (articleMapper.insert(article) == 0) {
+            articleId = articleMapper.insert(article);
+            if (articleId == 0) {
                 throw new Exception("操作异常");
             }
             User user = new User(article.getArticleAuthorId());
@@ -41,13 +42,12 @@ public class ArticleService {
             if (userMapper.updateNumber(user) == 0) {
                 throw new Exception("操作异常");
             }
-            success = true;
         } catch (Exception e) {
             //执行事务回滚
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             throw new Exception("操作异常");
         } finally {
-            return success ? FrontApiResponseEntity.SUCC().build():FrontApiResponseEntity.SYS_ERR().message("数据库操作异常").build();
+            return articleId ;
         }
     }
 

@@ -30,6 +30,16 @@ public class DetailArticleComment {
 
     private Integer userApproveType;
 
+    private Long articleId;
+
+    public Long getArticleId() {
+        return articleId;
+    }
+
+    public void setArticleId(Long articleId) {
+        this.articleId = articleId;
+    }
+
     public Long getArticleCommentId() {
         return articleCommentId;
     }

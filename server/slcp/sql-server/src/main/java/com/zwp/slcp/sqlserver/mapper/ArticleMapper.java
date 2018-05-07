@@ -13,7 +13,7 @@ import java.util.List;
 public interface ArticleMapper {
     int deleteByPrimaryKey(Long articleId);
 
-    int insert(Article record);
+    Long insert(Article record);
 
     int insertSelective(Article record);
 

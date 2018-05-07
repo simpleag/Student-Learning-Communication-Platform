@@ -47,7 +47,7 @@
     anoymouse_replay_userId, anoymous_comment_state, ac.create_time as create_time, ac.update_time as update_time, anoymous_id, (
 		SELECT count(1)
         FROM map_user_anoymousecomment as m
-        WHERE m.anoymouse_comment_id = ac.anoymous_comment_id
+        WHERE m.anoymouse_comment_id = ac.anoymous_comment_id AND m.user_approve_type = 1
     ) as approve_number, (
 			select m2.user_approve_type
             from map_user_anoymousecomment as m2
@@ -63,7 +63,7 @@ ORDER BY ac.anoymous_list_number
     anoymouse_replay_userId, anoymous_comment_state, ac.create_time as create_time, ac.update_time as update_time, anoymous_id, (
     SELECT count(1)
     FROM map_user_anoymousecomment as m
-    WHERE m.anoymouse_comment_id = ac.anoymous_comment_id
+    WHERE m.anoymouse_comment_id = ac.anoymous_comment_id AND m.user_approve_type = 1
     ) as approve_number, (
     select m2.user_approve_type
     from map_user_anoymousecomment as m2

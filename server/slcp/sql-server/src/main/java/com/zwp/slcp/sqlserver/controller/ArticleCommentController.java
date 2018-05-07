@@ -10,10 +10,7 @@ import com.zwp.slcp.sqlserver.mapper.ArticleCommentMapper;
 import com.zwp.slcp.sqlserver.mapper.MapUserArticlecommentMapper;
 import com.zwp.slcp.sqlserver.service.ArticleCommentService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -44,11 +41,25 @@ public class ArticleCommentController {
         }
     }
 
+    @RequestMapping("/listArticlesComment")
+    @ResponseBody
+    PageInfo<DetailArticleComment> listArticlesComment(Long userId, Long articleId, Integer pageNumber, Integer pageSize) {
+        if (StringUtils.isBlank(userId, articleId, pageNumber, pageSize)) {
+            return null;
+        } else {
+            PageHelper.startPage(pageNumber, pageSize);
+            List<DetailArticleComment> detailArticleCommentList = articleCommentMapper.selectDetailByArticleId(userId, articleId);
+            PageInfo<DetailArticleComment> detailArticleCommentPageInfo = new PageInfo<>(detailArticleCommentList);
+            return detailArticleCommentPageInfo;
+        }
+    }
+
     @RequestMapping("/createComment")
     @ResponseBody
-    String createComment(ArticleComment articleComment) {
-        if (articleCommentService.createArticleComment(articleComment)) {
-            return FrontApiResponseEntity.SUCC().build();
+    String createComment(@RequestBody ArticleComment articleComment) {
+        Long commentId = articleCommentService.createArticleComment(articleComment);
+        if (commentId != 0L) {
+            return FrontApiResponseEntity.SUCC().data("commentId", commentId).build();
         } else {
             return FrontApiResponseEntity.ERR(ResponseCode.SQLFAIl).build();
         }

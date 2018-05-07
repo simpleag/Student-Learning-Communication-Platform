@@ -19,6 +19,24 @@ public class Discuss {
 
     private Long updateTime;
 
+    public Discuss() {
+    }
+
+    public Discuss(Long discussId) {
+        this.discussId = discussId;
+        this.updateTime = System.currentTimeMillis();
+    }
+
+    public Discuss(Long discussAuthorId, String discussTitle, String discussContent, Integer discussTagId) {
+        this.discussAuthorId = discussAuthorId;
+        this.discussTitle = discussTitle;
+        this.discussContent = discussContent;
+        this.discussTagId = discussTagId;
+        this.discussState = 1;
+        this.createTime = System.currentTimeMillis();
+        this.updateTime = System.currentTimeMillis();
+    }
+
     public Long getDiscussId() {
         return discussId;
     }

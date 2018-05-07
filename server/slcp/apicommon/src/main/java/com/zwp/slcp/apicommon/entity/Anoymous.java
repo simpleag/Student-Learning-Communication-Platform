@@ -17,7 +17,20 @@ public class Anoymous {
 
     private Long updateTime;
 
+    public Anoymous() {
+    }
 
+    public Anoymous(Long anoymousId) {
+        this.anoymousId = anoymousId;
+        this.updateTime = System.currentTimeMillis();
+    }
+
+    public Anoymous(Long anoymousAuthorId, String anoymousTitle, String anoymousContent) {
+        this.anoymousAuthorId = anoymousAuthorId;
+        this.anoymousTitle = anoymousTitle;
+        this.anoymousContent = anoymousContent;
+        this.createTime = System.currentTimeMillis();
+    }
 
     public Long getAnoymousId() {
         return anoymousId;

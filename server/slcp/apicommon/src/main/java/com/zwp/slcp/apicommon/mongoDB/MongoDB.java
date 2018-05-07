@@ -185,6 +185,16 @@ public class MongoDB {
         }
         return result;
     }
+    public List<Document> findAllLimitPage(BasicDBObject query, BasicDBObject key, String collName, Integer limit, String sort, Integer skip) {
+        MongoCollection<Document> coll = this.mongoDatabase.getCollection(collName);
+        List<Document> result = new ArrayList<Document>();
+        FindIterable<Document> findIterable = coll.find(query).projection(key).limit(limit).skip(skip).sort(new BasicDBObject(sort,-1));
+        MongoCursor<Document> mongoCursor = findIterable.iterator();
+        while (mongoCursor.hasNext()) {
+            result.add(mongoCursor.next());
+        }
+        return result;
+    }
 
     public List<Document> findAll(String collName, BasicDBObject key) {
         MongoCollection<Document> coll = this.mongoDatabase.getCollection(collName);

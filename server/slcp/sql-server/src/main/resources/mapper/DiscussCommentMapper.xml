@@ -49,7 +49,7 @@
     discuss_replay_userId, discuss_comment_state, dc.create_time, dc.update_time, discuss_id, (
 		SELECT count(1)
         FROM map_user_discusscomment as m
-        WHERE m.disscuss_comment_id = dc.discuss_comment_id
+        WHERE m.disscuss_comment_id = dc.discuss_comment_id AND m.user_approve_type = 1
     ) as approve_number, (
 			select m2.user_approve_type
             from map_user_discusscomment as m2
@@ -80,7 +80,7 @@ ORDER BY dc.discuss_list_number
     delete from discuss_comment
     where discuss_comment_id = #{discussCommentId,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.zwp.slcp.apicommon.entity.DiscussComment" useGeneratedKeys="true" keyProperty="discussCommentId" keyColumn="discuss_comment_id">
+  <insert id="insert" useGeneratedKeys="true" keyProperty="discussCommentId" keyColumn="discuss_comment_id" parameterType="com.zwp.slcp.apicommon.entity.DiscussComment" >
     insert into discuss_comment (discuss_comment_id, discuss_comment_author_Id, 
       discuss_comment_content, discuss_list_number, 
       discuss_replay_userId, discuss_comment_state, 

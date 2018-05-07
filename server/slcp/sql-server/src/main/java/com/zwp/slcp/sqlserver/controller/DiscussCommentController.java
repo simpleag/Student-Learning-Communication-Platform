@@ -12,10 +12,7 @@ import com.zwp.slcp.sqlserver.mapper.MapUserDiscusscommentMapper;
 import com.zwp.slcp.sqlserver.service.DiscussCommentService;
 import com.zwp.slcp.sqlserver.service.DiscussService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -49,11 +46,26 @@ public class DiscussCommentController {
 
     @RequestMapping("/createComment")
     @ResponseBody
-    String createComment(DiscussComment discussComment) {
-        if (discussCommentService.createDiscussComment(discussComment)) {
-            return FrontApiResponseEntity.SUCC().build();
+    String createComment(@RequestBody DiscussComment discussComment) {
+        System.out.println("strartCreate");
+        Long dcId = discussCommentService.createDiscussComment(discussComment);
+        if (dcId != 0L) {
+            return FrontApiResponseEntity.SUCC().data("commentId", dcId).build();
         } else {
             return FrontApiResponseEntity.ERR(ResponseCode.SQLFAIl).build();
+        }
+    }
+
+    @RequestMapping("/listDiscussComment")
+    @ResponseBody
+    PageInfo<DetailDiscussComment> listDiscussComment(Long userId, Long discussId, Integer pageNumber, Integer pageSize) {
+        if (StringUtils.isBlank(userId, discussId, pageNumber, pageSize)) {
+            return null;
+        } else {
+            PageHelper.startPage(pageNumber, pageSize);
+            List<DetailDiscussComment> detailDiscussCommentsList = discussCommentMapper.selectDetailByDiscussId(userId, discussId);
+            PageInfo<DetailDiscussComment> detailDiscussCommentPageInfo = new PageInfo<>(detailDiscussCommentsList);
+            return detailDiscussCommentPageInfo;
         }
     }
 
@@ -63,7 +75,7 @@ public class DiscussCommentController {
         if (StringUtils.isBlank(userId, discussCommentId)) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         } else {
-
+            System.out.println("start");
             MapUserDiscusscommentKey key = new MapUserDiscusscommentKey(discussCommentId, userId);
             MapUserDiscusscomment mapUserDiscusscomment = mapUserDiscusscommentMapper.selectByPrimaryKey(key);
             if (mapUserDiscusscomment == null) {

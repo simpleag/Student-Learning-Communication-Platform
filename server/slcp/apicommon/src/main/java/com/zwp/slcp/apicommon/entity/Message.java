@@ -15,6 +15,23 @@ public class Message {
 
     private Long updateTime;
 
+    public Message() {
+    }
+
+    public Message(Long messageId) {
+        this.messageId = messageId;
+        this.updateTime = System.currentTimeMillis();
+    }
+
+    public Message(Long messageAuthorId, String messageContent, Long messageReceiveUserid) {
+        this.messageAuthorId = messageAuthorId;
+        this.messageContent = messageContent;
+        this.messageReceiveUserid = messageReceiveUserid;
+        this.messageState = 1;
+        this.createTime = System.currentTimeMillis();
+        this.updateTime = System.currentTimeMillis();
+    }
+
     public Long getMessageId() {
         return messageId;
     }

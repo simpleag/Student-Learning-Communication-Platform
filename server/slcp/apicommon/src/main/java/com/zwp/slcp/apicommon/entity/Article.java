@@ -21,6 +21,26 @@ public class Article {
 
     private Long updateTime;
 
+    public Article() {
+    }
+
+    public Article(Long articleId) {
+        this.articleId = articleId;
+        this.updateTime = System.currentTimeMillis();
+    }
+
+    public Article(Long articleAuthorId, String articleTitle, String articleContent, Integer articleTagId, String articlePicUrl) {
+        this.articleAuthorId = articleAuthorId;
+        this.articleTitle = articleTitle;
+        this.articleContent = articleContent;
+        this.articleTagId = articleTagId;
+        this.articlePicUrl = articlePicUrl;
+        this.articleState = 1;
+        this.articleCommentNumber = 0;
+        this.createTime = System.currentTimeMillis();
+        this.updateTime = System.currentTimeMillis();
+    }
+
     public Long getArticleId() {
         return articleId;
     }

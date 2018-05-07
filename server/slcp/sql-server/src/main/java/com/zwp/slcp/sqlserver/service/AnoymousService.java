@@ -28,10 +28,11 @@ public class AnoymousService {
     private InfoMapper infoMapper;
 
     @Transactional(timeout=36000,rollbackFor=Exception.class)
-    public String createAnoymous(Anoymous anoymous) {
-        boolean success = false;
+    public Long createAnoymous(Anoymous anoymous) {
+        Long anoymousId = 0L;
         try {
-            if (anoymousMapper.insert(anoymous) == 0) {
+            anoymousId = anoymousMapper.insert(anoymous);
+            if (anoymousId == 0) {
                 throw new Exception("操作异常");
             }
             User user = new User(anoymous.getAnoymousAuthorId());
@@ -39,13 +40,12 @@ public class AnoymousService {
             if (userMapper.updateNumber(user) == 0) {
                 throw new Exception("操作异常");
             }
-            success = true;
         } catch (Exception e) {
             //执行事务回滚
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             throw new Exception("操作异常");
         } finally {
-            return success ? FrontApiResponseEntity.SUCC().build():FrontApiResponseEntity.SYS_ERR().message("数据库操作异常").build();
+            return anoymousId;
         }
     }
 

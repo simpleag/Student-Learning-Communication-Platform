@@ -9,13 +9,15 @@ import java.util.List;
 public interface InfoMapper {
     int deleteByPrimaryKey(Long infoId);
 
-    int insert(Info record);
+    Long insert(Info record);
 
     int insertSelective(Info record);
 
     Info selectByPrimaryKey(Long infoId);
 
     List<Info> selectByUserId(Long infoReceiveUserId);
+
+    List<Info> selectNewInfoReceiveUserId(Long infoReceiveUserId);
 
     int updateByPrimaryKeySelective(Info record);
 

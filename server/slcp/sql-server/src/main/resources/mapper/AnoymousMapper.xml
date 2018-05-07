@@ -21,7 +21,7 @@
     <result column="update_time" property="updateTime" jdbcType="BIGINT" />
     <result column="approve_number" property="approveNumber" jdbcType="INTEGER" />
     <result column="favorite_number" property="favoriteNumber" jdbcType="INTEGER" />
-    <result column="userAnonymouseName" property="user_anonymouse_name" jdbcType="VARCHAR" />
+    <result column="user_anonymouse_name" property="userAnonymouseName" jdbcType="VARCHAR" />
     <result column="user_approve_type" property="userApproveType" jdbcType="INTEGER" />
     <result column="user_favorite_type" property="userFavoriteType" jdbcType="INTEGER" />
   </resultMap>
@@ -55,7 +55,7 @@
   </select>
   <select id="selectHomeAnoymousByTime" resultMap="HomeResultMap" parameterType="java.lang.Long">
     select distinct anoymous_id, anoymous_author_Id, anoymous_title, anoymous_comment_number,
-    anoymous_state, a.create_time as create_time, a.update_time as update_time, user_anonymouse_name, tag_name, (
+    anoymous_state, a.create_time as create_time, a.update_time as update_time, user_anonymouse_name, (
 		select count(1)
         from map_user_anoymouse as m
         WHERE m.anoymouse_id = a.anoymous_id AND m.user_approve_type = 1
@@ -74,13 +74,14 @@
             from map_user_anoymouse as m3
             WHERE m3.user_id = #{userId,jdbcType=BIGINT} AND m3.anoymouse_id = a.anoymous_id
         ) as user_favorite_type
-FROM anoymous as a, user as u, tag as t
+FROM anoymous as a, user as u
 WHERE   u.user_id = a.anoymous_author_Id
+AND anoymous_state = 1
 order by a.update_time DESC
   </select>
   <select id="selectHomeAnoymousOrderByHot" resultMap="HomeResultMap" parameterType="java.lang.Long" >
     select distinct anoymous_id, anoymous_author_Id, anoymous_title, anoymous_comment_number,
-    anoymous_state, a.create_time as create_time, a.update_time as update_time, user_anonymouse_name, tag_name, (
+    anoymous_state, a.create_time as create_time, a.update_time as update_time, user_anonymouse_name, (
 		select count(1)
         from map_user_anoymouse as m
         WHERE m.anoymouse_id = a.anoymous_id AND m.user_approve_type = 1
@@ -99,8 +100,9 @@ order by a.update_time DESC
             from map_user_anoymouse as m3
             WHERE m3.user_id = #{userId,jdbcType=BIGINT} AND m3.anoymouse_id = a.anoymous_id
         ) as user_favorite_type
-FROM anoymous as a, user as u, tag as t
+FROM anoymous as a, user as u
 WHERE   u.user_id = a.anoymous_author_Id
+AND anoymous_state = 1
 order by a.anoymous_comment_number DESC
   </select>
   <select id="selectHomeAnoumousByAuthorId" resultMap="HomeResultMap">
@@ -213,7 +215,7 @@ order by a.update_time DESC
     delete from anoymous
     where anoymous_id = #{anoymousId,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.zwp.slcp.apicommon.entity.Anoymous" >
+  <insert id="insert" parameterType="com.zwp.slcp.apicommon.entity.Anoymous" useGeneratedKeys="true" keyProperty="anoymousId" keyColumn="anoymous_id">
     insert into anoymous (anoymous_id, anoymous_author_Id, anoymous_title, 
       anoymous_content, anoymous_comment_number, 
       anoymous_state, create_time, update_time

@@ -37,4 +37,22 @@ public class InfoController {
         }
     }
 
+    @RequestMapping("/listUserNewReceiveCount")
+    @ResponseBody
+    Long listUserNewReceiveCount(Long userId) {
+        if (StringUtils.isBlank(userId)) {
+            return null;
+        } else {
+            PageHelper.startPage(1, 1);
+            List<Info> infoList = infoMapper.selectNewInfoReceiveUserId(userId);
+            PageInfo<Info> infoPageInfo = new PageInfo<>(infoList);
+            if (infoPageInfo != null) {
+
+                return infoPageInfo.getTotal();
+            }else {
+                return 0L;
+            }
+        }
+    }
+
 }

@@ -20,6 +20,14 @@
     <include refid="Base_Column_List" />
     from info
     where info_receive_user_id = #{infoReceiveUserId,jdbcType=BIGINT}
+    ORDER BY create_time DESC;
+  </select>
+  <select id="selectNewInfoReceiveUserId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select
+    <include refid="Base_Column_List" />
+    from info
+    where info_receive_user_id = #{infoReceiveUserId,jdbcType=BIGINT}
+    AND info_state = 1
   </select>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select
@@ -31,7 +39,7 @@
     delete from info
     where info_id = #{infoId,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.zwp.slcp.apicommon.entity.Info" >
+  <insert id="insert" parameterType="com.zwp.slcp.apicommon.entity.Info" useGeneratedKeys="true" keyProperty="infoId" keyColumn="info_id">
     insert into info (info_id, info_receive_user_id, into_content, 
       info_type, info_state, create_time, 
       update_time, info_target_id)

@@ -24,15 +24,21 @@ public class DiscussCommentService {
     private DiscussMapper discussMapper;
 
     @Transactional(timeout=36000,rollbackFor=Exception.class)
-    public boolean createDiscussComment(DiscussComment discussComment) {
-        boolean isSuccess = false;
+    public Long createDiscussComment(DiscussComment discussComment) {
+        Long dicussCommentId = 0L;
         try {
-            Long dicussCommentId = discussCommentMapper.insert(discussComment);
-            if (dicussCommentId == 0L) {
+            dicussCommentId = discussCommentMapper.insert(discussComment);
+            dicussCommentId = discussComment.getDiscussCommentId();
+            if (dicussCommentId == null || dicussCommentId == 0L) {
                 throw new Exception("数据库操作异常");
             }
             Discuss discuss = discussMapper.selectByPrimaryKey(discussComment.getDiscussId());
             if (discuss == null) {
+                throw new Exception("数据库操作异常");
+            }
+            discuss.setUpdateTime(System.currentTimeMillis());
+            discuss.setDiscussCommentNumber(discuss.getDiscussCommentNumber()+1);
+            if (discussMapper.updateByPrimaryKeySelective(discuss) == 0) {
                 throw new Exception("数据库操作异常");
             }
             User commentAuthor = new User(discussComment.getDiscussCommentAuthorId());
@@ -42,22 +48,23 @@ public class DiscussCommentService {
             }
             Info info = new Info(discuss.getDiscussAuthorId(), 8, 1, dicussCommentId);
             info.setIntoContent("您的文章"+discuss.getDiscussTitle()+"有一条评论");
-
+            info.setCreateTime(System.currentTimeMillis());
             if (infoMapper.insert(info) == 0) {
                 throw new Exception("数据库操作异常");
             }
-            if (discussComment.getDiscussReplayUserid() != null) {
+            if (discussComment.getDiscussReplayUserid() != null && discussComment.getDiscussReplayUserid() != 0) {
                 Info replayInfo = new Info(discussComment.getDiscussReplayUserid(),8,1,dicussCommentId);
                 replayInfo.setIntoContent("有人回复了您的一条评论");
+                replayInfo.setCreateTime(System.currentTimeMillis());
                 if (infoMapper.insert(replayInfo) == 0) {
                     throw new Exception("数据库操作异常");
                 }
             }
-            isSuccess = true;
+
         } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         } finally {
-            return isSuccess;
+            return dicussCommentId;
         }
     }
 
@@ -66,25 +73,31 @@ public class DiscussCommentService {
         boolean isSuccess = false;
         try {
             if (mapUserDiscusscommentMapper.insert(mapUserDiscusscomment) == 0) {
+                System.out.println("map插入失败");
                 throw new Exception("数据库操作异常");
             }
             DiscussComment discussComment = discussCommentMapper.selectByPrimaryKey(mapUserDiscusscomment.getDisscussCommentId());
             if (discussComment == null) {
+                System.out.println("讨论不存在");
                 throw new Exception("数据库操作异常");
             }
             Info info = new Info(discussComment.getDiscussCommentAuthorId(), 11, 1, discussComment.getDiscussCommentId());
             info.setIntoContent("您的一条评论收到了赞");
+            info.setCreateTime(System.currentTimeMillis());
 
             if (infoMapper.insert(info) == 0) {
+                System.out.println("info插入异常");
                 throw new Exception("数据库操作异常");
             }
             User user = new User(discussComment.getDiscussCommentAuthorId());
             user.setUserApproveNumber(1);
             if (userMapper.updateNumber(user) == 0) {
+                System.out.println("用户更新异常");
                 throw new Exception("数据库操作异常");
             }
 
         } catch (Exception e) {
+            System.out.println("异常出现");
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         } finally {
             return isSuccess;
@@ -100,11 +113,15 @@ public class DiscussCommentService {
             }
             DiscussComment discussComment = discussCommentMapper.selectByPrimaryKey(mapUserDiscusscomment.getDisscussCommentId());
             User user = new User(discussComment.getDiscussCommentAuthorId());
-            user.setUserApproveNumber(-1);
+            if (mapUserDiscusscomment.getUserApproveType() == 0) {
+                user.setUserApproveNumber(-1);
+            } else {
+                user.setUserApproveNumber(1);
+            }
             if (userMapper.updateNumber(user) == 0) {
                 throw new Exception("数据库操作异常");
             }
-
+            isSuccess = true;
         } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         } finally {

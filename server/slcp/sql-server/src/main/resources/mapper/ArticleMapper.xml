@@ -303,7 +303,7 @@ order by a.article_comment_number DESC
     delete from article
     where article_id = #{articleId,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.zwp.slcp.apicommon.entity.Article">
+  <insert id="insert" parameterType="com.zwp.slcp.apicommon.entity.Article" useGeneratedKeys="true" keyProperty="articleId" keyColumn="article_id">
     insert into article (article_id, article_author_Id, article_title, 
       article_content, article_comment_number, article_tag_id, 
       article_state, article_pic_url, create_time, 

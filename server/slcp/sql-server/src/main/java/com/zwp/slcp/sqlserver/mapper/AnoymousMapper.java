@@ -13,7 +13,7 @@ import java.util.List;
 public interface AnoymousMapper {
     int deleteByPrimaryKey(Long anoymousId);
 
-    int insert(Anoymous record);
+    Long insert(Anoymous record);
 
     int insertSelective(Anoymous record);
 

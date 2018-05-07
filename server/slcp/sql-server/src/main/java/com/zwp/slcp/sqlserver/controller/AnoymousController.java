@@ -11,10 +11,7 @@ import com.zwp.slcp.sqlserver.mapper.AnoymousMapper;
 import com.zwp.slcp.sqlserver.mapper.MapUserAnoymouseMapper;
 import com.zwp.slcp.sqlserver.service.AnoymousService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -132,20 +129,25 @@ public class AnoymousController {
 
     @RequestMapping("/createAnoymous")
     @ResponseBody
-    String createAnoymous(Anoymous anoymous) {
+    String createAnoymous(@RequestBody Anoymous anoymous) {
         anoymous.setCreateTime(System.currentTimeMillis());
         anoymous.setUpdateTime(System.currentTimeMillis());
         anoymous.setAnoymousState(1);
         if (StringUtils.isBlank(anoymous.getAnoymousAuthorId())) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         } else {
-            return anoymousService.createAnoymous(anoymous);
+            Long anoymousId = anoymousService.createAnoymous(anoymous);
+            if (anoymousId == 0L) {
+                return FrontApiResponseEntity.SYS_ERR().build();
+            } else {
+                return FrontApiResponseEntity.SUCC().data("anoymousId", anoymousId).build();
+            }
         }
     }
 
     @RequestMapping("/updateAnoymous")
     @ResponseBody
-    String updateAnoymous(Anoymous anoymous) {
+    String updateAnoymous(@RequestBody Anoymous anoymous) {
         anoymous.setCreateTime(System.currentTimeMillis());
         if (StringUtils.isBlank(anoymous.getAnoymousAuthorId())) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();

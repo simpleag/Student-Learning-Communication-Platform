@@ -6,7 +6,19 @@ import Login from '@/view/Login'
 import Register from '@/view/Register'
 import Home from '@/view/Home'
 import Main from '@/view/Main'
-
+import TagList from '@/view/TagList'
+import TagDetail from '@/view/TagDetail'
+import Discuss from '@/view/Discuss'
+import UserCenter from '@/view/UserCenter'
+import UserEdit from '@/view/UserEdit'
+import CreateArticle from '@/view/CreateArticle'
+import CreateDiscuss from '@/view/CreateDiscuss'
+import CreateAnoymous from '@/view/CreateAnoymous'
+import Message from '@/view/Message'
+import HitoryMessage from '@/view/HitoryMessage'
+import Info from '@/view/Info'
+import Article from '@/view/Article'
+import Anoymous from '@/view/Anoymous'
 Vue.use(Router)
 
 export default new Router({
@@ -40,6 +52,58 @@ export default new Router({
           path: 'Main',
           name: 'Main',
           component: Main
+        },{
+          path: 'TagList',
+          name: 'TagList',
+          component: TagList
+        },{
+          path: 'TagDetail',
+          name: 'TagDetail',
+          component: TagDetail
+        },{
+          path: 'Discuss/:discussId/:userId',
+          name: 'Discuss',
+          component: Discuss
+        },{
+          path: 'Article/:articleId/:userId',
+          name: 'Article',
+          component: Article
+        },{
+          path: 'Anoymous/:anoymousId/:userId',
+          name: 'Anoymous',
+          component: Anoymous
+        },{
+          path: 'UserCenter',
+          name: 'UserCenter',
+          component : UserCenter     
+        },{
+          path: 'UserEdit',
+          name: 'UserEdit',
+          component : UserEdit     
+        },{
+          path: 'CreateArticle',
+          name: 'CreateArticle',
+          component : CreateArticle     
+        },{
+          path: 'CreateDiscuss/:userId',
+          name: 'CreateDiscuss',
+          component : CreateDiscuss     
+        },{
+          path: 'CreateAnoymous',
+          name: 'CreateAnoymous',
+          component : CreateAnoymous     
+        },{
+          path: 'Message',
+          name: 'Message',
+          component : Message     
+        },{
+          path: 'HitoryMessage',
+          name: 'HitoryMessage',
+          component : HitoryMessage     
+        },{
+          path: 'Info',
+          name: 'Info',
+          component : Info     
         }
       ]    
     }

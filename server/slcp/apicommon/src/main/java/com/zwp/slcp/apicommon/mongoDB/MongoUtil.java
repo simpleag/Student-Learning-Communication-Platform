@@ -14,7 +14,7 @@ import java.util.List;
  * Created by ASUS on 2018/4/14.
  */
 public class MongoUtil {
-    static MongoDB mongo = new MongoDB("snowLeopardSite");
+    static MongoDB mongo = new MongoDB("testmondb");
 
     /**
      * 遍历实体类转成 Document
@@ -48,9 +48,8 @@ public class MongoUtil {
     }
 
     /**
-     * @Author : ljx
+     *
      * @Description : 查询库下的所有文件
-     * @Date : 2017/11/27 10:06
      */
     public static List<String> getCollection() {
         MongoIterable<String> collection = mongo.getCollection();
@@ -63,9 +62,8 @@ public class MongoUtil {
     }
 
     /**
-     * @Author : ljx
+     *
      * @Description :  删除 指定文件
-     * @Date : 2017/11/27 15:33
      */
     public static void deleteFile(String collName) {
         mongo.deleteFile(collName);
@@ -191,6 +189,10 @@ public class MongoUtil {
 
     public static List<Document> findByQueryKeyLimitSort(String collName, BasicDBObject query, BasicDBObject key, Integer limit) {
         return mongo.findAllLimitSort(query, key, collName, limit);
+    }
+
+    public static List<Document> findByQueryKeyLimitSortSkip(String collName, BasicDBObject query, BasicDBObject key, Integer limit, String sort, Integer skip) {
+        return mongo.findAllLimitPage(query, key, collName, limit, sort, skip);
     }
 
     /**

@@ -29,13 +29,13 @@
     <result column="update_time" property="updateTime" jdbcType="BIGINT" />
   </resultMap>
 
-  <resultMap id="LimitBaseMap" type="com.zwp.slcp.apicommon.entity.User" >
+  <resultMap id="LimitBaseMap" type="com.zwp.slcp.apicommon.entity.LimitUser" >
     <id column="user_id" property="userId" jdbcType="BIGINT" />
     <result column="user_pic_url" property="userPicUrl" jdbcType="VARCHAR" />
     <result column="user_name" property="userName" jdbcType="VARCHAR" />
     <result column="user_login_id" property="userLoginId" jdbcType="VARCHAR" />
-    <result column="infoNumber" property="infoNumber" jdbcType="VARCHAR" />
-    <result column="messageNumber" property="messageNumber" jdbcType="INTEGER" />
+    <result column="info_count" property="infoNumber" jdbcType="VARCHAR" />
+    <result column="message_count" property="messageNumber" jdbcType="INTEGER" />
   </resultMap>
   <resultMap id="UserFollowMap" type="com.zwp.slcp.apicommon.entity.UserFollow" >
     <id column="user_id" property="userId" jdbcType="BIGINT" />
@@ -101,15 +101,15 @@
   <!---->
   <select id="selectUserLimitInfo" resultMap="LimitBaseMap" parameterType="java.lang.Long">
 
-SELECT user_id, user_name, user_login_id, (
+SELECT user_id, user_name, user_login_id, user_pic_url, (
 	SELECT count(1)
     FROM info
     WHERE info.info_receive_user_id = #{userId,jdbcType=BIGINT}
-) as infoNumber,  (
+) as info_count,  (
 	SELECT count(1)
     FROM message
     WHERE message_receive_userId = #{userId,jdbcType=BIGINT}
-) as  messageNumber
+) as  message_count
 FROM user
 WHERE user_id = #{userId,jdbcType=BIGINT}
   </select>
@@ -430,16 +430,43 @@ WHERE user_id = #{userId,jdbcType=BIGINT}
     where user_id = #{userId,jdbcType=BIGINT}
   </update>
 
-  <update id="updateUserMap"  >
+  <update id="updateUserMap"  parameterType="com.zwp.slcp.apicommon.entity.User">
     update map_user
     set
     user_attention_type= #{userAttentionType,jdbcType=BIGINT},
     update_time = #{updateTime,jdbcType=BIGINT}
     where user_id = #{userId,jdbcType=BIGINT} AND user2_id = #{user2Id,jdbcType=BIGINT}
   </update>
-  <update id="updateNumber" >
+  <update id="updateNumber" parameterType="com.zwp.slcp.apicommon.entity.User">
     update user
     <set >
+      <if test="userName != null" >
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="userPwd != null" >
+        user_pwd = #{userPwd,jdbcType=VARCHAR},
+      </if>
+      <if test="userPhoneNumber != null" >
+        user_phone_number = #{userPhoneNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="userLoginId != null" >
+        user_login_id = #{userLoginId,jdbcType=VARCHAR},
+      </if>
+      <if test="userPicUrl != null" >
+        user_pic_url = #{userPicUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="userHonor != null" >
+        user_honor = #{userHonor,jdbcType=VARCHAR},
+      </if>
+      <if test="userAnonymouseName != null" >
+        user_anonymouse_name = #{userAnonymouseName,jdbcType=VARCHAR},
+      </if>
+      <if test="userAnonymouseHonor != null" >
+        user_anonymouse_honor = #{userAnonymouseHonor,jdbcType=VARCHAR},
+      </if>
+      <if test="userIntroduce != null" >
+        user_introduce = #{userIntroduce,jdbcType=VARCHAR},
+      </if>
       <if test="userGetApproveNumber != null" >
         user_get_approve_number = user_get_approve_number + #{userGetApproveNumber,jdbcType=INTEGER},
       </if>
@@ -466,6 +493,21 @@ WHERE user_id = #{userId,jdbcType=BIGINT}
       </if>
       <if test="userApproveNumber != null" >
         user_approve_number = user_approve_number + #{userApproveNumber,jdbcType=INTEGER},
+      </if>
+      <if test="userBorn != null" >
+        user_born = #{userBorn,jdbcType=BIGINT},
+      </if>
+      <if test="userSex != null" >
+        user_sex = #{userSex,jdbcType=VARCHAR},
+      </if>
+      <if test="userSchool != null" >
+        user_school = #{userSchool,jdbcType=VARCHAR},
+      </if>
+      <if test="userEducation != null" >
+        user_education = #{userEducation,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=BIGINT},
       </if>
       <if test="updateTime != null" >
         update_time = #{updateTime,jdbcType=BIGINT},
