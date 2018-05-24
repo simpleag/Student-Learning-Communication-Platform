@@ -20,7 +20,7 @@
     <include refid="Base_Column_List" />
     from info
     where info_receive_user_id = #{infoReceiveUserId,jdbcType=BIGINT}
-    ORDER BY create_time DESC;
+    ORDER BY create_time DESC
   </select>
   <select id="selectNewInfoReceiveUserId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select
@@ -28,6 +28,7 @@
     from info
     where info_receive_user_id = #{infoReceiveUserId,jdbcType=BIGINT}
     AND info_state = 1
+    ORDER BY create_time DESC
   </select>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select
@@ -129,6 +130,32 @@
     </set>
     where info_id = #{infoId,jdbcType=BIGINT}
   </update>
+  <update id="updateByReceiveUserId" parameterType="com.zwp.slcp.apicommon.entity.Info" >
+    update info
+    <set >
+
+      <if test="intoContent != null" >
+        into_content = #{intoContent,jdbcType=VARCHAR},
+      </if>
+      <if test="infoType != null" >
+        info_type = #{infoType,jdbcType=INTEGER},
+      </if>
+      <if test="infoState != null" >
+        info_state = #{infoState,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=BIGINT},
+      </if>
+      <if test="infoTargetId != null" >
+        info_target_id = #{infoTargetId,jdbcType=BIGINT},
+      </if>
+    </set>
+    where info_receive_user_id = #{infoReceiveUserId,jdbcType=BIGINT}
+  </update>
+
   <update id="updateByPrimaryKey" parameterType="com.zwp.slcp.apicommon.entity.Info" >
     update info
     set info_receive_user_id = #{infoReceiveUserId,jdbcType=BIGINT},

@@ -34,15 +34,15 @@ public class TagController {
 
     @RequestMapping(value = "/allUserAttentionAndUnattention")
     @ResponseBody
-    String allTags(Long userId, Integer pageNumber, Integer pageSize) {
-        if (StringUtils.isBlank(userId, pageNumber, pageSize)) {
+    String allUserAttentionAndUnattention(Long userId, Long targetUserId, Integer pageNumber, Integer pageSize) {
+        if (StringUtils.isBlank(userId, targetUserId, pageNumber, pageSize)) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         }else {
-            PageInfo<FullTag> userAttentionTags = tagService.userAttentionTags(userId, pageNumber, pageSize);
+            PageInfo<FullTag> userAttentionTags = tagService.userAttentionTags(targetUserId, pageNumber, pageSize);
             if (userAttentionTags == null) {
                 userAttentionTags = new PageInfo<>();
             }
-            PageInfo<Tag> userUnAttentionTags = tagService.listUnattentionTags(userId, pageNumber, pageSize);
+            PageInfo<Tag> userUnAttentionTags = tagService.listUnattentionTags(targetUserId, pageNumber, pageSize);
             if (userUnAttentionTags == null) {
                 userUnAttentionTags = new PageInfo<>();
             }
@@ -71,16 +71,30 @@ public class TagController {
 
     @RequestMapping(value = "/userAttentionTags")
     @ResponseBody
-    String userAttentionTags(Long userId, Integer pageNumber, Integer pageSize) {
-        if (StringUtils.isBlank(userId, pageNumber, pageSize)) {
+    String userAttentionTags(Long userId,Long targetUserId, Integer pageNumber, Integer pageSize) {
+        if (StringUtils.isBlank(userId, targetUserId, pageNumber, pageSize)) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         }else {
-            PageInfo<FullTag> userAttentionTags = tagService.userAttentionTags(userId, pageNumber, pageSize);
+            PageInfo<FullTag> userAttentionTags = tagService.userAttentionTags(targetUserId, pageNumber, pageSize);
             if (userAttentionTags == null) {
                 userAttentionTags = new PageInfo<>();
+                return FrontApiResponseEntity.SYS_ERR().message("无关注标签").data("attentionTags", userAttentionTags).build();
             }
             return FrontApiResponseEntity.SUCC().data("attentionTags", userAttentionTags).build();
 
         }
     }
+
+    @RequestMapping(value = "/updateUserAttentionTag")
+    @ResponseBody
+    String updateUserAttentionTag(Long userId,Integer tagId) {
+        if (StringUtils.isBlank(userId, tagId)) {
+            return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
+        }else {
+            return tagService.updateUserAttentionTag(userId, tagId);
+
+        }
+    }
+
+
 }

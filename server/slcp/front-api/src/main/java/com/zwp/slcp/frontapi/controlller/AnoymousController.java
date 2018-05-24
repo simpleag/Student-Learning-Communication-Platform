@@ -34,7 +34,7 @@ public class AnoymousController {
     private ActiveService activeService;
 
 
-    private final Logger logger = LoggerFactory.getLogger(AnoymousController.class);
+    private static final Logger logger = LoggerFactory.getLogger(AnoymousController.class);
     private final static String COLL_NAME = "active";
 
     @RequestMapping(value = "/listOrderByTime")
@@ -106,11 +106,11 @@ public class AnoymousController {
 
     @RequestMapping(value = "/userFavorite")
     @ResponseBody
-    String userFavorite(Long userId, Integer pageNumber, Integer pageSize) {
-        if (StringUtils.isBlank(userId, pageNumber, pageSize)) {
+    String userFavorite(Long userId, Long targetUserId, Integer pageNumber, Integer pageSize) {
+        if (StringUtils.isBlank(userId, targetUserId, pageNumber, pageSize)) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         } else {
-            PageInfo<HomeAnoymous> homeDiscussPageInfo =  anoymousService.listUsersFavoriteAnoymous(userId, pageNumber, pageSize);
+            PageInfo<HomeAnoymous> homeDiscussPageInfo =  anoymousService.listUsersFavoriteAnoymous(targetUserId, pageNumber, pageSize);
             if (homeDiscussPageInfo == null) {
                 return FrontApiResponseEntity.SYS_ERR().build();
             }
@@ -121,11 +121,13 @@ public class AnoymousController {
     @RequestMapping(value = "/create")
     @ResponseBody
     String create(Long userId, String tiltle, String content) {
+        logger.info("userId: "+userId+ "title: "+ tiltle+ "content: "+ content);
         if (StringUtils.isBlank(userId, tiltle, content)) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         } else {
             Anoymous anoymous = new Anoymous(userId, tiltle, content);
             JSONObject json = JSON.parseObject(anoymousService.createAnoymous(anoymous));
+            logger.info(json.toJSONString());
             return json.toJSONString();
         }
     }
@@ -159,11 +161,12 @@ public class AnoymousController {
     @RequestMapping(value = "/approve")
     @ResponseBody
     String approve(Long userId, Long articleId) {
+        logger.info("inFrontApi"+ userId+" "+articleId);
         if (StringUtils.isBlank(articleId, userId)) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         } else {
             //添加用户对应的动态
-            return  anoymousService.updateUserAttentionType(userId, articleId, 1);
+            return  anoymousService.updateUserAttentionType(userId, articleId, 5);
 
         }
     }
@@ -171,12 +174,13 @@ public class AnoymousController {
     @RequestMapping(value = "/favorite")
     @ResponseBody
     String favorite(Long userId, Long articleId) {
+        logger.info("inFrontApi"+ userId+" "+articleId);
         if (StringUtils.isBlank(articleId, userId)) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         } else {
             //添加用户对应的动态
 
-            return  anoymousService.updateUserAttentionType(userId, articleId, 2);
+            return  anoymousService.updateUserAttentionType(userId, articleId, 6);
 
         }
     }

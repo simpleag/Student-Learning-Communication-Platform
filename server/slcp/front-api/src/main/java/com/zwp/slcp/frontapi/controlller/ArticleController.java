@@ -11,13 +11,23 @@ import com.zwp.slcp.apicommon.utils.StringUtils;
 import com.zwp.slcp.frontapi.service.ActiveService;
 import com.zwp.slcp.frontapi.service.ArticleCommentService;
 import com.zwp.slcp.frontapi.service.ArticleService;
+import com.zwp.slcp.frontapi.service.UploadFileToOssService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by ASUS on 2018/4/26.
@@ -32,8 +42,54 @@ public class ArticleController {
     private ArticleCommentService articleCommentService;
     @Autowired
     private ActiveService activeService;
+    @Autowired
+    private UploadFileToOssService uploadFileToOssService;
 
-    private final Logger logger = LoggerFactory.getLogger(ArticleController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ArticleController.class);
+
+
+    @RequestMapping(value = "/uploadPicFile")
+    @ResponseBody
+    String uploadPicFile(@RequestParam("file") MultipartFile file) {
+
+        logger.debug("传入的文件参数：{}", JSON.toJSONString(file, true));
+
+        System.out.println("File: " + file == null);
+        System.out.println(file.getOriginalFilename());
+        String result = FrontApiResponseEntity.SYS_ERR().build();
+        try {
+            if (file != null) {
+                // 取得当前上传文件的文件名称
+                String fileName = file.getOriginalFilename();
+                //image/jpeg  image/png
+                String fileType = file.getContentType();
+                if (!fileType.equals("image/jpeg") && !fileType.equals("image/png")) {
+                    return FrontApiResponseEntity.SYS_ERR().message("图片类型只允许JPG和PNG").build();
+                }
+//                if (file.getContentType())
+                // 如果名称不为空,说明该文件存在，否则说明该文件不存在
+                if (fileName.trim() != "") {
+                    File newFile = new File(fileName);
+                    FileOutputStream outStream = new FileOutputStream(newFile); // 文件输出流用于将数据写入文件
+                    outStream.write(file.getBytes());
+                    outStream.close(); // 关闭文件输出流
+                    file.transferTo(newFile);
+                    // 上传到阿里云
+//                            files.add(uploadFileToOssService.upload(newFile));
+                    String path = uploadFileToOssService.upload(newFile);
+                    System.out.println(path);
+                    newFile.delete();
+                    result = FrontApiResponseEntity.SUCC().data("imgUrl", path).build();
+                }
+            }
+
+
+        } catch (Exception e) {
+            result = FrontApiResponseEntity.SYS_ERR().message(e.getMessage()).build();
+        } finally {
+            return result;
+        }
+    }
 
     @RequestMapping(value = "/listOrderByTime")
     @ResponseBody
@@ -122,7 +178,7 @@ public class ArticleController {
         if (StringUtils.isBlank(userId, authorId, pageNumber, pageSize)) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         } else {
-            PageInfo<HomeArticle> homeArticlePageInfo =  articleService.listUsersArticles(userId, authorId, pageNumber, pageSize);
+            PageInfo<HomeArticle> homeArticlePageInfo = articleService.listUsersArticles(userId, authorId, pageNumber, pageSize);
             if (homeArticlePageInfo == null) {
                 return FrontApiResponseEntity.SYS_ERR().build();
             }
@@ -132,11 +188,11 @@ public class ArticleController {
 
     @RequestMapping(value = "/userFavoriteArticle")
     @ResponseBody
-    String userFavoriteArticle(Long userId, Integer pageNumber, Integer pageSize) {
-        if (StringUtils.isBlank(userId, pageNumber, pageSize)) {
+    String userFavoriteArticle(Long userId, Long targetUserId, Integer pageNumber, Integer pageSize) {
+        if (StringUtils.isBlank(userId, targetUserId, pageNumber, pageSize)) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         } else {
-            PageInfo<HomeArticle> homeArticlePageInfo =  articleService.listUsersFavoriteArticles(userId, pageNumber, pageSize);
+            PageInfo<HomeArticle> homeArticlePageInfo = articleService.listUsersFavoriteArticles(targetUserId, pageNumber, pageSize);
             if (homeArticlePageInfo == null) {
                 return FrontApiResponseEntity.SYS_ERR().build();
             }
@@ -147,17 +203,21 @@ public class ArticleController {
     @RequestMapping(value = "/createArticle")
     @ResponseBody
     String createArticle(Long userId, String articleTiltle, String articleContent, Integer tagId, String articlePicUrl) {
+        logger.info("startCreate");
+        logger.info("userId: "+ userId+ "Title: "+ articleTiltle+" conetent: "+ articleContent+" tagId: "+ tagId+ "picUrl: "+ articlePicUrl);
         if (StringUtils.isBlank(userId, articleContent, articlePicUrl, articleTiltle, tagId, articleTiltle)) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         } else {
             Article article = new Article(userId, articleTiltle, articleContent, tagId, articlePicUrl);
-            JSONObject jsonObject =  JSON.parseObject(articleService.updateArticle(article));
+            JSONObject jsonObject = JSON.parseObject(articleService.createArticle(article));
+            logger.info(jsonObject.toJSONString());
             if (jsonObject.getString("code").equals("200")) {
                 Long articleId = jsonObject.getLong("articleId");
-                String content = "用户创建了"+ articleTiltle +"文章";
-                activeService.createActive(MyConstant.MONGODB_COLL_NAME,userId, articleId, 1, content);
+                String content = "用户创建了" + articleTiltle + "文章";
+                activeService.createActive(MyConstant.MONGODB_COLL_NAME, userId, articleId, 1, content);
             } else {
             }
+            logger.info(jsonObject.toJSONString());
             return jsonObject.toJSONString();
         }
     }
@@ -197,8 +257,8 @@ public class ArticleController {
             System.out.println("np");
             //添加用户对应的动态
             String content = "用户点赞了一篇文章";
-            activeService.createActive(MyConstant.MONGODB_COLL_NAME,userId, articleId, 2, content);
-            return  articleService.updateUserAttentionType(userId, articleId, 1);
+            activeService.createActive(MyConstant.MONGODB_COLL_NAME, userId, articleId, 2, content);
+            return articleService.updateUserAttentionType(userId, articleId, 1);
         }
     }
 
@@ -211,8 +271,8 @@ public class ArticleController {
             //添加用户对应的动态
 
             String content = "用户收藏了一篇文章";
-            activeService.createActive(MyConstant.MONGODB_COLL_NAME,userId, articleId, 3, content);
-            return  articleService.updateUserAttentionType(userId, articleId, 2);
+            activeService.createActive(MyConstant.MONGODB_COLL_NAME, userId, articleId, 3, content);
+            return articleService.updateUserAttentionType(userId, articleId, 2);
 
         }
     }

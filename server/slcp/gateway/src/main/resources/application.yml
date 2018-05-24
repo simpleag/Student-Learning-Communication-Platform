@@ -13,6 +13,9 @@ zuul:
   add-host-header: true
 # 确保cookie可以返回给客户端
   sensitive-headers: true
+
+spring.http.multipart.maxFileSize: 10Mb
+spring.http.multipart.maxRequestSize: 10Mb
 eureka:
   instance:
     prefer-ip-address: true

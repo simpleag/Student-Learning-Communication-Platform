@@ -38,6 +38,15 @@ public class UserController {
         }
     }
 
+    @RequestMapping("/isAttention")
+    @ResponseBody
+    public MapUser isAttention(Long user1Id, Long user2Id) {
+        MapUserKey mapUserKey = new MapUserKey();
+        mapUserKey.setUserId(user1Id);
+        mapUserKey.setUser2Id(user2Id);
+        MapUser mapUser = mapUserMapper.selectByPrimaryKey(mapUserKey);
+        return mapUser;
+    }
     /**
      * 还需要增加创建时对各数据的正则表达式匹配 输入格式、长度等
      * @param user
@@ -54,15 +63,11 @@ public class UserController {
 
             try {
                 result = userMapper.insert(user);
-//                if (result == 0) {
-//                    return FrontApiResponseEntity.ERR(ResponseCode.FAIl).build();
-//                } else {
-//                    return FrontApiResponseEntity.SUCC().build();
-//                }
+
             } catch (Exception e) {
-                message = e.getMessage();
+
             } finally {
-                if (!message.equals("") || result==0) {
+                if (result==0) {
                     return FrontApiResponseEntity.ERR(ResponseCode.FAIl).build();
                 } else {
                     return FrontApiResponseEntity.SUCC().build();
@@ -121,6 +126,7 @@ public class UserController {
     @RequestMapping("/listUserAttention")
     @ResponseBody
     public PageInfo<UserFollow> listUserAttention(Long userId, Integer pageNumber, Integer pageSize){
+        System.out.println("startListUserAttention");
         if (StringUtils.isBlank(userId)) {
             return null;
         } else {
@@ -155,6 +161,7 @@ public class UserController {
     @RequestMapping("/userUpdate")
     @ResponseBody
     public String userUpdate(@RequestBody User user) {
+        System.out.println("userUpdate");
         if (StringUtils.isBlank(user.getUserId())) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         }

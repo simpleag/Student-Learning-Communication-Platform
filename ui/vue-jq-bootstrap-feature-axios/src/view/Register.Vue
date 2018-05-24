@@ -4,31 +4,46 @@
       <div class="col-md-6 col-md-offset-3 ">
           <div class="col-md-4 col-md-offset-4">
               <h2 class="form-signin-heading">注册</h2>
+              
+                  <el-input placeholder="用户名" v-model="userName">
+                    <template slot="prepend" >用户名</template>
+                  </el-input>
+                  <P></p>
+                   <el-input placeholder="登录ID" v-model="userLoginId">
+                    <template slot="prepend" >登录ID</template>
+                  </el-input>
+                  <P></p>
+                   <el-input  type='password' placeholder="新密码" v-model="pwd">
+                    <template slot="prepend" style="width: 20%">新密码</template>
+                  </el-input>
+                  <P></p>
+                  <el-input  type='password' placeholder="新密码" v-model="pwd2">
+                    <template slot="prepend" style="width: 20%">新密码</template>
+                  </el-input>
+                    <P></p>
+                    <P></p>
+                  <el-button type="primary" @click="register()">注册</el-button>
           </div>
            <div class="col-xs-2 ">
           </div>
           
-          <div class="col-md-4 col-md-offset-4 " id='inputBox'>
+          <!-- <div class="col-md-4 col-md-offset-4 " id='inputBox'>
             <div class="form-inline">  
                <input type="text" class="form-control" placeholder="请输入手机号码" />  
                <button class="btn btn-primary">验证码</button>  
            </div>  
             <div class="login-wrap" v-show="showLogin">
                 <p v-show="showTishi">{{tishi}}</p>
-                <input type="text" class="form-control" placeholder="请输入登录id" v-model="username">
-                <input type="text" class="form-control" placeholder="请输入用户名" v-model="username">
-                <input type="password" class="form-control" placeholder="请输入密码" v-model="password">
-                <input type="password" class="form-control" placeholder="请确认密码" v-model="password">
-                <input type="text" class="form-control" placeholder="请输入短信验证码" v-model="username">
+                
                 
                 <button v-on:click="login" button type="button" class="btn btn-primary">注册</button>
                 <span v-on:click="ToRegister">忘记密码？</span>
-            </div> 
+            </div>  -->
                            
           </div>
           
           
-          <span v-on:click="ToRegister">已有帐号？请登录</span>
+          <span ><el-button type="text" @click="jumpToLogin()">已有帐号？请登录</el-button></span>
          
       </div>
         
@@ -37,6 +52,14 @@
 
 <script>
 //逻辑尚未完善
+import Vue from "vue";
+import qs from "qs";
+import { formatDate } from "../common/date.js";
+
+var userName='';
+var pwd='';
+var pwd2='';
+var userLoginId='';
   export default{
         data(){
             return{
@@ -44,10 +67,56 @@
                 showRegister: false,
                 showTishi: false,
                 tishi: '',
-                username: '',
-                password: '',
-                newUsername: '',
-                newPassword: ''
+                userName: this.userName,
+                pwd : this.pwd,
+                pwd2: this.pwd2,
+                userLoginId: this.userLoginId
+            }
+        },
+        methods: {
+            register(){
+                var _this = this;
+                
+                _this.ajaxRegister();
+            },
+            ajaxRegister(){
+                 var _this = this;
+                axios
+                    .post(
+                    "http://localhost:5555/sclp/user/register",
+                    qs.stringify({
+                        userName: _this.userName,
+                        pwd: _this.pwd,
+                        pwd2: _this.pwd2,
+                        userLoginId: _this.userLoginId
+                    })
+                    )
+                    .then(function(res) {
+                    if (res.data.code == '200') {
+                        // _this.initUser(res);
+                        _this.errorNet('成功','success',res.data.message)
+                        _this.jumpToLogin();
+                    } else {
+                        _this.errorNet('出错','error',res.data.message)
+                    }
+                    
+                    
+                    })
+                    .catch(function(err) {
+                    console.log(err);
+                    });
+            },
+            errorNet(title,type,message){
+                    console.log("error")
+                    this.$notify({
+                    title: title,
+                    message: message,
+                    type: type
+                    });
+                    
+                },
+            jumpToLogin(){
+                this.$router.push({ name: "Login" });
             }
         }
     }

@@ -93,6 +93,10 @@ public class TagController {
 
             MapUserTag mapUserTag = mapUserTagMapper.selectByPrimaryKey(key);
             if (mapUserTag == null) {
+                mapUserTag = new MapUserTag();
+                mapUserTag.setTagId(tagId);
+                mapUserTag.setUserId(userId);
+                mapUserTag.setUserAttentionType(1);
                 isSuccess = tagService.createUserAttentionTagType(mapUserTag);
             } else {
                 if (mapUserTag.getUserAttentionType() == 0) {

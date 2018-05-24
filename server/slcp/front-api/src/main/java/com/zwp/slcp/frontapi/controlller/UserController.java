@@ -11,6 +11,7 @@ import com.zwp.slcp.apicommon.response.ResponseCode;
 import com.zwp.slcp.apicommon.utils.MD5Utils;
 import com.zwp.slcp.apicommon.utils.StringUtils;
 import com.zwp.slcp.frontapi.service.*;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,26 +72,28 @@ public class UserController {
     }
     @RequestMapping(value = "/register")
     @ResponseBody
-    public String register(String phoneNumber, String verifyCode, String userName, String pwd, String pwd2, String userLoginId) {
-        if (StringUtils.isBlank(phoneNumber, verifyCode, userName, pwd, pwd2, userLoginId)) {
+    public String register(String userName, String pwd, String pwd2, String userLoginId) {
+        if (StringUtils.isBlank(userName, pwd, pwd2, userLoginId)) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         }
         //判断手机号、登录id、用户名、密码是否合法
 
         //判断密码是否相等
-
+        if (!pwd.equals(pwd2)) {
+            return FrontApiResponseEntity.SYS_ERR().message("密码不一致").build();
+        }
         //将密码用Md5加密
 
-        User user = new User(phoneNumber, userLoginId, userName);
+        User user = new User("unknow", userLoginId, userName);
         String md5pwd = MD5Utils.MD5(pwd);
         user.setUserPwd(md5pwd);
 
-        String str = userServie.createUser(user);
-        if (str != null) {
-            return FrontApiResponseEntity.SYS_ERR().build();
-        } else {
-            return FrontApiResponseEntity.SUCC().build();
-        }
+        return userServie.createUser(user);
+//        if (str != null) {
+//            return FrontApiResponseEntity.SUCC().build();
+//        } else {
+//            return FrontApiResponseEntity.SYS_ERR().build();
+//        }
     }
 
     @RequestMapping(value = "/login")
@@ -195,6 +198,8 @@ public class UserController {
         }
     }
 
+
+
     @RequestMapping(value = "/logout")
     @ResponseBody
     public String logout(
@@ -223,7 +228,8 @@ public class UserController {
             User user = new User();
             user.setUserPwd(MD5Utils.MD5(newPwd1));
             user.setUpdateTime(System.currentTimeMillis());
-            user.setUserId(userId);;
+            user.setUserId(userId);
+            System.out.println("change?");
             return userServie.userUpdate(user);
         }
     }
@@ -260,21 +266,22 @@ public class UserController {
 
     @RequestMapping(value = "/center")
     @ResponseBody
-    String center(Long userId, Long loginUserId, Integer pageNumber, Integer pageSize) {
-        if (StringUtils.isBlank(userId)){
+    String center(Long userId, Long targetUserId, Integer pageNumber, Integer pageSize) {
+        if (StringUtils.isBlank(userId, targetUserId, pageNumber, pageSize)){
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         } else {
-            User tagetUserInfo = userServie.findOne(userId);
+            User tagetUserInfo = userServie.findOne(targetUserId);
             //从nosql中获取loginUserId
 
             //其他用户查看
-            if (!userId.equals(loginUserId)) {
+            if (!userId.equals(targetUserId)) {
                 tagetUserInfo.setUserAnonymouseName("unknow");
             }
 
             //从nosql中查找用户动态
+            List<Document> listActive = activeService.listUsersActives("active", targetUserId, pageSize, pageNumber);
 
-            return null;
+            return FrontApiResponseEntity.SUCC().data("user", tagetUserInfo).data("actives", listActive).build();
         }
     }
 
@@ -293,29 +300,29 @@ public class UserController {
 
     @RequestMapping(value = "/attentionUserList")
     @ResponseBody
-    String attentionUser(Long userId, Integer pageNumber, Integer pageSize) {
-        if (StringUtils.isBlank(userId, pageNumber, pageSize)) {
+    String attentionUser(Long userId, Long targetUserId, Integer pageNumber, Integer pageSize) {
+        if (StringUtils.isBlank(userId, targetUserId, pageNumber, pageSize)) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         } else {
-            List<UserFollow> userPageInfo = userServie.listUserAttention(userId, pageNumber, pageSize);
+            PageInfo<UserFollow> userPageInfo = userServie.listUserAttention(targetUserId, pageNumber, pageSize);
             if (userPageInfo == null) {
                 return FrontApiResponseEntity.SYS_ERR().build();
             }
-            return FrontApiResponseEntity.SUCC().data("userPageInfo", userId).build();
+            return FrontApiResponseEntity.SUCC().data("userPageInfo", userPageInfo).build();
         }
     }
 
     @RequestMapping(value = "/userFollowList")
     @ResponseBody
-    String userFollowList(Long userId, Integer pageNumber, Integer pageSize) {
-        if (StringUtils.isBlank(userId, pageNumber, pageSize)) {
+    String userFollowList(Long userId, Long targetUserId, Integer pageNumber, Integer pageSize) {
+        if (StringUtils.isBlank(userId, targetUserId, pageNumber, pageSize)) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         } else {
-            List<UserFollow> userPageInfo = userServie.listUserFollows(userId, pageNumber, pageSize);
+            PageInfo<UserFollow> userPageInfo = userServie.listUserFollows(targetUserId, pageNumber, pageSize);
             if (userPageInfo == null) {
                 return FrontApiResponseEntity.SYS_ERR().build();
             }
-            return FrontApiResponseEntity.SUCC().data("userPageInfo", userId).build();
+            return FrontApiResponseEntity.SUCC().data("userPageInfo", userPageInfo).build();
         }
     }
 
@@ -380,30 +387,45 @@ public class UserController {
         }
     }
 
+    @RequestMapping(value = "/updateUserInfos")
+    @ResponseBody
+    String updateUserInfos(Long userId, String userName,String userHonor, String userAnoymouseHonor, String introduce){
+        if (StringUtils.isBlank(userId, userName, userHonor, userAnoymouseHonor, introduce)) {
+            return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
+        }
+        User user = new User(userId);
+        user.setUserIntroduce(introduce);
+        user.setUserName(userName);
+        user.setUserHonor(userHonor);
+        user.setUserAnonymouseHonor(userAnoymouseHonor);
+        return userServie.userUpdate(user);
+
+    }
     @RequestMapping(value = "/updateUserBaseDate")
     @ResponseBody
-    String updateUserBaseDate(Long userId, Long loginUserId, String userName, Long bornDate, String userSex
+    String updateUserBaseDate(Long userId, Long targetUserId, String userName, Long bornDate, String userSex
                                 , String userLearningSchool, String education, String userHonor) {
-        if (StringUtils.isBlank(userId, loginUserId, userName, bornDate, userSex, userLearningSchool, education, userHonor)) {
+        if (StringUtils.isBlank(userId, targetUserId, userName, bornDate, userSex, userLearningSchool, education, userHonor)) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         } else {
-            if (!userId.equals(loginUserId)) {
+            if (!userId.equals(targetUserId)) {
                 return FrontApiResponseEntity.SYS_ERR().build();
             }
-            User user = new User(userId, userName, bornDate, userSex, userLearningSchool, education);
+            User user = new User(targetUserId, userName, bornDate, userSex, userLearningSchool, education);
             user.setUserHonor(userHonor);
 
             return userServie.userUpdate(user);
         }
     }
 
-    @RequestMapping(value = "/updatUesersCommunityData")
+    @RequestMapping(value = "/updateUesersCommunityData")
     @ResponseBody
-    String updatUesersCommunityData(Long userId, String userAnoymousName, String userAnoymouseHonor, String userHonor) {
-        if (StringUtils.isBlank(userId, userAnoymouseHonor, userAnoymousName, userHonor)) {
+    String updatUesersCommunityData(Long userId, String userAnoymousName, String userAnoymouseHonor, String userHonor, String introduce) {
+        if (StringUtils.isBlank(userId, userAnoymouseHonor, userAnoymousName, userHonor, introduce)) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         } else {
             User user = new User(userId, userHonor, userAnoymousName, userAnoymouseHonor);
+            user.setUserIntroduce(introduce);
             return userServie.userUpdate(user);
         }
     }
@@ -421,7 +443,7 @@ public class UserController {
 
             if (jsonObject.getString("code").equals("200")) {
                 String content = "用户关注了用户"+targetUser.getUserName();
-                activeService.createActive(MyConstant.MONGODB_COLL_NAME, userId, targetUserId, 8, content);
+                activeService.createActive(MyConstant.MONGODB_COLL_NAME, userId, targetUserId, 13, content);
             }
             return jsonObject.toJSONString();
         }
@@ -437,13 +459,29 @@ public class UserController {
         }
     }
 
+    @RequestMapping(value = "/isAttention")
+    @ResponseBody
+    String isAttention(Long userId, Long targetUserId) {
+        if (StringUtils.isBlank(userId, targetUserId)) {
+            return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
+        }
+        MapUser mapUser = userServie.isAttention(userId, targetUserId);
+        if (mapUser == null) {
+            mapUser = new MapUser();
+            mapUser.setUserId(userId);
+            mapUser.setUser2Id(targetUserId);
+            mapUser.setUserAttentionType(0);
+        }
+        return FrontApiResponseEntity.SUCC().data("mapUser", mapUser).build();
+
+    }
     @RequestMapping(value = "/infos")
     @ResponseBody
-    String info(Long userId, Integer pageNumber, Integer pageSize) {
-        if (StringUtils.isBlank(userId, pageNumber, pageSize)) {
+    String info(Long userId, Integer pageNumber, Integer pageSize, Integer isRead) {
+        if (StringUtils.isBlank(userId, pageNumber, pageSize, isRead)) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         } else {
-            PageInfo<Info>  pageInfo = infoService.listUserReceiveInfo(userId, pageNumber, pageSize);
+            PageInfo<Info>  pageInfo = infoService.listUserReceiveInfo(userId, pageNumber, pageSize, isRead);
             if (pageInfo == null) {
                 return FrontApiResponseEntity.SYS_ERR().build();
             }

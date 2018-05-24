@@ -49,9 +49,11 @@
         </div>
     </div>
     <div class="col-md-3" id='div3'>
-        <el-row>
-            <el-button plain @click="createDiscuss">发布</el-button>
+        <el-row class='text-left'>
+            <el-button plain @click="createDiscuss">发布讨论</el-button>
+            <p></p>
              <el-button plain @click="notCreate" >取消发布</el-button>
+             <p></p>
              <el-select v-model="value2" placeholder="请选择标签" id='tagSelect' @change="tagChangeValue">
                 <el-option
                 v-for="item in tags"
@@ -148,8 +150,8 @@ export default {
         )
         .then(function(res) {
           console.log(res.data.code)
-          if (res.dta.code == '200') {
-            this.$router.push({ name: "Main"});
+          if (res.data.code == '200') {
+            _this.$router.push({ name: "Main"});
           } else {
             this.errorNotice('res.data.code');
           }
@@ -183,7 +185,7 @@ export default {
     },
     initPage(){
       this.userId = window.localStorage.getItem("userId");
-      console.log("userId"+ this.userId)
+      console.log("userId: "+ this.userId)
       this.ajaxTag();
     },
     errorNotice(message){

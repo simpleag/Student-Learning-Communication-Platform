@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public interface InfoService {
     @RequestMapping("/info/listUserReceiveInfo")
     @ResponseBody
-    PageInfo<Info> listUserReceiveInfo(@RequestParam(value = "userId") Long userId, @RequestParam(value = "pageNumber") Integer pageNumber, @RequestParam(value = "pageSize") Integer pageSize);
+    PageInfo<Info> listUserReceiveInfo(@RequestParam(value = "userId") Long userId, @RequestParam(value = "pageNumber") Integer pageNumber, @RequestParam(value = "pageSize") Integer pageSize, @RequestParam(value = "isRead") Integer isRead);
 
     @RequestMapping("/info/listUserNewReceiveCount")
     @ResponseBody

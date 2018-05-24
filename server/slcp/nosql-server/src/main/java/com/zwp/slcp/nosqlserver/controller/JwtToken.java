@@ -44,7 +44,7 @@ public class JwtToken {
         AccessToken accessTokenEntity = new AccessToken(accessToken, randomCode.toString());
 
         String jsontString = JSON.toJSONString(accessTokenEntity);
-        if (!RedisUtils.setStrTime(String.valueOf(userId), jsontString, 6000)) {
+        if (!RedisUtils.setStrTime(String.valueOf(userId), jsontString, 60*60*24*7)) {
             return FrontApiResponseEntity.SYS_ERR().build();
         } else {
             return FrontApiResponseEntity.SUCC().data("accessToken", accessToken).build();

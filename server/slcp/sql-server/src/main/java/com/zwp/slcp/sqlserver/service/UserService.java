@@ -74,7 +74,7 @@ public class UserService {
         MapUser mapUser = new MapUser();
         logger.info(key.getUser2Id().toString());
         boolean success = false;
-        //如果没有关联
+        //如果有关联
         if (null != mapUserMapper.selectByPrimaryKey(key)) {
             mapUser = new MapUser(key.getUserId(), key.getUser2Id());
             User user = new User(key.getUserId());

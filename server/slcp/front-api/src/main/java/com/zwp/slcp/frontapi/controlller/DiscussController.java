@@ -127,11 +127,11 @@ public class DiscussController {
 
     @RequestMapping(value = "/userFavorite")
     @ResponseBody
-    String userFavorite(Long userId, Integer pageNumber, Integer pageSize) {
-        if (StringUtils.isBlank(userId, pageNumber, pageSize)) {
+    String userFavorite(Long userId,Long targetUserId, Integer pageNumber, Integer pageSize) {
+        if (StringUtils.isBlank(userId, targetUserId, pageNumber, pageSize)) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         } else {
-            PageInfo<HomeDiscuss> homeDiscussPageInfo =  discussService.listUsersFavoriteDiscuss(userId, pageNumber, pageSize);
+            PageInfo<HomeDiscuss> homeDiscussPageInfo =  discussService.listUsersFavoriteDiscuss(targetUserId, pageNumber, pageSize);
             if (homeDiscussPageInfo == null) {
                 return FrontApiResponseEntity.SYS_ERR().build();
             }

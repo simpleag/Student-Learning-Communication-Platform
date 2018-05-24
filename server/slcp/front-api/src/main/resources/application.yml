@@ -10,9 +10,13 @@ eureka:
 
 slcp:
    upload:
-      rootpath: http://slcp.oss-cn-hangzhou.aliyuncs.com/
+      rootpath: https://slcpbuckt.oss-cn-hangzhou.aliyuncs.com
       oss:
         accesskeyid: LTAI3QEFccJdvdLK
         accesskeysecret: csdyl9RpRqmDKdrA2AYhkr84sv94Lg
         endpoint: oss-cn-hangzhou.aliyuncs.com
-        bucket: slcp
+        bucket: slcpbuckt
+
+
+spring.http.multipart.maxFileSize: 1Mb
+spring.http.multipart.maxRequestSize: 1Mb

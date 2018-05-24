@@ -22,7 +22,7 @@
           </div>
           
           <!-- <el-button type="text">没有账号？马上注册</el-button> -->
-          <span ><el-button type="text">没有账号？马上注册</el-button></span>
+          <span ><el-button type="text" @click="jumpToRegister()">没有账号？马上注册</el-button></span>
          
       </div>
         
@@ -80,6 +80,9 @@ export default {
       this.$router.push({
         name: "Main",
       });
+    },
+    jumpToRegister(){
+      this.$router.push({ name: "Register" });
     },
     errorNet(message){
         console.log("error")

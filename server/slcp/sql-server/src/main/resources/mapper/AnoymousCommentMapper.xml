@@ -13,6 +13,7 @@
     <result column="anoymous_id" jdbcType="BIGINT" property="anoymousId" />
   </resultMap>
   <resultMap id="DetailResultMap" type="com.zwp.slcp.apicommon.entity.DetailAnoymousComment" >
+    <id column="anoymous_comment_id"  property="anoymousCommentId" jdbcType="BIGINT"/>
     <result column="anoymous_comment_author_Id" jdbcType="BIGINT" property="anoymousCommentAuthorId" />
     <result column="anoymous_comment_content" jdbcType="VARCHAR" property="anoymousCommentContent" />
     <result column="anoymous_list_number" jdbcType="INTEGER" property="anoymousListNumber" />
@@ -78,7 +79,7 @@ ORDER BY ac.anoymous_list_number
     delete from anoymous_comment
     where anoymous_comment_id = #{anoymousCommentId,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.zwp.slcp.apicommon.entity.AnoymousComment" useGeneratedKeys="true" keyProperty="anoymousCommentId" keyColumn="anoymous_comment_id">
+  <insert id="insert" useGeneratedKeys="true" keyProperty="anoymousCommentId" keyColumn="anoymous_comment_id" parameterType="com.zwp.slcp.apicommon.entity.AnoymousComment" >
     insert into anoymous_comment (anoymous_comment_id, anoymous_comment_author_Id, 
       anoymous_comment_content, anoymous_list_number, 
       anoymouse_replay_userId, anoymous_comment_state, 

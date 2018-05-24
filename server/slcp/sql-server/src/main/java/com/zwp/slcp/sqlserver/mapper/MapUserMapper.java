@@ -5,6 +5,8 @@ import com.zwp.slcp.apicommon.entity.MapUserKey;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Mapper
 public interface MapUserMapper {
     int deleteByPrimaryKey(MapUserKey key);
@@ -16,7 +18,7 @@ public interface MapUserMapper {
     MapUser selectByPrimaryKey(MapUserKey key);
 
     //查找两个用户之间的关系
-    MapUser selectByUserId(MapUserKey key);
+    List<MapUser> selectByUserId(MapUserKey key);
 
     int updateByPrimaryKeySelective(MapUser record);
 

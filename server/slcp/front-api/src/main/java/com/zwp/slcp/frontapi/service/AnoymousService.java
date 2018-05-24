@@ -47,11 +47,11 @@ public interface AnoymousService {
 
     @RequestMapping("/anoymous/createAnoymous")
     @ResponseBody
-    String createAnoymous(@RequestBody Anoymous anoymous);
+    String createAnoymous(Anoymous anoymous);
 
     @RequestMapping("/anoymous/updateAnoymous")
     @ResponseBody
-    String updateAnoymous(@RequestBody Anoymous anoymous);
+    String updateAnoymous(Anoymous anoymous);
 
     @RequestMapping("/anoymous/updateUserAttentionType")
     @ResponseBody

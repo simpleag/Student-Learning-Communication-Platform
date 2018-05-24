@@ -54,7 +54,7 @@
     user_id, user_name, user_pic_url, user_login_id, infoNumber, messageNumber
   </sql>
   <sql id="User_Follow_Column_List" >
-    user_id, user_name, user_pic_url, user_attention_type
+    user2_id as user_id, user_name, user_pic_url, user_attention_type
   </sql>
   <!--一些最基础的用户信息-->
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
@@ -77,8 +77,7 @@
   </select>
 
   <select id="selectUserFollow" resultMap="UserFollowMap" parameterType="java.lang.Long" >
-    select
-    <include refid="User_Follow_Column_List" />
+    select user.user_id, user_name, user_pic_url, user_attention_type
     from slcp.map_user as map,user
     where map.user2_id = #{userId,jdbcType=BIGINT} AND user.user_id = map.user_id
   </select>

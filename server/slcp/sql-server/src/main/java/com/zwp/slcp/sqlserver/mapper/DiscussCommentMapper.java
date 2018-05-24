@@ -12,7 +12,7 @@ import java.util.List;
 public interface DiscussCommentMapper {
     int deleteByPrimaryKey(Long discussCommentId);
 
-    Long insert(DiscussComment record);
+    int insert(DiscussComment record);
 
     int insertSelective(DiscussComment record);
 

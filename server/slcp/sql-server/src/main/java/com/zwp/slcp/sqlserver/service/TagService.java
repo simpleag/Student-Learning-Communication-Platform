@@ -28,15 +28,15 @@ public class TagService {
         boolean isSuccess = false;
         try {
             User user = new User(mapUserTag.getUserId());
-            if (mapUserTag.getUserAttentionType() == 0) {
+//            if (mapUserTag.getUserAttentionType() == 0) {
                 user.setUserAttentionNumber(-1);
-            } else {
-                user.setUserAttentionNumber(1);
-            }
+//            } else {
+//                user.setUserAttentionNumber(1);
+//            }
             if (userMapper.updateNumber(user) == 0) {
                 throw new Exception("数据库操作异常");
             }
-            if (mapUserTagMapper.updateByPrimaryKeySelective(mapUserTag) == 0) {
+            if (mapUserTagMapper.deleteByPrimaryKey(mapUserTag) == 0) {
                 throw new Exception("数据库操作异常");
             }
             isSuccess = true;

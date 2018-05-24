@@ -200,22 +200,15 @@ order by d.update_time DESC
         from map_user_discuss as m
         WHERE m.discuss_id = d.discuss_id AND m.user_favorite_type = 1
 
-        ) as favoriteNumber, (
-			select m2.user_approve_type
-            from map_user_discuss as m2
-            WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.discuss_id = d.discuss_id
-        ) as user_approve_type,
-        (
-			select m3.user_favorite_type
-            from map_user_discuss as m3
-            WHERE m3.user_id = #{userId,jdbcType=BIGINT} AND m3.discuss_id = d.discuss_id
-        ) as user_favorite_type
+        ) as favoriteNumber, m0.user_approve_type,
+        m0.user_favorite_type
 FROM discuss as d, user as u, tag as t, map_user_discuss as m0
 WHERE m0.user_id = #{userId,jdbcType=BIGINT}
 AND m0.user_favorite_type = 1
+AND d.discuss_id = m0.discuss_id
 AND t.tag_id = d.discuss_tag_id
 AND u.user_id = d.discuss_author_id
-AND d.discuss_tag_id = t.tag_id
+
 order by d.update_time DESC
 
 

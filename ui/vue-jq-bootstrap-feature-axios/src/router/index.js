@@ -57,7 +57,7 @@ export default new Router({
           name: 'TagList',
           component: TagList
         },{
-          path: 'TagDetail',
+          path: 'TagDetail/:tagId',
           name: 'TagDetail',
           component: TagDetail
         },{
@@ -73,7 +73,7 @@ export default new Router({
           name: 'Anoymous',
           component: Anoymous
         },{
-          path: 'UserCenter',
+          path: 'UserCenter/:targetUserId',
           name: 'UserCenter',
           component : UserCenter     
         },{

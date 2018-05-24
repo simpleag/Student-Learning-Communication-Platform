@@ -29,12 +29,14 @@ public class AnoymousService {
 
     @Transactional(timeout=36000,rollbackFor=Exception.class)
     public Long createAnoymous(Anoymous anoymous) {
+
         Long anoymousId = 0L;
         try {
             anoymousId = anoymousMapper.insert(anoymous);
             if (anoymousId == 0) {
                 throw new Exception("操作异常");
             }
+            anoymousId = anoymous.getAnoymousId();
             User user = new User(anoymous.getAnoymousAuthorId());
             user.setUserAnoymouseNumber(1);
             if (userMapper.updateNumber(user) == 0) {
@@ -60,12 +62,15 @@ public class AnoymousService {
             if (StringUtils.isBlank(anoymous.getAnoymousId(), anoymous.getAnoymousAuthorId())) {
                 throw new Exception("操作异常");
             }
+            User targetUser = new User(anoymous.getAnoymousAuthorId());
+
             info = new Info(anoymous.getAnoymousAuthorId(), sqlUpdateType, 5, anoymous.getAnoymousId());
             info.setCreateTime(System.currentTimeMillis());
             if (sqlUpdateType == 1) {
                 user.setUserApproveNumber(1);
                 info.setInfoType(5);
                 info.setIntoContent("您的"+anoymous.getAnoymousTitle()+"匿名讨论收到了一条赞");
+                targetUser.setUserGetApproveNumber(1);
             } else if (sqlUpdateType == 2) {
                 user.setUserApproveNumber(-1);
             } else if (sqlUpdateType == 3) {
@@ -82,6 +87,9 @@ public class AnoymousService {
                 throw new Exception("操作异常");
             }
             if (mapUserAnoymouseMapper.updateByPrimaryKeySelective(mapUserAnoymouse) == 0) {
+                throw new Exception("操作异常");
+            }
+            if (userMapper.updateNumber(targetUser) == 0) {
                 throw new Exception("操作异常");
             }
             success = true;
@@ -107,10 +115,10 @@ public class AnoymousService {
             }
             Info info = new Info(anoymous.getAnoymousAuthorId(), 0, 1, anoymous.getAnoymousId());
             info.setCreateTime(System.currentTimeMillis());
-            if (mapUserAnoymouse.getUserFavoriteType() == 1) {
+            if (mapUserAnoymouse.getUserApproveType() == 1) {
                 info.setInfoType(5);
                 info.setIntoContent("您的"+anoymous.getAnoymousTitle()+"匿名讨论收到了一条赞");
-            } else if (mapUserAnoymouse.getUserApproveType() == 1) {
+            } else if (mapUserAnoymouse.getUserFavoriteType() == 1) {
                 info.setInfoType(6);
                 info.setIntoContent("您的"+anoymous.getAnoymousTitle()+"匿名讨论被一名用户收藏");
             } else {

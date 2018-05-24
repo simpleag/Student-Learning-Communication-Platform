@@ -64,14 +64,18 @@ public class ArticleService {
             }
             info = new Info(article.getArticleAuthorId(), sqlUpdateType, 1, article.getArticleId());
             info.setCreateTime(System.currentTimeMillis());
+            User targetUser = new User(article.getArticleAuthorId());
             if (sqlUpdateType == 1) {
                 user.setUserApproveNumber(1);
                 info.setInfoType(1);
                 info.setIntoContent("您的"+article.getArticleTitle()+"文章收到了一条赞");
+                targetUser.setUserGetApproveNumber(1);
             } else if (sqlUpdateType == 2) {
                 user.setUserApproveNumber(-1);
+                targetUser.setUserGetApproveNumber(-1);
             } else if (sqlUpdateType == 3) {
                 user.setUserFavoriteNumber(1);
+
                 info.setInfoType(2);
                 info.setIntoContent("您的"+article.getArticleTitle()+"文章被一名用户收藏");
             } else if (sqlUpdateType == 4) {
@@ -81,6 +85,11 @@ public class ArticleService {
                 throw new Exception("操作异常");
             }
             if (userMapper.updateNumber(user) == 0) {
+                throw new Exception("操作异常");
+            }
+
+
+            if (userMapper.updateNumber(targetUser) == 0) {
                 throw new Exception("操作异常");
             }
             if (mapUserArticleMapper.updateByPrimaryKey(mapUserArticle) == 0) {
@@ -104,14 +113,17 @@ public class ArticleService {
             user.setUserFavoriteNumber(mapUserArticle.getUserFavoriteType());
             user.setUserApproveNumber(mapUserArticle.getUserApproveType());
             Article article = articleMapper.selectByPrimaryKey(mapUserArticle.getArticleId());
+            User targetUser = new User(article.getArticleAuthorId());
+
             if (StringUtils.isBlank(article.getArticleId(), article.getArticleAuthorId())) {
                 throw new Exception("操作异常");
             }
             Info info = new Info(article.getArticleAuthorId(), 1, 1, article.getArticleId());
             info.setCreateTime(System.currentTimeMillis());
-            if (mapUserArticle.getUserFavoriteType() == 1) {
+            if (mapUserArticle.getUserApproveType() == 1) {
                 info.setIntoContent("您的"+article.getArticleTitle()+"文章收到了一条赞");
-            } else if (mapUserArticle.getUserApproveType() == 1) {
+                targetUser.setUserGetApproveNumber(1);
+            } else if (mapUserArticle.getUserFavoriteType() == 1) {
                 info.setInfoType(2);
                 info.setIntoContent("您的"+article.getArticleTitle()+"文章被一名用户收藏");
             } else {
@@ -124,6 +136,10 @@ public class ArticleService {
                 throw new Exception("操作异常");
             }
             if (mapUserArticleMapper.insert(mapUserArticle) == 0) {
+                throw new Exception("操作异常");
+            }
+
+            if (userMapper.updateNumber(targetUser) == 0) {
                 throw new Exception("操作异常");
             }
             success = true;

@@ -57,6 +57,7 @@ public class DiscussService {
             User user = new User(mapUserDiscuss.getUserId());
             Info info = null;
             Discuss discuss = discussMapper.selectByPrimaryKey(mapUserDiscuss.getDiscussId());
+            User targetUser = new User(discuss.getDiscussAuthorId());
             if (StringUtils.isBlank(discuss.getDiscussId(), discuss.getDiscussAuthorId())) {
                 throw new Exception("操作异常");
             }
@@ -64,10 +65,13 @@ public class DiscussService {
             info.setCreateTime(System.currentTimeMillis());
             if (sqlUpdateType == 1) {
                 user.setUserApproveNumber(1);
-                info.setInfoType(3);
+                info.setInfoType(11);
                 info.setIntoContent("您的"+discuss.getDiscussTitle()+"讨论收到了一条赞");
+
+                targetUser.setUserGetApproveNumber(1);
             } else if (sqlUpdateType == 2) {
                 user.setUserApproveNumber(-1);
+                targetUser.setUserGetApproveNumber(-1);
             } else if (sqlUpdateType == 3) {
                 user.setUserFavoriteNumber(1);
                 info.setInfoType(4);
@@ -81,9 +85,14 @@ public class DiscussService {
             if (userMapper.updateNumber(user) == 0) {
                 throw new Exception("操作异常");
             }
+            if (userMapper.updateNumber(targetUser) == 0) {
+                throw new Exception("操作异常");
+            }
             if (mapUserDiscussMapper.updateByPrimaryKey(mapUserDiscuss) == 0) {
                 throw new Exception("操作异常");
             }
+
+
             success = true;
         } catch (Exception e) {
             //执行事务回滚
@@ -105,12 +114,14 @@ public class DiscussService {
             if (StringUtils.isBlank(discuss.getDiscussId(), discuss.getDiscussAuthorId())) {
                 throw new Exception("操作异常");
             }
+            User targetUser = new User(discuss.getDiscussAuthorId());
             Info info = new Info(discuss.getDiscussAuthorId(), 1, 1, discuss.getDiscussId());
             info.setCreateTime(System.currentTimeMillis());
-            if (mapUserDiscuss.getUserFavoriteType() == 1) {
-                info.setInfoType(3);
+            if (mapUserDiscuss.getUserApproveType() == 1) {
+                info.setInfoType(11);
                 info.setIntoContent("您的"+discuss.getDiscussTitle()+"讨论收到了一条赞");
-            } else if (mapUserDiscuss.getUserApproveType() == 1) {
+                targetUser.setUserGetApproveNumber(1);
+            } else if (mapUserDiscuss.getUserFavoriteType() == 1) {
                 info.setInfoType(4);
                 info.setIntoContent("您的"+discuss.getDiscussTitle()+"讨论被一名用户收藏");
             } else {
@@ -123,6 +134,9 @@ public class DiscussService {
                 throw new Exception("操作异常");
             }
             if (mapUserDiscussMapper.insert(mapUserDiscuss) == 0) {
+                throw new Exception("操作异常");
+            }
+            if (userMapper.updateNumber(targetUser) == 0) {
                 throw new Exception("操作异常");
             }
             success = true;

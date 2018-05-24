@@ -40,17 +40,42 @@ public class CommentController {
 
     @RequestMapping(value = "/listUsersComment")
     @ResponseBody
-    String listUsersComment(Long userId, Long loginUserId, Integer pageNumber, Integer pageSize) {
+    String listUsersComment(Long userId, Long targetUserId, Integer pageNumber, Integer pageSize) {
         //
-        PageInfo<ArticleComment> pageInfo = articleCommentService.listUsersComment(userId, pageNumber, pageSize);
-        PageInfo<DiscussComment> discussCommentPageInfo = discussCommentService.listUsersComment(userId, pageNumber, pageSize);
-        if (userId.longValue() == loginUserId.longValue()) {
-            PageInfo<AnoymousComment> anoymousCommentPageInfo = anoymousCommentService.listUsersComment(userId, pageNumber, pageSize);
+        if (StringUtils.isBlank(userId, targetUserId, pageNumber, pageSize)) {
+            return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
+        }
+        PageInfo<ArticleComment> pageInfo = articleCommentService.listUsersComment(targetUserId, pageNumber, pageSize);
+        PageInfo<DiscussComment> discussCommentPageInfo = discussCommentService.listUsersComment(targetUserId, pageNumber, pageSize);
+        if (userId.longValue() == targetUserId.longValue()) {
+            PageInfo<AnoymousComment> anoymousCommentPageInfo = anoymousCommentService.listUsersComment(targetUserId, pageNumber, pageSize);
             return FrontApiResponseEntity.SUCC().data("articleCommentList", pageInfo).data("discussCommentList", discussCommentPageInfo)
                     .data("anoymousCommentList", anoymousCommentPageInfo).build();
         } else {
             return FrontApiResponseEntity.SUCC().data("articleCommentList", pageInfo).data("discussCommentList", discussCommentPageInfo).build();
         }
+    }
+
+    @RequestMapping(value = "/listUsersCommentByType")
+    @ResponseBody
+    String listUsersCommentByType(Long userId, Long targetUserId, Integer pageNumber, Integer pageSize, Integer type) {
+        //
+        if (StringUtils.isBlank(userId, targetUserId, pageNumber, pageSize, type)) {
+            return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
+        }
+        if (type == 2){
+            PageInfo<ArticleComment> pageInfo = articleCommentService.listUsersComment(targetUserId, pageNumber, pageSize);
+            return FrontApiResponseEntity.SUCC().data("commentList", pageInfo).build();
+        } else if (type == 1) {
+            PageInfo<DiscussComment> discussCommentPageInfo = discussCommentService.listUsersComment(targetUserId, pageNumber, pageSize);
+            return FrontApiResponseEntity.SUCC().data("commentList", discussCommentPageInfo).build();
+        } else if (type==3 && userId.longValue()==targetUserId.longValue()) {
+            PageInfo<AnoymousComment> anoymousCommentPageInfo = anoymousCommentService.listUsersComment(targetUserId, pageNumber, pageSize);
+            return FrontApiResponseEntity.SUCC().data("commentList", anoymousCommentPageInfo).build();
+        } else {
+            return FrontApiResponseEntity.SYS_ERR().build();
+        }
+
     }
 
     @RequestMapping(value = "/createArticleComment")
@@ -67,8 +92,8 @@ public class CommentController {
         JSONObject jsonObject =  JSON.parseObject(articleCommentService.createComment(articleComment));
         if (jsonObject.getString("code").equals("200")) {
             Long acId = jsonObject.getLong("commentId");
-            String content = "用户发飙了一篇文章的评论";
-            activeService.createActive(MyConstant.MONGODB_COLL_NAME, articleComment.getArticleCommentAuthorId(), acId, 3, content);
+            String content = "用户发表了一篇文章的评论";
+            activeService.createActive(MyConstant.MONGODB_COLL_NAME, articleComment.getArticleCommentAuthorId(), articleComment.getArticleId(), 3, content);
 
         }
         return jsonObject.toJSONString();
@@ -137,7 +162,7 @@ public class CommentController {
         if (jsonObject.getString("code").equals("200")) {
             String content = "用户发表了一篇讨论的评论";
             Long commentId = jsonObject.getLong("commentId");
-            activeService.createActive(MyConstant.MONGODB_COLL_NAME, discussComment.getDiscussCommentAuthorId(), commentId, 5, content);
+            activeService.createActive(MyConstant.MONGODB_COLL_NAME, discussComment.getDiscussCommentAuthorId(), discussComment.getDiscussId(), 5, content);
 
         }
         return jsonObject.toJSONString();
@@ -145,25 +170,28 @@ public class CommentController {
     @RequestMapping(value = "/approveComment")
     @ResponseBody
     String approveComment(Long userId, Long commentId, Integer type) {
+        System.out.println("inFrontApi"+ userId+ commentId+ type);
         if (StringUtils.isBlank(userId, commentId, type)) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         }
         String returnString;
         String content;
+
         //讨论赞同
         if (type == 1) {
+//            ArticleComment articleComment = articleCommentService.
             returnString = articleCommentService.updateAttentionType(userId, commentId);
             content = "用户赞同了一条文章的评论";
             //感觉动态的迁移到sqlservice中
-            activeService.createActive(MyConstant.MONGODB_COLL_NAME, userId, commentId, 6, content);
+//            activeService.createActive(MyConstant.MONGODB_COLL_NAME, userId, commentId, 6, content);
         } else if (type == 2) {
             returnString = discussCommentService.updateAttentionType(userId, commentId);
             content = "用户赞同了一条讨论的评论";
-            activeService.createActive(MyConstant.MONGODB_COLL_NAME, userId, commentId, 7, content);
+//            activeService.createActive(MyConstant.MONGODB_COLL_NAME, userId, commentId, 7, content);
         } else if (type == 3) {
             content = "用户赞同了一条讨论的评论";
             returnString = anoymousCommentService.updateAttentionType(userId, commentId);
-            activeService.createActive(MyConstant.MONGODB_COLL_NAME, userId, commentId, 7, content);
+//            activeService.createActive(MyConstant.MONGODB_COLL_NAME, userId, commentId, 7, content);
         } else {
             returnString = FrontApiResponseEntity.SYS_ERR().build();
         }

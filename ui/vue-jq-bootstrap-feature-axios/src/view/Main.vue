@@ -31,7 +31,9 @@
                                     <td  class="col-md-2">
                                         <div class="sep100 pull-center" >
                                             <!-- <a href="/"> -->
-                                            <img :src="item.userPicUrl" width="100%" class="img-responsive img-circle" border="0" align="default" >
+                                            <router-link :to="{ name: 'UserCenter', params : {targetUserId: item.discussAuthorId}}">
+                                            <img :src="item.userPicUrl" style="width:100%; height:120px;" class="img-circle" border="0" align="default" >
+                                            </router-link>
                                             </a>
                                         </div>
                                     </td>
@@ -95,9 +97,12 @@
                                 <tr >
                                     <td  class="col-md-2">
                                         <div class="sep100 pull-center" >
-                                            <a href="wwww.baidu.com">
-                                            <img :src="item.userPicUrl" width="100%" class="img-responsive img-circle" border="0" align="default" >
-                                            </a>
+                                           
+                                            <router-link :to="{ name: 'UserCenter', params : {targetUserId: item.articleAuthorId}}">
+
+                                            
+                                            <img :src="item.userPicUrl" style="width:100%; height:120px;" class="img-circle" border="0" align="default" >
+                                            </router-link>
                                         </div>
                                     </td>
                                     <td class="col-md-6">
@@ -159,23 +164,14 @@
                             </thead>
                             <tbody>
                                 <tr >
-                                    <!-- <td  class="col-md-2">
-                                        <div class="sep100 pull-center" >
-                                            <a href="wwww.baidu.com">
-                                            <img :src="item.userPicUrl" width="100%" class="img-responsive img-circle" border="0" align="default" >
-                                            </a>
-                                        </div>
-                                    </td> -->
                                     <td class="col-md-6">
                                         <span class="item_title">
-                                            <router-link :to="{ name: 'Article', params : {anoymousId: item.anoymousId, userId: userId}}">{{item.anoymousTitle}}</router-link>
+                                            <router-link :to="{ name: 'Anoymous', params : {anoymousId: item.anoymousId, userId: userId}}">{{item.anoymousTitle}}</router-link>
                                         <!-- <a href="www.baidu.com"> {{item.anoymousTitle}}</a> -->
                                     </span>
                                     <div class="sep5"></div>
                                     <span>
                                         <strong>{{item.userAnonymouseName}}</strong>发表于:{{item.createTime | formatDate}} </strong>
-                                        <!-- <p></p>
-                                        <P>来自<strong>{{item.tagName}}</strong></P> -->
                                     </span>
 
                                     </td>
@@ -204,7 +200,7 @@
                    <el-pagination
                     @current-change="anoymousHandleCurrentChange"
                     :current-page.sync="anoymousNow"
-                    :page-size="1"
+                    :page-size="10"
                     layout="prev, pager, next, jumper"
                     :total="anoymousPages">
                     </el-pagination>
@@ -215,16 +211,19 @@
     </div>
     <div class="col-md-3 " id='tagList'>
 
-        <div class="col-md-6 ">
-           <img :src = 'user.userPicUrl' class="img-responsive img-circle" width="100%"alt="Responsive image">
+        <div class="col-md-6 " id='div7'>
+           <img :src = 'user.userPicUrl' class="img-circle"  style="width:100%; height:200px;" alt="Responsive image">
             <strong>{{user.userName}}</strong>
        </div>
         
-       <div class="col-md-3 ">
-           
+       <div class="col-md-3">
+
+            <!-- <el-button type="success" class='pull-left'style="margin-top: 10px">主要按钮</el-button>
+            <el-button type="success" class='pull-left' style="margin-top: 10px">成功按钮</el-button>
+            <el-button type="info" class='pull-center' style="margin-top: 10px">信息按钮</el-button> -->
             <button type="button" @click="createDiscuss()" class="btn btn-default " style="margin-top: 10px">发表讨论</button>
-            <button type="button" class="btn btn-default " style="margin-top: 10px">发表文章</button>
-            <button type="button" class="btn btn-default " style="margin-top: 10px">发表匿名讨论</button>
+            <button type="button" @click="createArticle()" class="btn btn-default " style="margin-top: 10px">发表文章</button>
+            <button type="button" @click="createAnoymous()" class="btn btn-default " style="margin-top: 10px">匿名讨论</button>
        </div>
        <div class="col-md-12 sep5" >
        </div>
@@ -234,7 +233,7 @@
        </div>
        <div class="col-md-12 sep5" >
            <strong>关注的元素</strong>
-           <button type="button" class="btn btn-default" >全部</button>
+           <!-- <button type="button" class="btn btn-default" >全部</button> -->
        </div>
         <div class="col-md-12 sep5" >
        </div>
@@ -245,7 +244,8 @@
        <div class="col-md-12 " >
            <div v-for="tag in tags">
                <span>
-                   <strong>{{tag.tagName}}</strong>
+                 <el-button type="text" @click="jumpToTagPage(tag)"><strong>{{tag.tagName}}</strong></el-button>
+                   
                    <p>{{tag.tagInfo}}</p>
                </span>
            </div>
@@ -289,15 +289,15 @@ export default {
     return {
       items: items,
       activeName: "discuss",
-      anoymousList: anoymousList,
-      articlesList: articlesList,
-      anoymousPages: anoymousPages,
-      articlePages: articlePages,
-      discussPages: discussPages,
-      tags: tags,
-      articleNow: articleNow,
-      disscussNow: disscussNow,
-      anoymousNow: anoymousNow,
+      anoymousList: this.anoymousList,
+      articlesList: this.articlesList,
+      anoymousPages: this.anoymousPages,
+      articlePages: this.articlePages,
+      discussPages: this.discussPages,
+      tags: this.tags,
+      articleNow: this.articleNow,
+      disscussNow: this.disscussNow,
+      anoymousNow: this.anoymousNow,
       userId: this.userId
     };
   },
@@ -330,8 +330,23 @@ export default {
     //     }
 
     // },
+    // jumpToTag(tagId){
+    //   console.log('tagId');
+    //   console.log(tagId);
+    // },
     createDiscuss() {
       this.$router.push({ name: "CreateDiscuss", params: { userId: this.userId } });
+    },
+    createArticle() {
+      this.$router.push({ name: "CreateArticle", params: { userId: this.userId } });
+    },
+    createAnoymous() {
+      this.$router.push({ name: "CreateAnoymous", params: { userId: this.userId } });
+    },
+    jumpToTagPage(tag){
+      console.log('tagId');
+      console.log(tag.tagId);
+      this.$router.push({ name: "TagDetail", params: { tagId: tag.tagId,  tagName: tag.tagName, tagInfo: tag.tagInfo} });
     },
     errorNet(message){
         console.log("error")
@@ -343,6 +358,7 @@ export default {
         this.$router.push({ name: "Login" });
       },
     handleClick(tab, event) {
+      
       console.log("tab:" + tab.name + "+" + event);
       if (tab.name == "article") {
         console.log("articleSuccess");
@@ -386,12 +402,12 @@ export default {
         });
     },
     initDiscuss: function(res) {
+      console.log('startInitDiscuss')
       console.log("code" + res.data.code + res.data.message);
       items = res.data.discussList.list;
-      discussPages = res.data.discussList.total;
       console.log("page" + discussPages);
-      this.discussPages = discussPages;
-      discussPagesNumber = res.data.discussList.navigatepageNums;
+      this.discussPages = res.data.discussList.total;
+      discussPagesNumber = res.data.discussList.pageNum;
       this.discussPagesNumber = discussPagesNumber;
       var date = new Date(res.data.discussList.list[0].createTime);
       console.log("data" + formatDate(date, "yyyy-MM-dd hh:mm"));
@@ -427,6 +443,7 @@ export default {
           "http://localhost:5555/sclp/tag/userAttentionTags",
           qs.stringify({
             userId: this.userId,
+            targetUserId: this.userId,
             pageNumber: "1",
             pageSize: "5"
           })
@@ -471,6 +488,7 @@ export default {
     },
     ajaxAnoymous: function(number) {
       var _this = this;
+      console.log('anoymousNumber'+ number)
       axios
         .post(
           "http://localhost:5555/sclp/anoymous/listOrderByTime",
@@ -579,6 +597,9 @@ table {
 }
 .sep5 {
   height: 15px;
+}
+#div7 {
+  height: 300px;
 }
 .sep100 {
   height: 100px;

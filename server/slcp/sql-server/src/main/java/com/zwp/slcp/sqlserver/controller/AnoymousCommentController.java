@@ -74,6 +74,7 @@ public class AnoymousCommentController {
     @RequestMapping("/updateAttentionType")
     @ResponseBody
     String updateAttentionType(Long userId, Long anoymousCommentId) {
+        System.out.println("userId"+ userId+ "commentId"+ anoymousCommentId);
         if (StringUtils.isBlank(userId, anoymousCommentId)) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         } else {

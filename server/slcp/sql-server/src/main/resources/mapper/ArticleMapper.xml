@@ -221,16 +221,8 @@ order by a.update_time DESC
     from map_user_article as m
     WHERE m.article_id = a.article_id AND m.user_favorite_type = 1
 
-    ) as favorite_number, (
-    select m2.user_approve_type
-    from map_user_article as m2
-    WHERE m2.user_id = #{userId,jdbcType=BIGINT} AND m2.article_id = a.article_id
-    ) as user_approve_type,
-    (
-    select m3.user_favorite_type
-    from map_user_article as m3
-    WHERE m3.user_id = #{userId,jdbcType=BIGINT} AND m3.article_id = a.article_id
-    ) as user_favorite_type, a.create_time as create_time , a.update_time as update_time
+    ) as favorite_number, m0.user_approve_type,
+    m0.user_favorite_type, a.create_time as create_time , a.update_time as update_time
 
     FROM article as a,user as u, tag as t, map_user_article as m0
     WHERE  m0.user_id = #{userId,jdbcType=BIGINT}

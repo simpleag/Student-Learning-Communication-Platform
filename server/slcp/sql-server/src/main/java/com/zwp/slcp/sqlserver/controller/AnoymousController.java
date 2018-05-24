@@ -10,10 +10,12 @@ import com.zwp.slcp.sqlserver.mapper.AnoymousCommentMapper;
 import com.zwp.slcp.sqlserver.mapper.AnoymousMapper;
 import com.zwp.slcp.sqlserver.mapper.MapUserAnoymouseMapper;
 import com.zwp.slcp.sqlserver.service.AnoymousService;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Created by ASUS on 2018/4/22.
@@ -30,6 +32,8 @@ public class AnoymousController {
     private AnoymousService anoymousService;
     @Autowired
     private AnoymousCommentMapper anoymousCommentMapper;
+
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(AnoymousController.class);
 
     @RequestMapping("/listHomeAnoymouseByTime")
     @ResponseBody
@@ -133,6 +137,7 @@ public class AnoymousController {
         anoymous.setCreateTime(System.currentTimeMillis());
         anoymous.setUpdateTime(System.currentTimeMillis());
         anoymous.setAnoymousState(1);
+        anoymous.setAnoymousCommentNumber(0);
         if (StringUtils.isBlank(anoymous.getAnoymousAuthorId())) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         } else {
@@ -164,7 +169,9 @@ public class AnoymousController {
     @ResponseBody
     String updateUserAttentionType (Long userId, Long discussId, Integer type) {
         boolean success = false;
+        logger.info("insql"+userId+"  "+ discussId+" "+ type);
         Integer sqlUpdateType = 1;
+
         if (StringUtils.isBlank(userId, discussId, type)) {
             return FrontApiResponseEntity.ERR(ResponseCode.PARAMERROR).build();
         } else {

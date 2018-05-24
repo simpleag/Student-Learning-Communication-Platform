@@ -3,32 +3,32 @@
     <div class="col-md-6 col-md-offset-3 form-inlin" id='div2'>
         <div class="col-md-12 form-inlin" id='div3'>
             <div class="col-md-9 text-left">
-                <h2 class="text-left">{{discussDetail.discussTitle}}</h2>
+                <h2 class="text-left">{{discussAnoymous.discussTitle}}</h2>
             </div>
             <div class="col-md-3 text-center text-right">
                 <div class='sep5'></div>
                 
-                <button @click="clickDiscussApprove()" type="button" class="btn btn-default" >{{discussDetail.approveNumber}}个赞同</button>
-                <button @click="clickDiscussFavorite()" type="button" class="btn btn-default">{{discussDetail.favoriteNumber}}个收藏</button>
+                <button @click="clickAnoymousApprove()" type="button" class="btn btn-default" >{{discussAnoymous.approveNumber}}个赞同</button>
+                <button @click="clickDiscussFavorite()" type="button" class="btn btn-default">{{discussAnoymous.favoriteNumber}}个收藏</button>
             </div>
         </div>
         <div class="col-md-12 form-inlin" id='div3'>
             <div class="col-md-3" id='div4'>
-                <img :src="discussDetail.userPicUrl" width="100%" class="img-responsive img-circle" border="0" align="default" >
+                <!-- <img :src="discussAnoymous.userPicUrl" width="100%" class="img-responsive img-circle" border="0" align="default" > -->
                 <div class='sep5'></div>
-                <strong>{{discussDetail.userHonor}}</strong>
+                <strong>{{discussAnoymous.userAnonymouseHonor}}</strong>
                 <div class='sep5'></div>
-                <strong>{{discussDetail.userName}}</strong>
+                <strong>{{discussAnoymous.userAnonymouseName}}</strong>
             </div>
              <div class="col-md-9" id='div5'>
-                 <p class='text-justify' v-html='discussDetail.discussContent'></p>
-                 <!-- {{discussDetail.discussContent}} -->
+                 <p class='text-justify' v-html='discussAnoymous.anoymousContent'></p>
+                 <!-- {{discussAnoymous.discussContent}} -->
             </div>
             
         </div>
         <div class="col-md-12 form-inlin" id='div3'>
             <div class='sep5'></div>
-            <p class="text-right">发表于{{discussDetail.createTime | formatDate}} 共<strong>{{discussDetail.discussCommentNumber}}</strong>条回复</p>
+            <p class="text-right">发表于{{discussAnoymous.createTime | formatDate}} 共<strong>{{discussAnoymous.anoymousCommentNumber}}</strong>条回复</p>
         </div>
         <div class="col-md-12"id="div6">
             <div v-for="item in commentList">
@@ -44,18 +44,18 @@
                                 <tr >
                                     <td  class="col-md-3">
                                         <div class="sep100 pull-center" >
-                                            <a href="wwww.baidu.com">
+                                            <!-- <a href="wwww.baidu.com">
                                             <img :src="item.userPicUrl" width="100%" class="img-responsive img-circle" border="0" align="default" >
-                                            </a>
+                                            </a> -->
                                         </div>
                                     </td>
                                     <td class="col-md-8 pull-left">
-                                        <p class="text-left"><strong>{{item.userName}}</strong>发表于: {{item.createTime | formatDate}}</strong></p>
+                                        <p class="text-left"><strong>{{item.userAnonymouseName}}</strong>发表于: {{item.createTime | formatDate}}</strong></p>
                                     </span>
                                     <div class="sep5"></div>
                                     <p class="text-left">
                                     <span >
-                                        <strong v-html="item.discussCommentContent"></strong>
+                                        <strong v-html="item.anoymousCommentContent"></strong>
                                     </span>
                                     </p>
 
@@ -63,13 +63,13 @@
                                     <td class="col-md-3">
                                         <div class="sep5"></div>
                                    <span>
-                                       <strong>#{{item.discussListNumber}}</strong>
+                                       <strong>#{{item.anoymousListNumber}}</strong>
                                        <p></p>
                                         
                                     </span>
                                     <span>
-                                    <button @click="clickCommentApprove(item.discussCommentId)" type="button" class="btn btn-default">{{item.approveNumber}}个赞同</button>
-                                    <button @click="clickReplayComment(item.userName, item.discussCommentAuthorId)" type="button" class="btn btn-default">回复评论</button>
+                                    <button @click="clickCommentApprove(item.anoymousCommentId)" type="button" class="btn btn-default">{{item.approveNumber}}个赞同</button>
+                                    <button @click="clickReplayComment(item.userName, item.anoymousCommentAuthorId, item.anoymousListNumber)" type="button" class="btn btn-default">回复评论</button>
                                     </span>
                                     </td>
                                 </tr>
@@ -116,13 +116,13 @@ import UE from '../components/Ue.vue';
 import qs from 'qs';
 import {formatDate} from '../common/date.js';  
 var commentList = [];
-var discussDetail;
+var discussAnoymous;
 var commentPages;
 var pageSize = 10;
 var commentPagesNow = 1;
 var defaultMsg = '在这里输入回复'
 var replayUserId = 0;
-var discussCommentNumber = 0;
+var anoymousListNumber = 0;
 var commentTotal = 0;
 var userId;
 export default {
@@ -137,7 +137,7 @@ export default {
           initialFrameHeight: 350,
           maximumWords:255
         },
-        discussDetail: discussDetail,
+        discussAnoymous: discussAnoymous,
         commentList: commentList,
         commentPages: commentPages,
         commentPagesNow: commentPagesNow,
@@ -158,9 +158,17 @@ export default {
         });
         console.log(content)
       },
-      
-      clickReplayComment(userName, userId){
-          this.defaultMsg = '回复'+userName+': ';
+      errorNet(message){
+        console.log("error")
+        this.$notify({
+          title: '出错',
+          message: message,
+          type: 'error'
+        });
+        this.$router.push({ name: "Login" });
+      },
+      clickReplayComment(userName, userId,listNumber){
+          this.defaultMsg = '回复#'+listNumber+": "+userName+': ';
           this.replayUserId = userId;
           console.log('set')
           
@@ -169,15 +177,15 @@ export default {
           
       },
 
-      clickCommentApprove(discussCommentId){
-          console.log('atteath'+discussCommentId)
+      clickCommentApprove(anoymousCommentId){
+          console.log('atteath'+anoymousCommentId)
         //   var item;
             // console.log('length'+this.commentList.length)
           for(var i=0;i<this.commentList.length;i++) {
               var item = this.commentList[i];
-            //   console.log('atteath2'+item.discussCommentId)
-              if (item.discussCommentId == discussCommentId) {
-                  this.ajaxApproveDiscussComment(this.userId, discussCommentId);
+            //   console.log('atteath2'+item.anoymousCommentId)
+              if (item.anoymousCommentId == anoymousCommentId) {
+                  this.ajaxApproveAnoymousComment(this.userId, anoymousCommentId);
                   if (item.userApproveType==null || item.userApproveType==0) {
                       item.userApproveType=1;
                       item.approveNumber += 1;
@@ -189,41 +197,42 @@ export default {
               }
           }
       },
-      clickDiscussApprove(){
-          if (this.discussDetail.userApproveType==null || this.discussDetail.userApproveType==0) {
-              this.discussDetail.approveNumber += 1;
-              this.discussDetail.userApproveType = 1;
+      clickAnoymousApprove(){
+          if (this.discussAnoymous.userApproveType==null || this.discussAnoymous.userApproveType==0) {
+              this.discussAnoymous.approveNumber += 1;
+              this.discussAnoymous.userApproveType = 1;
           }else {
-              this.discussDetail.approveNumber -= 1;
-              this.discussDetail.userApproveType = null;
+              this.discussAnoymous.approveNumber -= 1;
+              this.discussAnoymous.userApproveType = null;
           }
-          this.ajaxApproveDiscuss(this.userId, this.$route.params.discussId);
+          this.ajaxApproveAnoymous(this.userId, this.$route.params.anoymousId);
       },
       clickDiscussFavorite(){
           
-          if (this.discussDetail.userFavoriteType==null || this.discussDetail.userFavoriteType==0) {
-              this.discussDetail.favoriteNumber += 1;
-              this.discussDetail.userFavoriteType = 1;
+          if (this.discussAnoymous.userFavoriteType==null || this.discussAnoymous.userFavoriteType==0) {
+              this.discussAnoymous.favoriteNumber += 1;
+              this.discussAnoymous.userFavoriteType = 1;
           }else {
-              this.discussDetail.favoriteNumber -= 1;
-              this.discussDetail.userFavoriteType = null;
+              this.discussAnoymous.favoriteNumber -= 1;
+              this.discussAnoymous.userFavoriteType = null;
           }
-          this.ajaxFavoriteDiscuss(this.userId, this.$route.params.discussId);
+          this.ajaxFavoriteDiscuss(this.userId, this.$route.params.anoymousId);
       },
-      ajaxDiscuss: function(userId, articleId) {
+      ajaxAnoymous: function(userId, articleId) {
             var _this = this;
-            console.log('userIDd: '+ userId);
-            axios.post('http://localhost:5555/sclp/discuss/detail',qs.stringify(
+            // console.log('userIDd: '+ userId);
+            axios.post('http://localhost:5555/sclp/anoymous/detail',qs.stringify(
                     {
                         userId: userId,
                         articleId: articleId
                     }
                 )).then(function(res) {
-                    
-                _this.initDiscuss(res);
+                console.log("code"+ res.data.code)
+                _this.initAnoymous(res);
                
             }).catch(function(err) {
-                console.log('error'+err);
+                console.log('error: '+err);
+                _this.errorNet('出错');
             });
 
            },
@@ -235,9 +244,9 @@ export default {
         //   message: content,
         //   type: 'success'
         // });
-        console.log(content);
-        this.discussCommentNumber = this.discussCommentNumber+1
-        this.ajaxCreateDiscussComment(this.userId, content,this.discussCommentNumber, this.replayUserId , this.$route.params.discussId)
+        console.log("content"+ content);
+        this.anoymousListNumber = this.anoymousListNumber+1
+        this.ajaxCreateDiscussComment(this.userId, content,this.anoymousListNumber, this.replayUserId , this.$route.params.anoymousId)
         
       },
       ajaxCreateDiscussComment: function(userId, content, number, replayUserId, discussId) {
@@ -247,19 +256,23 @@ export default {
             console.log('number: '+ number);
             console.log('replayUserId: '+ replayUserId);
             console.log('discussId: '+ discussId);
-            axios.post('http://localhost:5555/sclp/comment/createDiscussComment',qs.stringify(
+            axios.post('http://localhost:5555/sclp/comment/createAnoymousComment',qs.stringify(
                     {
                         userId: userId,
-                        discussCommentAuthorId: userId,
-                        discussCommentContent: content,
-                        discussListNumber: number,
-                        discussReplayUserid: replayUserId,
-                        discussId: discussId,
+                        anoymousCommentAuthorId: userId,
+                        anoymousCommentContent: content,
+                        anoymousListNumber: number,
+                        anoymouseReplayUserid: replayUserId,
+                        anoymousId: discussId,
                     }
                 )).then(function(res) {
-                console.localhost(res.data.code+" "+res.data.message)
-                // _this.initDiscuss(res);
-            //    this.ajaxComment(this.$route.params.userId, this.$route.params.discussId,1,10)
+                    console.log(" message"+res.data.message)
+                    console.log("code: "+ res.data.code)
+                    console.log(res.data.code+" "+res.data.message)
+                 
+                    window.location.reload();
+                // _this.initAnoymous(res);
+            //    this.ajaxComment(this.userId, this.$route.params.anoymousId,1,10)
             }).catch(function(err) {
                 console.log('error'+err);
             });
@@ -268,7 +281,7 @@ export default {
            ajaxFavoriteDiscuss: function(userId, articleId) {
             var _this = this;
             console.log('userIDd: '+ userId);
-            axios.post('http://localhost:5555/sclp/discuss/favorite',qs.stringify(
+            axios.post('http://localhost:5555/sclp/anoymous/favorite',qs.stringify(
                     {
                         userId: userId,
                         articleId: articleId
@@ -281,10 +294,10 @@ export default {
             });
 
            },
-           ajaxApproveDiscuss: function(userId, articleId) {
+           ajaxApproveAnoymous: function(userId, articleId) {
             var _this = this;
             console.log('userIDd: '+ userId);
-            axios.post('http://localhost:5555/sclp/discuss/approve',qs.stringify(
+            axios.post('http://localhost:5555/sclp/anoymous/approve',qs.stringify(
                     {
                         userId: userId,
                         articleId: articleId
@@ -297,14 +310,14 @@ export default {
             });
 
            },
-           ajaxApproveDiscussComment: function(userId, commentId) {
+           ajaxApproveAnoymousComment: function(userId, commentId) {
             var _this = this;
             console.log('userIDd: '+ userId);
             axios.post('http://localhost:5555/sclp/comment/approveComment',qs.stringify(
                     {
                         userId: userId,
                         commentId: commentId,
-                        type: 2
+                        type: 3
                     }
                 )).then(function(res) {
                     console.log(res.data.code+ res.data.message)
@@ -323,7 +336,7 @@ export default {
                         targetId: articleId,
                         pageNumber: pageNumber,
                         pageSize: pageSize,
-                        type: 1
+                        type: 3
                     }
                 )).then(function(res) {
                     
@@ -334,17 +347,17 @@ export default {
             });
 
            },
-            initDiscuss: function(res) {
-                this.discussDetail = res.data.discuss;
-                console.log('discuss: '+ this.discussDetail.discussContent)
+            initAnoymous: function(res) {
+                this.discussAnoymous = res.data.anoymous;
+                console.log('discuss: '+ this.discussAnoymous.anoymousContent)
                 this.commentList = res.data.comment.list;
                 // if (this.commentList==null || this.commentList.length==0) {
 
                 // } else{
                     // console.log('comment'+ this.commentList[0].userName);
                     this.commentPages = res.data.comment.pages;
-                    this.discussCommentNumber = this.discussDetail.discussCommentNumber;
-                    console.log('number'+ this.discussCommentNumber);
+                    this.anoymousListNumber = this.discussAnoymous.anoymousCommentNumber;
+                    console.log('number'+ this.anoymousListNumber);
                     console.log('size'+ this.commentPages);
                     this.commentTotal = res.data.comment.total;
                 // }
@@ -371,16 +384,27 @@ export default {
             commentHandleCurrentChange(val) {
                 this.commentPagesNow = val;
                 console.log('changeNumber'+ val)
-                this.ajaxComment(this.userId, this.$route.params.discussId,val,10)
+                this.ajaxComment(this.userId, this.$route.params.anoymousId,val,10)
+            },
+            initPage(){
+                // if (this.$route.params.anoymousId==undefine || this.userId==undefine) {
+                //     this.errorNet()
+                // }
+                console.log('statr')
+                if (window.localStorage.getItem("userId") == null) {
+                    this.errorNet('非正常访问');
+                } else {
+                
+                    var id = this.$route.params.anoymousId;
+                    console.log(id)
+                    this.userId = window.localStorage.getItem("userId");
+                    console.log(this.userId)
+                    this.ajaxAnoymous(this.userId, this.$route.params.anoymousId);
+                }
             }
   },
   mounted() {
-      console.log('statr')
-      var id = this.$route.params.discussId;
-      console.log(id)
-      this.userId = window.localStorage.getItem("userId");
-    //   console.log(this.$route.params.userId)
-      this.ajaxDiscuss(this.userId, this.$route.params.discussId);
+      this.initPage()
   },filters: {
         formatDate(time) {
         var date = new Date(time);
@@ -390,21 +414,7 @@ export default {
 };
 
 var items = [
-  {
-    discussId: "Foo",
-    discussTitle: "一直不会微积分，今后生活会比别人困难吗？",
-    authorId: "1",
-    userName: "用户1",
-    authorPicUrl:
-      "https://cdn.v2ex.com/avatar/c2db/c77d/146640_normal.png?m=1452582980",
-    createTime: "20180410 12:05:00",
-    approveNumber: "0",
-    commentNumber: "0",
-    TagId: "TagId",
-    TagName: "微积分",
-    Info:
-      "微积分（Calculus）是高等数学中研究函数的微分（Differentiation）、积分(Integration)以及有关概念和应用的数学分支。它是数学的一个基础学科。"
-  }
+  
 ];
 </script>
 

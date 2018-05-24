@@ -1,6 +1,8 @@
 package com.zwp.slcp.frontapi.service.failCallBack;
 
+import com.github.pagehelper.PageInfo;
 import com.zwp.slcp.apicommon.entity.LimitUser;
+import com.zwp.slcp.apicommon.entity.MapUser;
 import com.zwp.slcp.apicommon.entity.User;
 import com.zwp.slcp.apicommon.entity.UserFollow;
 import com.zwp.slcp.frontapi.service.UserServie;
@@ -39,14 +41,15 @@ public class UserFailCallBack implements UserServie {
     }
 
     @Override
-    public List<UserFollow> listUserFollows(Long userId, Integer pageNumber, Integer pageSize) {
+    public PageInfo<UserFollow> listUserFollows(Long userId, Integer pageNumber, Integer pageSize) {
         return null;
     }
 
     @Override
-    public List<UserFollow> listUserAttention(Long userId, Integer pageNumber, Integer pageSize) {
+    public PageInfo<UserFollow> listUserAttention(Long userId, Integer pageNumber, Integer pageSize) {
         return null;
     }
+
 
     @Override
     public String userAttention(Long userId, Long user2Id) {
@@ -60,6 +63,11 @@ public class UserFailCallBack implements UserServie {
 
     @Override
     public String userUpdate(User user) {
+        return null;
+    }
+
+    @Override
+    public MapUser isAttention(Long user1Id, Long user2Id) {
         return null;
     }
 }

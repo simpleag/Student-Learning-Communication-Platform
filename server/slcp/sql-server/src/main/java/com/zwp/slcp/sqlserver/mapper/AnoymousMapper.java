@@ -25,11 +25,11 @@ public interface AnoymousMapper {
     List<HomeAnoymous> selectHomeAnoymousByTime(Long userId);
 
     //查看用户发表的匿名讨论 当前用户id和作者
-    List<HomeAnoymous> selectHomeAnoumousByAuthorId(Long userId, Long authorId);
+    List<HomeAnoymous> selectHomeAnoumousByAuthorId(@Param("userId") Long userId, @Param("authorId") Long authorId);
 
     List<HomeAnoymous> selectUserFavoriteAnoymous(Long userId);
 
-    DetailAnoymous selectAnoymousDetailById(@Param("userId")Long userId, @Param("anoymousId") Long anoymousId);
+    DetailAnoymous selectAnoymousDetailById(@Param("userId") Long userId, @Param("anoymousId") Long anoymousId);
 
     DetailAnoymous selectAnoumousDetailByComment(@Param("userId") Long userId, @Param("anoymousCommentId") Long anoymousCommentId);
 
@@ -37,5 +37,5 @@ public interface AnoymousMapper {
 
     int updateByPrimaryKey(Anoymous record);
 
-    int updateCommentNumber(Long updateTime, Long anoymousId);
+    int updateCommentNumber(@Param("updateTime") Long updateTime, @Param("anoymousId") Long anoymousId);
 }

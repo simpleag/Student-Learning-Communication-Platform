@@ -1,6 +1,8 @@
 package com.zwp.slcp.frontapi.service;
 
+import com.github.pagehelper.PageInfo;
 import com.zwp.slcp.apicommon.entity.LimitUser;
+import com.zwp.slcp.apicommon.entity.MapUser;
 import com.zwp.slcp.apicommon.entity.User;
 import com.zwp.slcp.apicommon.entity.UserFollow;
 import com.zwp.slcp.frontapi.service.failCallBack.UserFailCallBack;
@@ -39,11 +41,11 @@ public interface UserServie {
 
     @RequestMapping("/user/listUserFollows")
     @ResponseBody
-    List<UserFollow> listUserFollows(@RequestParam(value = "userId") Long userId, @RequestParam(value = "pageNumber") Integer pageNumber, @RequestParam(value = "pageSize") Integer pageSize);
+    PageInfo<UserFollow> listUserFollows(@RequestParam(value = "userId") Long userId, @RequestParam(value = "pageNumber") Integer pageNumber, @RequestParam(value = "pageSize") Integer pageSize);
 
     @RequestMapping("/user/listUserAttention")
     @ResponseBody
-    List<UserFollow> listUserAttention(@RequestParam(value = "userId") Long userId, @RequestParam(value = "pageNumber") Integer pageNumber, @RequestParam(value = "pageSize") Integer pageSize);
+    PageInfo<UserFollow> listUserAttention(@RequestParam(value = "userId") Long userId, @RequestParam(value = "pageNumber") Integer pageNumber, @RequestParam(value = "pageSize") Integer pageSize);
 
     @RequestMapping("/user/userAttention")
     @ResponseBody
@@ -56,5 +58,9 @@ public interface UserServie {
     @RequestMapping("/user/userUpdate")
     @ResponseBody
     String userUpdate(@RequestBody User user);
+
+    @RequestMapping("/user/isAttention")
+    @ResponseBody
+    MapUser isAttention(@RequestParam(value = "user1Id") Long user1Id, @RequestParam(value = "user2Id") Long user2Id);
 
 }

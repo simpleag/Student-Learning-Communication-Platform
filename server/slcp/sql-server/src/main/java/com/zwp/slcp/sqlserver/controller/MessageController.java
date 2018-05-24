@@ -42,6 +42,11 @@ public class MessageController {
             logger.info("userId" + userId+ "message"+ pageNumber + " " +pageSize);
             PageHelper.startPage(pageNumber, pageSize);
             List<FullMessage> fullMessageList = messageMapper.selectByReceiveUserId(userId);
+            Message message = new Message();
+            message.setUpdateTime(System.currentTimeMillis());
+            message.setMessageReceiveUserid(userId);
+            message.setMessageState(0);
+            messageMapper.updateByReceiveUserId(message);
             PageInfo<FullMessage> messagePageInfo = new PageInfo<>(fullMessageList);
 //            List<FullMessage> list = messageMapper.selectByReceiveUserId(userId);
             return messagePageInfo;

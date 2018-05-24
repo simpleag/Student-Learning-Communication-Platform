@@ -27,7 +27,10 @@ public class DiscussCommentService {
     public Long createDiscussComment(DiscussComment discussComment) {
         Long dicussCommentId = 0L;
         try {
-            dicussCommentId = discussCommentMapper.insert(discussComment);
+            int result = discussCommentMapper.insert(discussComment);
+            if (result == 0) {
+                throw new Exception("数据库操作异常");
+            }
             dicussCommentId = discussComment.getDiscussCommentId();
             if (dicussCommentId == null || dicussCommentId == 0L) {
                 throw new Exception("数据库操作异常");
@@ -46,14 +49,14 @@ public class DiscussCommentService {
             if (userMapper.updateNumber(commentAuthor) == 0) {
                 throw new Exception("数据库操作异常");
             }
-            Info info = new Info(discuss.getDiscussAuthorId(), 8, 1, dicussCommentId);
+            Info info = new Info(discuss.getDiscussAuthorId(), 8, 1, discuss.getDiscussId());
             info.setIntoContent("您的文章"+discuss.getDiscussTitle()+"有一条评论");
             info.setCreateTime(System.currentTimeMillis());
             if (infoMapper.insert(info) == 0) {
                 throw new Exception("数据库操作异常");
             }
             if (discussComment.getDiscussReplayUserid() != null && discussComment.getDiscussReplayUserid() != 0) {
-                Info replayInfo = new Info(discussComment.getDiscussReplayUserid(),8,1,dicussCommentId);
+                Info replayInfo = new Info(discussComment.getDiscussReplayUserid(),8,1,discuss.getDiscussId());
                 replayInfo.setIntoContent("有人回复了您的一条评论");
                 replayInfo.setCreateTime(System.currentTimeMillis());
                 if (infoMapper.insert(replayInfo) == 0) {
@@ -77,13 +80,16 @@ public class DiscussCommentService {
                 throw new Exception("数据库操作异常");
             }
             DiscussComment discussComment = discussCommentMapper.selectByPrimaryKey(mapUserDiscusscomment.getDisscussCommentId());
-            if (discussComment == null) {
+            Discuss discuss = discussMapper.selectByPrimaryKey(discussComment.getDiscussId());
+            if (discussComment == null || discuss==null) {
                 System.out.println("讨论不存在");
                 throw new Exception("数据库操作异常");
             }
-            Info info = new Info(discussComment.getDiscussCommentAuthorId(), 11, 1, discussComment.getDiscussCommentId());
-            info.setIntoContent("您的一条评论收到了赞");
+            User targetUser = new User(discussComment.getDiscussCommentAuthorId());
+            Info info = new Info(discussComment.getDiscussCommentAuthorId(), 11, 1, discuss.getDiscussId());
+            info.setIntoContent("您的一条讨论评论收到了赞");
             info.setCreateTime(System.currentTimeMillis());
+            targetUser.setUserGetApproveNumber(1);
 
             if (infoMapper.insert(info) == 0) {
                 System.out.println("info插入异常");
@@ -94,6 +100,9 @@ public class DiscussCommentService {
             if (userMapper.updateNumber(user) == 0) {
                 System.out.println("用户更新异常");
                 throw new Exception("数据库操作异常");
+            }
+            if (userMapper.updateNumber(targetUser) == 0) {
+                throw new Exception("操作异常");
             }
 
         } catch (Exception e) {
@@ -112,6 +121,7 @@ public class DiscussCommentService {
                 throw new Exception("数据库操作异常");
             }
             DiscussComment discussComment = discussCommentMapper.selectByPrimaryKey(mapUserDiscusscomment.getDisscussCommentId());
+
             User user = new User(discussComment.getDiscussCommentAuthorId());
             if (mapUserDiscusscomment.getUserApproveType() == 0) {
                 user.setUserApproveNumber(-1);

@@ -48,14 +48,14 @@ public class ArticleCommentService {
             if (userMapper.updateNumber(commentAuthor) == 0) {
                 throw new Exception("数据库操作异常");
             }
-            Info info = new Info(article.getArticleAuthorId(), 7, 1, articleCommentId);
+            Info info = new Info(article.getArticleAuthorId(), 7, 1, article.getArticleId());
             info.setIntoContent("您的文章"+article.getArticleTitle()+"有一条评论");
             info.setCreateTime(System.currentTimeMillis());
             if (infoMapper.insert(info) == 0) {
                 throw new Exception("数据库操作异常");
             }
             if (articleComment.getArticleReplayUserid() != null && articleComment.getArticleReplayUserid() != 0) {
-                Info replayInfo = new Info(articleComment.getArticleReplayUserid(),7,1,articleCommentId);
+                Info replayInfo = new Info(articleComment.getArticleReplayUserid(),7,1,article.getArticleId());
                 replayInfo.setIntoContent("有人回复了您的一条评论");
                 replayInfo.setCreateTime(System.currentTimeMillis());
                 if (infoMapper.insert(replayInfo) == 0) {
@@ -79,12 +79,15 @@ public class ArticleCommentService {
                 throw new Exception("数据库操作异常");
             }
             ArticleComment articleComment = articleCommentMapper.selectByPrimaryKey(mapUserArticlecomment.getArticleCommentId());
-            if (articleComment == null) {
+            Article article = articleMapper.selectByPrimaryKey(articleComment.getArticleId());
+            if (articleComment==null || article==null) {
                 throw new Exception("数据库操作异常");
             }
-            Info info = new Info(articleComment.getArticleCommentAuthorId(), 10, 1, articleComment.getArticleCommentId());
-            info.setIntoContent("您的一条评论收到了赞");
+            User targetUser = new User(articleComment.getArticleCommentAuthorId());
+            Info info = new Info(articleComment.getArticleCommentAuthorId(), 10, 1, article.getArticleId());
+            info.setIntoContent("您的一条文章评论收到了赞");
             info.setCreateTime(System.currentTimeMillis());
+            targetUser.setUserGetApproveNumber(1);
 
             if (infoMapper.insert(info) == 0) {
                 throw new Exception("数据库操作异常");
@@ -93,6 +96,9 @@ public class ArticleCommentService {
             user.setUserApproveNumber(1);
             if (userMapper.updateNumber(user) == 0) {
                 throw new Exception("数据库操作异常");
+            }
+            if (userMapper.updateNumber(targetUser) == 0) {
+                throw new Exception("操作异常");
             }
             isSuccess = true;
         } catch (Exception e) {

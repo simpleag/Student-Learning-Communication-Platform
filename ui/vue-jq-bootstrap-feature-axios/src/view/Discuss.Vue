@@ -14,7 +14,9 @@
         </div>
         <div class="col-md-12 form-inlin" id='div3'>
             <div class="col-md-3" id='div4'>
-                <img :src="discussDetail.userPicUrl" width="100%" class="img-responsive img-circle" border="0" align="default" >
+                <router-link :to="{ name: 'UserCenter', params : {targetUserId: discussDetail.discussAuthorId}}">
+                <img :src="discussDetail.userPicUrl" style="width:100%; height:200px;" class="img-circle" border="0" align="default" >
+                 </router-link>
                 <div class='sep5'></div>
                 <strong>{{discussDetail.userHonor}}</strong>
                 <div class='sep5'></div>
@@ -44,9 +46,11 @@
                                 <tr >
                                     <td  class="col-md-3">
                                         <div class="sep100 pull-center" >
-                                            <a href="wwww.baidu.com">
-                                            <img :src="item.userPicUrl" width="100%" class="img-responsive img-circle" border="0" align="default" >
-                                            </a>
+                                            <!-- <a href="wwww.baidu.com"> -->
+                                                <router-link :to="{ name: 'UserCenter', params : {targetUserId: item.discussCommentAuthorId}}">
+                                            <img :src="item.userPicUrl" style="width:100%; height:200px;" class="img-circle" border="0" align="default" >
+                                             </router-link>
+                                            <!-- </a> -->
                                         </div>
                                     </td>
                                     <td class="col-md-8 pull-left">
@@ -220,6 +224,8 @@ export default {
       },
       ajaxDiscuss: function(userId, articleId) {
             var _this = this;
+             console.log("userId"+ userId)
+             console.log("articleId"+ articleId)
             // console.log('userIDd: '+ userId);
             axios.post('http://localhost:5555/sclp/discuss/detail',qs.stringify(
                     {
@@ -232,7 +238,7 @@ export default {
                
             }).catch(function(err) {
                 console.log('error: '+err);
-                _this.errorNet('权限验证出错');
+                // _this.errorNet('权限验证出错');
             });
 
            },
@@ -247,7 +253,7 @@ export default {
         console.log(content);
         this.discussCommentNumber = this.discussCommentNumber+1
         this.ajaxCreateDiscussComment(this.userId, content,this.discussCommentNumber, this.replayUserId , this.$route.params.discussId)
-        
+        window.location.reload();
       },
       ajaxCreateDiscussComment: function(userId, content, number, replayUserId, discussId) {
             var _this = this;
@@ -267,7 +273,8 @@ export default {
                     }
                 )).then(function(res) {
                 console.localhost(res.data.code+" "+res.data.message)
-                this.initPage();
+                window.location.reload();
+                // this.initPage();
                 // _this.initDiscuss(res);
             //    this.ajaxComment(this.userId, this.$route.params.discussId,1,10)
             }).catch(function(err) {
@@ -346,7 +353,7 @@ export default {
            },
             initDiscuss: function(res) {
                 this.discussDetail = res.data.discuss;
-                console.log('discuss: '+ this.discussDetail.discussContent)
+                // console.log('discuss: '+ this.discussDetail.discussContent)
                 this.commentList = res.data.comment.list;
                 // if (this.commentList==null || this.commentList.length==0) {
 
@@ -423,6 +430,7 @@ var items = [
   height: 100px;
   min-height: 900px;
 }
+
 #div2 {
   /* background-color: blueviolet; */
   height: auto !important;

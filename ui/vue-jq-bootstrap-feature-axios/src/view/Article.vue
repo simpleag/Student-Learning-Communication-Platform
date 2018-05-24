@@ -17,7 +17,9 @@
         </div>
         <div class="col-md-12 form-inlin" id='div3'>
             <div class="col-md-3" id='div4'>
-                <img :src="articleDetail.userPicUrl" width="100%" class="img-responsive img-circle" border="0" align="default" >
+              <router-link :to="{ name: 'UserCenter', params : {targetUserId: articleDetail.articleAuthorId}}">
+                <img :src="articleDetail.userPicUrl" style="width:100%; height:200px;" class="img-responsive img-circle" border="0" align="default" >
+                 </router-link> 
                 <div class='sep5'></div>
                 <strong>{{articleDetail.userHonor}}</strong>
                 <div class='sep5'></div>
@@ -47,9 +49,12 @@
                                 <tr >
                                     <td  class="col-md-3">
                                         <div class="sep100 pull-center" >
-                                            <a href="wwww.baidu.com">
-                                            <img :src="item.userPicUrl" width="100%" class="img-responsive img-circle" border="0" align="default" >
-                                            </a>
+                                            <!-- <a href="wwww.baidu.com"> -->
+                                               <router-link :to="{ name: 'UserCenter', params : {targetUserId: item.articleCommentAuthorId}}">
+                                            <img :src="item.userPicUrl"  class=" img-circle" border="0" align="default" style="width:100%; height:180px;">
+                                             </router-link>
+ 
+                                            <!-- </a> -->
                                         </div>
                                     </td>
                                     <td class="col-md-8 pull-left">
@@ -243,7 +248,9 @@ export default {
           })
         )
         .then(function(res) {
+           
           _this.initArticle(res);
+
         })
         .catch(function(err) {
           console.log("error" + err);
@@ -293,6 +300,7 @@ export default {
           })
         )
         .then(function(res) {
+          window.location.reload();
           console.log(res.data.code + " " + res.data.message);
           // _this.initDiscuss(res);
           //    this.ajaxComment(this.$route.params.userId, this.$route.params.discussId,1,10)
@@ -350,12 +358,24 @@ export default {
           })
         )
         .then(function(res) {
-          console.log(res.data.code + res.data.message);
+          if (res.data.code == '200') {
+             window.location.reload();
+          } else {
+            this.errorNotice('res.data.code');
+          }
         })
         .catch(function(err) {
           console.log("error" + err);
         });
     },
+    errorNotice(message){
+        console.log("error")
+        this.$notify({
+          title: '出错',
+          message: message,
+          type: 'error'
+        });
+      },
     ajaxComment: function(userId, articleId, pageNumber, pageSize) {
       var _this = this;
       // console.log('userIDd: '+ userId);
@@ -485,7 +505,7 @@ var items = [
 }
 #div7 {
   /* background-color: cornflowerblue; */
-  height: 200px;
+  height: 300px;
 }
 .sep5 {
   height: 15px;

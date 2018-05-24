@@ -15,11 +15,13 @@ public interface InfoMapper {
 
     Info selectByPrimaryKey(Long infoId);
 
-    List<Info> selectByUserId(Long infoReceiveUserId);
+    List<Info> selectReceiveUserId(Long infoReceiveUserId);
 
     List<Info> selectNewInfoReceiveUserId(Long infoReceiveUserId);
 
     int updateByPrimaryKeySelective(Info record);
 
     int updateByPrimaryKey(Info record);
+
+    int updateByReceiveUserId(Info record);
 }

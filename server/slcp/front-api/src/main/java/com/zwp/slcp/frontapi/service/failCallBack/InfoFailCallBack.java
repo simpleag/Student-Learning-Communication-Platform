@@ -10,8 +10,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class InfoFailCallBack implements InfoService{
+
+
     @Override
-    public PageInfo<Info> listUserReceiveInfo(Long userId, Integer pageNumber, Integer pageSize) {
+    public PageInfo<Info> listUserReceiveInfo(Long userId, Integer pageNumber, Integer pageSize, Integer isRead) {
         return null;
     }
 

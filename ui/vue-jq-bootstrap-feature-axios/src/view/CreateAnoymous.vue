@@ -5,21 +5,19 @@
             <div class="col-md-12 sep5"></div>
             <div class="col-md-12 sep5"></div>
              <div class="col-md-3">
-                <el-select v-model="value7" placeholder="请选择">
-                    <el-option-group
-                    v-for="group in options3"
-                    :key="group.label"
-                    :label="group.label">
-                    <el-option
-                        v-for="item in group.options"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value">
-                    </el-option>
-                    </el-option-group>
-                </el-select>
+                <!-- <el-row>
+            
+                  <el-select v-model="value1" placeholder="请选择分类" id='discussSelect' @change="discussChangeValue">
+                      <el-option
+                      v-for="item in options"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.label">
+                      </el-option>
+                  </el-select>
+              </el-row> -->
             </div>
-            <div class="col-md-9">
+            <div class="col-md-12 text-left">
                 
                 <el-input v-model="input" placeholder="请输入标题"></el-input>
             </div>
@@ -27,8 +25,8 @@
             <div class="col-md-12 sep5"></div>
         </div>
         <div class="col-md-12 sep5"></div>
-        <div class="col-md-12 sep5"></div>
-        <div class="col-md-12 sep5"></div>
+        <!-- <div class="col-md-12 sep5"></div>
+        <div class="col-md-12 sep5"></div> -->
         <div class="col-md-12" id="div5">
             <div class='sep5'></div>
            <div class="components-container">
@@ -50,11 +48,20 @@
              
         </div>
     </div>
-    <div class="col-md-3 text-left" id='div3'>
-        <el-row >
-            <el-button plain>发布</el-button>
-             <el-button plain>取消发布</el-button>
-             
+    <div class="col-md-3" id='div3'>
+        <el-row class='text-left'>
+            <el-button plain @click="createAnoymous" >发布匿名讨论</el-button>
+            <p></p>
+             <el-button plain @click="notCreate" >取消发布讨论</el-button>
+             <p></p>
+             <!-- <el-select v-model="value2" placeholder="请选择标签" id='tagSelect' @change="tagChangeValue">
+                <el-option
+                v-for="item in tags"
+                :key="item.tagId"
+                :label="item.tagName"
+                :value="item.tagId">
+                </el-option>
+            </el-select> -->
         </el-row>
         <el-row>
             
@@ -64,80 +71,149 @@
 </template>
 
 <script>
+var tags;
+var userId;
+var discussType;
+var tagType;
+var input= '';
+
 import Vue from "vue";
-import UE from '../components/Ue.vue';
+import UE from "../components/Ue.vue";
+import qs from 'qs';
 export default {
-  components: {UE},
+  components: { UE },
   data() {
     return {
       items: items,
-      defaultMsg: '在这里输入讨论内容',
-        config: {
-          initialFrameWidth: null,
-          initialFrameHeight: 500
-        },
-        fileList2: [],
-        options3: [{
-          label: '热门城市',
-          options: [{
-            value: 'Shanghai',
-            label: '上海'
-          }, {
-            value: 'Beijing',
-            label: '北京'
-          }]
-        }, {
-          label: '城市名',
-          options: [{
-            value: 'Chengdu',
-            label: '成都'
-          }, {
-            value: 'Shenzhen',
-            label: '深圳'
-          }, {
-            value: 'Guangzhou',
-            label: '广州'
-          }, {
-            value: 'Dalian',
-            label: '大连'
-          }]
-        }],
-        value7: ''
-        
-      
+      defaultMsg: "在这里输入讨论内容",
+      config: {
+        initialFrameWidth: null,
+        initialFrameHeight: 500
+      },
+      fileList2: [],
+      tags: tags,
+      value1: "",
+      value2: "",
+      input: this.input
     };
   },
   methods: {
-       getUEContent() {
-        let content = this.$refs.ue.getUEContent();
-        this.$notify({
-          title: '获取成功，可在控制台查看！',
-          message: content,
-          type: 'success'
+    getUEContent() {
+      let content = this.$refs.ue.getUEContent();
+      this.$notify({
+        title: "获取成功，可在控制台查看！",
+        message: content,
+        type: "success"
+      });
+      console.log(content);
+    },
+    discussChangeValue(value){
+      this.discussType = value;
+      console.log("value"+ value+" "+ this.discussType)
+    },
+    tagChangeValue(value){
+      this.tagType = value;
+      console.log("value"+ value+" "+ this.tagType)
+    },
+    notCreate(){
+      this.$router.push({ name: "Main"});
+    },
+    ajaxcreateAnoymous: function(tiltle, content) {
+      var _this = this;
+      console.log(tiltle)
+      console.log(content)
+      // console.log(tagId)
+      console.log(this.userId)
+      axios
+        .post(
+          "http://localhost:5555/sclp/anoymous/create",
+          qs.stringify({
+            userId: this.userId,
+            tiltle: tiltle,
+            content: content,
+          })
+        )
+        .then(function(res) {
+          console.log(res.data.code)
+          if (res.data.code == '200') {
+            _this.$router.push({ name: "Main"});
+          } else {
+            _this.errorNotice('res.data.code');
+          }
+        })
+        .catch(function(err) {
+          console.log("error" + err);
+          _this.errorNotice('权限验证失败');
         });
-        console.log(content)
-      },
+    },
+    ajaxTag: function() {
+      var _this = this;
+      axios
+        .post(
+          "http://localhost:5555/sclp/tag/allTags",
+          qs.stringify({
+            userId: this.userId,
+            
+          })
+        )
+        .then(function(res) {
+          _this.initTags(res);
+        })
+        .catch(function(err) {
+          console.log("error" + err);
+        });
+    },
+    initTags(res){
+      console.log("row: "+res.data.listTags.endRow)
+      this.tags = res.data.listTags.list
       
+    },
+    initPage(){
+      this.userId = window.localStorage.getItem("userId");
+      console.log("userId: "+ this.userId)
+      this.ajaxTag();
+    },
+    errorNotice(message){
+        console.log("error")
+        this.$notify({
+          title: '出错',
+          message: message,
+          type: 'error'
+        });
+      },
+    errorNet(message){
+        console.log("error")
+        this.$notify({
+          title: '出错',
+          message: message,
+          type: 'error'
+        });
+        this.$router.push({ name: "Login" });
+      },
+    createAnoymous(){
+      let content  = this.$refs.ue.getUEContent();;
+      console.log("1: "+ content)
+      console.log('text: '+ this.input)
+      console.log( this.discussType+ " "+  this.tagType)
+      // if ( this.tagType==undefined) {
+      //   console.log("fail")
+      //   this.errorNotice('输入不完整');
+       
+      // } else{
+        var title = this.input;
+        this.ajaxcreateAnoymous(title, content);
+        // this.$router.push({ name: "Main"});
+      // }
+
+    }
   },
-  mounted() {}
+  mounted() {
+    this.initPage();
+  }
 };
 
 var items = [
-  {
-    discussId: "Foo",
-    discussTitle: "一直不会微积分，今后生活会比别人困难吗？",
-    authorId: "1",
-    userName: "用户1",
-    authorPicUrl:
-      "https://cdn.v2ex.com/avatar/c2db/c77d/146640_normal.png?m=1452582980",
-    createTime: "20180410 12:05:00",
-    approveNumber: "0",
-    commentNumber: "0",
-    TagId: "TagId",
-    TagName: "微积分",
-    Info:
-      "微积分（Calculus）是高等数学中研究函数的微分（Differentiation）、积分(Integration)以及有关概念和应用的数学分支。它是数学的一个基础学科。"
-  }
+ 
 ];
 </script>
 
@@ -150,7 +226,7 @@ var items = [
   min-height: 900px;
 }
 #div2 {
-  background-color: blueviolet;
+  /* background-color: blueviolet; */
   height: auto !important;
   min-height: 900px;
 }
@@ -159,27 +235,27 @@ var items = [
   min-height: 200px;
 }
 #div4 {
-  background-color: burlywood;
+  /* background-color: burlywood; */
   min-height: 80px;
 }
 
 #div5 {
-  background-color: chartreuse;
+  /* background-color: chartreuse; */
   min-height: 500px;
 }
 #div6 {
-  background-color: cornflowerblue;
+  /* background-color: cornflowerblue; */
   min-height: 110px;
 }
 .sep5 {
   height: 15px;
 }
-.info{
-    border-radius: 10px;
-    line-height: 20px;
-    padding: 10px;
-    margin: 10px;
-    /* background-color: #ffffff; */
-  }
+.info {
+  border-radius: 10px;
+  line-height: 20px;
+  padding: 10px;
+  margin: 10px;
+  /* background-color: #ffffff; */
+}
 </style>
 

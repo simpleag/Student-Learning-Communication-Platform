@@ -26,12 +26,19 @@ public class InfoController {
 
     @RequestMapping("/listUserReceiveInfo")
     @ResponseBody
-    PageInfo<Info> listUserReceiveInfo(Long userId, Integer pageNumber, Integer pageSize) {
+    PageInfo<Info> listUserReceiveInfo(Long userId, Integer pageNumber, Integer pageSize, Integer isRead) {
         if (StringUtils.isBlank(userId, pageNumber, pageSize)) {
             return null;
         } else {
             PageHelper.startPage(pageNumber, pageSize);
-            List<Info> infoList = infoMapper.selectByUserId(userId);
+            List<Info> infoList = infoMapper.selectReceiveUserId(userId);
+            Info info = new Info();
+            info.setUpdateTime(System.currentTimeMillis());
+            info.setInfoReceiveUserId(userId);
+            info.setInfoState(0);
+            if (isRead==1) {
+                infoMapper.updateByReceiveUserId(info);
+            }
             PageInfo<Info> infoPageInfo = new PageInfo<>(infoList);
             return infoPageInfo;
         }
@@ -39,20 +46,30 @@ public class InfoController {
 
     @RequestMapping("/listUserNewReceiveCount")
     @ResponseBody
-    Long listUserNewReceiveCount(Long userId) {
+    Long listUserNewReceiveCount(Long userId, Integer pageNumber, Integer pageSize) {
         if (StringUtils.isBlank(userId)) {
             return null;
         } else {
-            PageHelper.startPage(1, 1);
-            List<Info> infoList = infoMapper.selectNewInfoReceiveUserId(userId);
-            PageInfo<Info> infoPageInfo = new PageInfo<>(infoList);
-            if (infoPageInfo != null) {
+            try{
 
-                return infoPageInfo.getTotal();
-            }else {
+//                PageHelper.startPage(pageNumber, pageSize);
+                List<Info> infoList = infoMapper.selectNewInfoReceiveUserId(userId);
+                if (infoList ==null || infoList.size()==0) {
+                    return 0L;
+                }
+//                PageInfo<Info> infoPageInfo = new PageInfo<>(infoList);
+                if (infoList != null && infoList.size()!=0) {
+
+                    return Long.valueOf(infoList.size());
+                }else {
+                    return 0L;
+                }
+            }catch (Exception e) {
                 return 0L;
             }
         }
     }
+
+
 
 }
